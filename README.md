@@ -1,6 +1,8 @@
 # zain_single_server
 
 git clone https://github.com/zaintan/zain_single_server.git
+git submodule init
+git submodule update
 
 cd zain_single_server
 git submodule add https://github.com/zaintan/skynet skynet
@@ -17,5 +19,24 @@ git push origin master
 
 ##拉取
 git pull origin
+
+编译skynet
+cd skynet;make clean;make linux;
+
+##编译pbc
+cd pbc;make clean;make;
+
+##编译protobuf.so
+缺少protobuf.so,在pbc/binding/lua53目录下 make clean; make;如果缺少lua环境,修改Makefile文件 LUADIR = ./../../../skynet/3rd/lua
+
+cd pbc/binding/lua53;make clean;make;
+
+cp protobuf.so ./../../../skynet/luaclib/
+cp protobuf.lua ./../../../skynet/lualib/
+
+
+#!/bin/bash
+dos2unix servers/server_single/start.sh
+
 
 
