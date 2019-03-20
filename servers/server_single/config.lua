@@ -28,7 +28,8 @@ harbor      = 0
 daemon      = nil
 ---!  日志文件
 -- logger      = nil
-logger      = _root .. "/logs/"..app_name .. ".log"
+logger      = nil
+--logger      = _root .. "/logs/"..app_name .. ".log"
 logpath     = "."
 ---!  初始启动的模块
 bootstrap   = "snlua bootstrap"
