@@ -15,7 +15,6 @@ local CacheUserMap      = NumSet.create()
 local CacheTokenMap     = NumSet.create()
 local CacheLimitCount   = 2048
 
-local dbAddr            = skynet.uniqueservice("DBService")
 
 ---! lua commands
 local CMD = {}
