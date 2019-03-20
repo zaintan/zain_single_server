@@ -64,8 +64,8 @@ end
 function class:quit()
     Log.i("Agent","玩家下线!")
     --下线通知 中心服 和 游戏服
-    pcall(skynet.send, LoginSvr, "logout",  self.FUserID)
-    pcall(skynet.send, GameSvr,  "offline", self.FUserID)
+    pcall(skynet.call, LoginSvr, "logout",  self.FUserID)
+    pcall(skynet.call, GameSvr,  "offline", self.FUserID)
 
     if self.client_fd then 
         socket.close(self.client_fd)

@@ -1,21 +1,29 @@
 -------------------------------------------------------------
----! @file  NodeStat.lua
+---! @file  GameService.lua
 ---! @brief 调试当前节点，获取运行信息
 --------------------------------------------------------------
 
 local skynet    = require "skynet"
-local strHelper = require "StringHelper"
 
-local function info()
-	local watchdog = skynet.uniqueservice("WatchDog")
+local CMD = {}
 
-	local stat = skynet.call(watchdog, "lua", "getStat")
-	local arr  = {nodeInfo.appName}
-	table.insert(arr, string.format("Tcp: %d", stat.tcp))
-	table.insert(arr, string.format("总人数: %d", stat.sum))	
-    return strHelper.join(arr, "\t")
-end
 
+---! 服务的启动函数
 skynet.start(function()
-    skynet.info_func(info)
+    ---! 初始化随机数
+    math.randomseed( tonumber(tostring(os.time()):reverse():sub(1,6)) )
+
+    ---! 注册skynet消息服务
+    skynet.dispatch("lua", function(session, source, cmd, ...)
+        local f = CMD[cmd]
+        if f then
+            local ret = f(source, ...)
+            if ret then
+                skynet.ret(skynet.pack(ret))
+            end
+        else
+            Log.e(LOGTAG,"unknown command:%s", cmd)
+        end
+    end)
+    
 end)
