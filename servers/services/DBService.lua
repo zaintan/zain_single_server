@@ -5,7 +5,7 @@
 
 ---! 依赖库
 local skynet    = require "skynet"
-
+require "skynet.manager"
 ---! 全局常量
 --local redis_srv
 local mysql_srv
