@@ -21,16 +21,18 @@ local dbAddr            = skynet.uniqueservice("DBService")
 local CMD = {}
 
 function CMD.on_login(msg_id, msg_body)
-    --if true then
+    Log.d("LoginService","recv cmd on_login")
     return true
 end
 
 ----注意清缓存
 function CMD.logout(source, uid)
+    Log.d("LoginService","recv cmd logout")
     return true
 end
 
 function CMD.query(source, uid )
+    Log.d("LoginService","recv cmd query")
     return false
 end
 
@@ -48,6 +50,7 @@ skynet.start(function()
     ---! 初始化随机数
     math.randomseed( tonumber(tostring(os.time()):reverse():sub(1,6)) )
 
+    skynet.register(".LoginService")
     ---! 注册skynet消息服务
     skynet.dispatch("lua", function(session, source, cmd, ...)
         local f = CMD[cmd]

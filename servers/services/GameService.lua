@@ -12,10 +12,11 @@ local CMD = {}
 skynet.start(function()
     ---! 初始化随机数
     math.randomseed( tonumber(tostring(os.time()):reverse():sub(1,6)) )
-
+    skynet.register(".GameService")
     ---! 注册skynet消息服务
     skynet.dispatch("lua", function(session, source, cmd, ...)
         local f = CMD[cmd]
+        Log.d("GameService","recv cmd:",cmd)
         if f then
             local ret = f(source, ...)
             if ret then

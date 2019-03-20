@@ -6,9 +6,6 @@ local socket    = require "skynet.socket"
 local packetHelper  = (require "PacketHelper").create("protos/ZainCommon.pb")
 local ProtoHelper   = (require "ProtoHelper").init()
 
-local LoginSvr = skynet.uniqueservice("LoginService")
-local GameSvr  = skynet.uniqueservice("GameService")
-
 local class = {mt = {}}
 class.mt.__index = class
 
@@ -64,8 +61,8 @@ end
 function class:quit()
     Log.i("Agent","玩家下线!")
     --下线通知 中心服 和 游戏服
-    pcall(skynet.call, LoginSvr, "logout",  self.FUserID)
-    pcall(skynet.call, GameSvr,  "offline", self.FUserID)
+    pcall(skynet.call, ".LoginService","lua","logout",  self.FUserID)
+    pcall(skynet.call, ".GameService", "lua","offline", self.FUserID)
 
     if self.client_fd then 
         socket.close(self.client_fd)
@@ -97,17 +94,16 @@ function class:_handlerHeartReq(data)
 end
 
 function class:_handlerLoginReq(data)
-    local ok,uid = pcall(skynet.call, LoginSvr, "on_login", msg_id, msg_body)
+    local ok,uid = pcall(skynet.call, ".LoginService", "lua", "on_login", msg_id, msg_body)
     if not ok then 
         log.e("Agent","call LoginService failed!")
     else 
         self.FUserID = uid
-        --local ok,roomId = pcall(skynet.call, GameSvr, "queryRoom", msg_id, msg_body)
     end 
 end
 
 function class:_handlerRoomReq(msg_id, data)
-    pcall(skynet.call, GameSvr, "on_req",msg_id, data)
+    pcall(skynet.call, ".GameService","lua","on_req",msg_id, data)
 end
 
 local ComandFuncMap = {

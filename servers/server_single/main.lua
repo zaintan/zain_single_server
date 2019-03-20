@@ -28,12 +28,12 @@ skynet.start(function()
 
     ---! 启动AgentWatch
     skynet.uniqueservice("WatchDog")
-
+  
     ---! 启动Login
-    skynet.uniqueservice("LoginService")
+    skynet.newservice("LoginService")
 
     ---! 启动Game
-    skynet.uniqueservice("GameService")        
+    skynet.newservice("GameService")        
     
     ---! 启动好了，没事做就退出
     skynet.exit()
