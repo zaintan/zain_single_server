@@ -1,0 +1,258 @@
+package Zain;
+
+option java_package = "protobuf.cher";
+// 服务端客户端通信消息体
+message ProtoInfo {
+    enum ProtoMainType {
+        REQUEST = 1; // 请求类型
+        RESPONSE = 2; // 响应类型
+        UPLOAD = 3; // 客户端上报
+        PUSH = 4; // 服务端到客户端的主动推送
+    }
+
+    enum ProtoSubType {
+        GATE = 1; // 网关消息
+        HALL = 2; // 大厅消息
+        ALLOC = 3; // 创建房间
+        ROOM = 4; // 房间消息
+    }
+
+    required int32 main_type = 1; // 消息主类型
+    required int32 sub_type = 2; // 消息副类型
+    optional int32 msg_id = 3; // 消息ID
+    optional bytes msg_body = 4; // 消息内容
+    repeated int32 reserved = 110; // 消除Warning的预留值
+}
+// 玩家信息
+message AccountInfo {
+    optional int64 user_id = 1; // 用户ID
+    optional string user_name = 2; // 用户名
+    optional string head_img_url = 3; // 头像
+    optional int32 sex = 4; // 性别
+    optional int64 diamond = 5; // 金币数目
+    optional int64 gold = 6; // 房卡数目
+    optional int32 vip_level = 7; // 代理等级
+    repeated int32 reserved = 110; // 消除Warning的预留值
+}
+// 房间内的玩家信息
+message RoomUserInfo {
+    optional int64 user_id = 1; // 用户ID
+    optional string user_name = 2; // 用户名
+    optional string head_img_url = 3; // 头像
+    optional int32 score = 4; // 游戏分数
+    optional int32 seat_index = 5; // 座位号
+    optional bool ready = 6; // 是否已经准备
+    repeated int32 reserved = 110; // 消除Warning的预留值
+}
+// 吃落组合数据
+message ChiGroupCard {
+    optional int32 lou_weave_count = 1;
+    repeated int32 lou_weave_kind = 2; // 落起组合
+}
+// 组合牌信息
+message WeaveItemInfo {
+    optional int32 weave_kind = 1; // 组合类型
+    optional int32 center_card = 2; // 中心牌
+    optional int32 public_card = 3; // 公开标志
+    optional int32 provide_player = 4; // 供应用户
+    optional int32 hu_xi = 5; // 组合胡息
+    repeated ChiGroupCard chi_group_cards = 6; // 吃牌对应的落组合
+    repeated int32 weave_cards = 7; // 实际组合牌
+    repeated int32 client_special_cards = 8; // 客户端需要特殊处理的牌值
+    repeated int32 reserved = 110; // 消除Warning的预留值
+}
+// 玩家手牌信息
+message PlayerCardsInfo {
+    optional bool has_hands = 1; // 是否刷新手牌
+    optional bool has_weaves = 2; // 是否刷新组合牌
+    optional bool has_discards = 3; // 是否刷新弃牌
+    repeated int32 hands = 4; // 手牌数据
+    repeated int32 discards = 5; // 弃牌数据
+    repeated WeaveItemInfo weaves = 6; // 组合牌数据
+    optional int32 seat_index = 7; // 谁的手牌
+    optional int32 reserved = 110; // 消除Warning的预留值
+}
+// 操作条信息
+message OperateInfo {
+    repeated WeaveItemInfo weaves = 1; // 可操作的组合牌信息
+    optional int32 reserved = 110; // 消除Warning的预留值
+}
+// 小局房间信息
+message RoundRoomInfo {
+    optional int32 cur_val = 1; // 当前局数或当前圈数或当前分数
+    optional int32 remain_num = 2; // 剩余牌数
+    optional int32 total_num = 3; // 总牌数 total_num = remain_num + hend_send_count + tail_send_count
+    optional int32 cur_banker = 4; // 当前庄家座位号
+    optional int32 pointed_seat_index = 5; // 当前东南西北的坐标指向人
+    repeated int32 player_statuses = 6; // 玩家状态，0：无操作，1：出牌，2：操作牌
+    optional int32 head_send_count = 7; // 牌墩顺序发牌张数
+    optional int32 tail_send_count = 8; // 牌墩尾部发牌张数
+    repeated int32 dice_values = 9; // 骰子点数 
+    repeated int32 reserved = 110; // 消除Warning的预留值
+}
+// 登录请求
+message LoginRequest {
+    required int32 login_type = 1; // 登录类型
+    optional string token = 2; // 玩家用户名或微信token值
+    optional int32 platform = 3; // 终端类型，1=android，2=ios，3=pc
+    optional string client_version = 4; // 客户端版本
+    optional int32 game_index = 5; // APP平台类型
+    repeated int32 reserved = 110; // 消除Warning的预留值
+}
+// 登录响应
+message LoginResponse {
+    required int32 status = 1; // 状态
+    optional string status_tip = 2; // 状态提示信息
+    optional AccountInfo user_info = 3; // 玩家信息
+    repeated int32 reserved = 110; // 消除Warning的预留值
+}
+// 创建房间请求
+message CreateRoomRequest {
+    required int32 create_type = 1; // 创建类型
+    required int32 game_id = 2; // 子游戏ID
+    required int32 game_type = 3; // 子玩法ID
+    repeated int32 game_rules = 4; // 玩法规则
+    required int32 over_type = 5; // 结束类型，1：局数，2：圈数，3：分数
+    optional int32 over_val = 6; // 结束类型的值，8局或1圈或100分
+    repeated int32 reserved = 110; // 消除Warning的预留值
+}
+// 创建房间响应
+message CreateRoomResponse {
+    required int32 status = 1; // 状态
+    optional string status_tip = 2; // 状态提示信息
+    optional int32 room_id = 3; // 房间号
+    repeated int32 reserved = 110; // 消除Warning的预留值
+}
+// 进入房间请求
+message JoinRoomRequest {
+    required int32 room_id = 1; // 房间号
+    repeated int32 reserved = 110; // 消除Warning的预留值
+}
+// 进入房间响应
+message JoinRoomResponse {
+    optional int32 status = 1; // 状态
+    optional string status_tip = 2; // 状态提示信息
+    optional int32 game_id = 3; // 子游戏ID
+    optional int32 game_type = 4; // 子玩法ID
+    repeated int32 game_rules = 5; // 玩法规则
+    repeated RoomUserInfo players = 6; // 房间内的玩家
+    optional int32 game_status = 7; // 游戏状态
+    optional int32 over_type = 9; // 结束类型，1：局数，2：圈数，3：分数
+    optional int32 over_val = 10; // 结束类型的值，8局或1圈或100分
+    optional RoundRoomInfo round_room_info = 11; // 小局房间信息
+    optional OperateInfo op_info = 12; // 当前进入房间的玩家的操作条消息
+    repeated PlayerCardsInfo cards_infos = 13; // 房间内所有玩家的牌数据
+    optional int32 room_id = 14; // 房间号
+    repeated int32 reserved = 110; // 消除Warning的预留值
+}
+// 准备请求
+message ReadyRequest {
+    optional bool ready = 1; // 是否准备
+    repeated int32 reserved = 110; // 消除Warning的预留值
+}
+// 准备响应
+message ReadyResponse {
+    optional bool ready = 1; // 是否准备
+    repeated int32 reserved = 110; // 消除Warning的预留值
+}
+// 准备状态推送
+message ReadyPush {
+    optional bool ready = 1; // 是否准备
+    optional int32 seat_index = 2; // 操作人
+    repeated int32 reserved = 110; // 消除Warning的预留值
+}
+// 游戏开始推送
+message GameStartPush {
+    optional RoundRoomInfo round_room_info = 1; // 小局房间信息
+    optional int32 game_status = 2; // 游戏状态
+    repeated int32 reserved = 110; // 消除Warning的预留值
+}
+// 心跳请求
+message HeartRequest {
+}
+// 心跳响应
+message HeartResponse {
+}
+// 通用文字提示推送
+message CommonTipsPush {
+    optional int32 type = 1; // 提示类型：1，弹窗类型；2，文本类型
+    optional string content = 2; // 信息内容
+    repeated int32 reserved = 110; // 消除Warning的预留值
+}
+// 玩家状态推送
+message PlayerStatusPush {
+    optional int32 player_status = 1; // 玩家状态
+    optional int32 pointed_seat_index = 2; // 当前东南西北的坐标指向人
+    optional OperateInfo op_info = 3; // 操作条信息
+    repeated int32 reserved = 110; // 消除Warning的预留值
+}
+// 牌型推送
+message CardTypePush {
+    optional int32 seat_index = 1; // 操作人
+    repeated int32 card_types = 2; // 牌型
+    repeated int32 reserved = 110; // 消除Warning的预留值
+}
+// 房间内所有玩家的牌数据推送
+message RoomCardsPush {
+    repeated PlayerCardsInfo cards_infos = 1; // 房间内所有玩家的牌数据
+    optional int32 reserved = 110; // 消除Warning的预留值
+}
+// 小局结算推送
+message GameFinishPush {
+    repeated RoomUserInfo players = 1; // 房间内的玩家
+    optional RoundRoomInfo round_room_info = 2; // 小局房间信息
+    optional int32 room_id = 3; // 房间号
+    repeated PlayerCardsInfo cards_infos = 4; // 房间内所有玩家的牌数据
+    repeated int32 remain_cards = 5; // 剩余牌堆
+    repeated string finish_desc = 6; // 小结算文字描述信息
+    optional int32 game_status = 7; // 游戏状态
+    repeated int32 reserved = 110; // 消除Warning的预留值
+}
+// 抓牌推送
+message DispatchCardPush {
+    optional int32 dispatch_card = 1; // 抓的牌
+    optional int32 seat_index = 2; // 抓牌人
+    repeated int32 reserved = 110; // 消除Warning的预留值 
+}
+// 玩家手牌推送
+message PlayerCardsPush {
+    optional PlayerCardsInfo cards_infos = 1; // 牌数据
+    repeated int32 reserved = 110; // 消除Warning的预留值
+}
+// 操作牌请求
+message OperateCardRequest {
+    optional int32 seat_index = 1; // 操作人
+    optional int32 weave_kind = 2; // 点了什么操作
+    optional int32 center_card = 3; // 操作的牌
+    repeated int32 reserved = 110; // 消除Warning的预留值
+}
+// 操作牌响应
+message OperateCardResponse {
+    optional int32 status = 1; // 状态
+    optional string status_tip = 2; // 状态提示信息
+    repeated int32 reserved = 110; // 消除Warning的预留值
+}
+// 操作牌推送，客户端用来播放动画
+message OperateCardPush {
+    optional int32 seat_index = 1; // 操作人
+    optional int32 weave_kind = 2; // 操作值
+    repeated int32 reserved = 110; // 消除Warning的预留值
+}
+// 出牌请求
+message OutCardRequest {
+    optional int32 seat_index = 1; // 出牌人
+    optional int32 out_card = 2; // 出的牌
+    repeated int32 reserved = 110; // 消除Warning的预留值
+}
+// 出牌响应
+message OutCardResponse {
+    optional int32 status = 1; // 状态
+    optional string status_tip = 2; // 状态提示信息
+    repeated int32 reserved = 110; // 消除Warning的预留值
+}
+// 出牌推送
+message OutCardPush {
+    optional int32 seat_index = 1; // 出牌人
+    optional int32 out_card = 2; // 出的牌
+    repeated int32 reserved = 110; // 消除Warning的预留值
+}
