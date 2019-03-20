@@ -118,7 +118,7 @@ local ComandFuncMap = {
 }
 
 function class:command_handler(msg, recvTime)
-    --Log.d("Agent","command_handler msg len:%d accessTime:%s",#msg,tostring(skynet.time()))
+    Log.d("Agent","command_handler msg len:%d accessTime:%s",#msg,tostring(skynet.time()))
     self:_active()
     --解析包头 转发处理消息 做对应转发
     local args  = packetHelper:decodeMsg("Zain.ProtoInfo",msg)
@@ -128,10 +128,13 @@ function class:command_handler(msg, recvTime)
         return 
     end 
 
-    local data,err = packetHelper:decodeMsg("Zain.".., args.msg_body)
+    local data,err = packetHelper:decodeMsg("Zain."..msgName, args.msg_body)
     if not data or err ~= nil then 
         log.e("Agent","parse msg err: ",args.msg_id, msgName )
+        return
     end 
+
+    Log.dump("Agent",data)
 
     local f = ComandFuncMap[args.msg_id]
     if f then 
