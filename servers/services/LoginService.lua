@@ -215,5 +215,6 @@ skynet.start(function()
         end
     end)
 
+    skynet.newservice("DBService")
     skynet.fork(checkCleanCache)
 end)
