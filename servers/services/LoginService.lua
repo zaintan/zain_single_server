@@ -130,7 +130,7 @@ function CMD.on_login(agent, reqData)
             _updateCacheUser(userid,agent)
             return _onLoginSuccess(userid)
         else--缓存里面没有  需要去查数据库
-            local sqlStr = string.format("select * from TUser where FPlatformID=\"%s\";",args.token)
+            local sqlStr = string.format("select * from TUser where FPlatformID=\"%s\";",reqData.token)
             local pRet   = skynet.call(".DBService", "lua", "execDB", sqlStr)
             if pRet and type(pRet) == "table" then 
                 if #pRet <= 0 then --数据库查询不到
