@@ -21,7 +21,7 @@ local function _onLoginFalid(tip)
 end
 
 local function _onLoginSuccess(uid)
-    local user = CacheUserMap[uid]
+    local user = CacheUserMap:getObject(uid)
 
     local info = {}
     info.user_id      = user.FUserID
@@ -52,7 +52,7 @@ local function _createNewUser( reqData )
 end
 --缓存用户信息
 local function _updateCacheUser(uid ,agent, dbInfo )
-    local user = CacheUserMap[uid]
+    local user = CacheUserMap:getObject(uid)
     if not user then 
         local tmp = {}
         tmp.FUserID        = dbInfo.FUserID
@@ -66,8 +66,9 @@ local function _updateCacheUser(uid ,agent, dbInfo )
         tmp.FGameIndex     = dbInfo.FGameIndex
 
         tmp.agent          = agent
-        CacheUserMap[uid]  = tmp
-        CacheTokenMap[tmp.FPlatformID] = tmp.FUserID
+
+        CacheUserMap:addObject(tmp, uid)
+        CacheTokenMap:addObject(tmp.FUserID, tmp.FPlatformID)
     else--已经缓存了 
         --已经有登录的了 --重复登录 t下线
         if user.agent and user.agent ~= agent then 
@@ -124,7 +125,7 @@ function CMD.on_login(agent, reqData)
     end 
 
     if reqData.login_type == const.LoginType.USER then --游客登录
-        local userid = CacheTokenMap[reqData.token]
+        local userid = CacheTokenMap:getObject(reqData.token)
         if userid then --缓存里查到了
             _updateCacheUser(userid,agent)
             return _onLoginSuccess(userid)
@@ -156,7 +157,7 @@ end
 ----注意清缓存
 function CMD.logout(source,uid)
     Log.d("Login","recv cmd logout uid:",uid)
-    local user = CacheUserMap[uid]
+    local user = CacheUserMap:getObject(uid)
     if user then 
         user.agent = nil
         user.logoutTime = os.time()
@@ -166,7 +167,7 @@ end
 
 function CMD.query(source,uid )
     --Log.d("Login","recv cmd query")
-    return CacheUserMap[uid]
+    return CacheUserMap:getObject(uid)
 end
 
 
@@ -178,19 +179,18 @@ local function checkCleanCache()
     while true do 
         local curTime = os.time()
 
-        local cleanList = {}
-        for uid,user in pairs(CacheUserMap) do
+        local removeUserKeys = {}
+        local removeTokenKeys = {}
+        CacheUserMap:forEach(function (user)
             if user.agent == nil and user.logoutTime ~= nil then
                 if curTime - user.logoutTime > ExpireTime then 
-                    table.insert(cleanList, {uid,user.FPlatformID })
+                    table.insert(removeUserKeys,  user.FUserID)
+                    table.insert(removeTokenKeys, user.FPlatformID)
                 end 
             end 
-        end
-
-        for _,data in ipairs(cleanList) do
-            CacheUserMap[data[1]]  = nil
-            CacheTokenMap[data[2]] = nil
-        end
+        end)
+        CacheUserMap:removeObjects(removeUserKeys)
+        CacheTokenMap:removeObjects(removeTokenKeys)
 
         skynet.sleep(timeout * 100)
     end 
