@@ -180,7 +180,7 @@ local function checkCleanCache()
 
         local cleanList = {}
         for uid,user in pairs(CacheUserMap) do
-            if user.agent == nil and user.logoutTime ~= nil and
+            if user.agent == nil and user.logoutTime ~= nil then
                 if curTime - user.logoutTime > ExpireTime then 
                     table.insert(cleanList, {uid,user.FPlatformID })
                 end 
