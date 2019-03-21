@@ -5,5 +5,6 @@ M.GameStatus   = require("constants.GameStatus")
 M.PlayerStatus = require("constants.PlayerStatus")
 M.GameRule     = require("constants.GameRule")
 M.GameAction   = require("constants.GameAction")
+M.LoginType    = require("constants.LoginType")
 
 return M

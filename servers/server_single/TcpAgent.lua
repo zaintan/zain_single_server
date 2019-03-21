@@ -27,8 +27,8 @@ function CMD.start( info )
 end
 
 ---! @brief 通知agent主动结束
-function CMD.disconnect(bNotiCenter, bNotiGame)
-    agent:quit(bNotiCenter,bNotiGame)
+function CMD.disconnect()
+    agent:quit()
 end
 
 function CMD.sendMsg(...)

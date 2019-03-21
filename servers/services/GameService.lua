@@ -7,6 +7,14 @@ local skynet    = require "skynet"
 require "skynet.manager"
 local CMD = {}
 
+function CMD.offline(source)
+    return true
+end
+
+function CMD.on_req(source, msg_id)
+    skynet.ignoreret()
+    
+end
 
 ---! 服务的启动函数
 skynet.start(function()

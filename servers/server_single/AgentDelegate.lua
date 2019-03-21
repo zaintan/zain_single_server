@@ -94,11 +94,14 @@ function class:_handlerHeartReq(data)
 end
 
 function class:_handlerLoginReq(data)
-    local ok,uid = pcall(skynet.call, ".LoginService", "lua", "on_login", msg_id, msg_body)
+    local ok,data = pcall(skynet.call, ".LoginService", "lua", "on_login", data)
     if not ok then 
         log.e("Agent","call LoginService failed!")
-    else 
-        self.FUserID = uid
+    else
+        if data.user_info then 
+            self.FUserID = data.user_info.user_id
+        end 
+        self:sendMsg(const.MsgId.LoginRsp, data)
     end 
 end
 
@@ -109,15 +112,13 @@ end
 local ComandFuncMap = {
     [const.MsgId.HeartReq]      = class._handlerHeartReq;
     [const.MsgId.LoginReq]      = class._handlerLoginReq;
-    --[const.MsgId.CreateRoomReq] = class._handlerCreateReq;
-    --[const.MsgId.JoinRoomReq]   = class._handlerJoinReq;
 }
 
 function class:command_handler(msg, recvTime)
     Log.d("Agent","command_handler msg len:%d accessTime:%s",#msg,tostring(skynet.time()))
     self:_active()
     --解析包头 转发处理消息 做对应转发
-    local args  = packetHelper:decodeMsg("Zain.ProtoInfo",msg)
+    local args    = packetHelper:decodeMsg("Zain.ProtoInfo",msg)
     local msgName = ProtoHelper.IdToName[args.msg_id]
     if not msgName then 
         log.e("Agent","unknown msg_id: ",args.msg_id)

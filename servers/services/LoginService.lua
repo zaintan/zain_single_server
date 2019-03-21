@@ -13,32 +13,184 @@ local NumSet       = require "NumSet"
 local CacheUserMap      = NumSet.create()
 ---! all quick login token;  k = token; v = accountId;
 local CacheTokenMap     = NumSet.create()
+
 local CacheLimitCount   = 2048
+-----------------------------------------------------------------------------------------
+local function _onLoginFalid(tip)
+    return {status = -1;status_tip = tip;}
+end
+
+local function _onLoginSuccess(uid)
+    local user = CacheUserMap[uid]
+
+    local info = {}
+    info.user_id      = user.FUserID
+    info.user_name    = user.FUserName
+    info.head_img_url = user.FHeadUrl
+    info.sex          = user.FSex
+    info.diamond      = user.FDiamond
+    info.gold         = user.FGold
+    --info.vip_level    = user.F
+    return {status = 0;user_info = info;}
+end
+
+--创建新用户
+local function _createNewUser( reqData )
+    local args = {}
+
+    args.FPlatformID   = args.token or "default"
+    args.FPlatformType = args.platform or 3
+    args.FGameIndex    = args.game_index or 0
+    args.FSex          = args.sex or 1
+
+    args.FUserName     = tostring(args.FPlatformID)
+    args.FHeadUrl      = ""
+    args.FDiamond      = 10
+    args.FGold         = 1000
+
+    return args
+end
+--缓存用户信息
+local function _updateCacheUser(uid ,agent, dbInfo )
+    local user = CacheUserMap[uid]
+    if not user then 
+        local tmp = {}
+        tmp.FUserID        = dbInfo.FUserID
+        tmp.FPlatformID    = dbInfo.FPlatformID
+        tmp.FUserName      = dbInfo.FUserName
+        tmp.FHeadUrl       = dbInfo.FHeadUrl
+        tmp.FSex           = dbInfo.FSex
+        tmp.FDiamond       = dbInfo.FDiamond
+        tmp.FGold          = dbInfo.FGold
+        tmp.FPlatformType  = dbInfo.FPlatformType
+        tmp.FGameIndex     = dbInfo.FGameIndex
+
+        tmp.agent          = agent
+        CacheUserMap[uid]  = tmp
+        CacheTokenMap[tmp.FPlatformID] = tmp.FUserID
+    else--已经缓存了 
+        --已经有登录的了 --重复登录 t下线
+        if user.agent and user.agent ~= agent then 
+            skynet.call(agent, "lua", "disconnect")
+        end 
+        user.agent = agent
+    end 
+end
+
+--注册用户
+--[[
+insert into TUser(FPlatformID,FUserName,FHeadUrl,FSex,FDiamond,FGold,FPlatformType,FGameIndex,FRegDate,FLastLoginTime)
+values('tzy','zaintan','','1','10','1000','3','0',NOW(),NOW());
++---------+-------------+-----------+----------+------+----------+-------+---------------+------------+------------+---------------------+
+| FUserID | FPlatformID | FUserName | FHeadUrl | FSex | FDiamond | FGold | FPlatformType | FGameIndex | FRegDate   | FLastLoginTime      |
++---------+-------------+-----------+----------+------+----------+-------+---------------+------------+------------+---------------------+
+|    1000 | tzy         | zaintan   |          |    1 |       10 |  1000 |             3 |          0 | 2018-11-02 | 2018-11-02 17:18:14 |
++---------+-------------+-----------+----------+------+----------+-------+---------------+------------+------------+---------------------+
+]]
+local function _registerGuestUser(reqData)
+
+    local info = _createNewUser(reqData)
+    --插入数据库
+    local sqlStr = string.format("insert into TUser(FPlatformID,FUserName,FHeadUrl,FSex,FDiamond,FGold,FPlatformType,FGameIndex,FRegDate,FLastLoginTime) values('%s','%s','%s','%d','%d','%d','%d','%d','%s','%s');", 
+            info.FPlatformID,info.FUserName,info.FHeadUrl,info.FSex,info.FDiamond,info.FGold,info.FPlatformType,info.FGameIndex,"NOW()","NOW()");
+    
+    local pRet   = skynet.call(".DBService", "lua", "execDB", sqlStr)
+    if not pRet then 
+        return nil
+    end    
+
+    local sqlStr = string.format("select * from TUser where FPlatformID=\"%s\";",info.FPlatformID)
+    local pRet   = skynet.call(".DBService", "lua", "execDB", sqlStr)
+    if pRet and type(pRet) == "table" and #pRet > 0 then 
+        info.FUserID        = tonumber(pRet[1].FUserID)
+        info.FRegDate       = pRet[1].FRegDate
+        info.FLastLoginTime = pRet[1].FLastLoginTime
+    else--找不到
+        return nil
+    end  
+    return info
+end
 
 
+
+-----------------------------------------------------------------------------------------
 ---! lua commands
 local CMD = {}
 
-function CMD.on_login(msg_id, msg_body)
-    Log.d("LoginService","recv cmd on_login")
-    return true
+function CMD.on_login(agent, reqData)
+    Log.d("Login","recv cmd on_login")
+    if not reqData.login_type or not reqData.token then 
+        return _onLoginFalid("缺失必要的登录参数！")
+    end 
+
+    if reqData.login_type == const.LoginType.USER then --游客登录
+        local userid = CacheTokenMap[reqData.token]
+        if userid then --缓存里查到了
+            _updateCacheUser(userid,agent)
+            return _onLoginSuccess(userid)
+        else--缓存里面没有  需要去查数据库
+            local sqlStr = string.format("select * from TUser where FPlatformID=\"%s\";",args.token)
+            local pRet   = skynet.call(".DBService", "lua", "execDB", sqlStr)
+            if pRet and type(pRet) == "table" then 
+                if #pRet <= 0 then --数据库查询不到
+                    --register
+                    local registerRet = _registerGuestUser(reqData)
+                    if registerRet then 
+                        _updateCacheUser(registerRet.FUserID ,agent, registerRet)
+                        return _onLoginSuccess(registerRet.FUserID)
+                    else
+                        return _onLoginFalid("注册失败!")
+                    end  
+                else--数据库查询到了
+                    _updateCacheUser(pRet[1].FUserID, agent, pRet[1])
+                    return _onLoginSuccess(pRet[1].FUserID)
+                end
+            else--找不到
+                return _onLoginFalid("数据库链接失败!")
+            end 
+        end 
+    end 
+    return _onLoginFalid("暂不支持的登录方式！")
 end
 
 ----注意清缓存
-function CMD.logout(source, uid)
-    Log.d("LoginService","recv cmd logout")
+function CMD.logout(source,uid)
+    Log.d("Login","recv cmd logout uid:",uid)
+    local user = CacheUserMap[uid]
+    if user then 
+        user.agent = nil
+        user.logoutTime = os.time()
+    end 
     return true
 end
 
-function CMD.query(source, uid )
-    Log.d("LoginService","recv cmd query")
-    return false
+function CMD.query(source,uid )
+    --Log.d("Login","recv cmd query")
+    return CacheUserMap[uid]
 end
 
 
 local function checkCleanCache()
     local timeout = 3600 --1h -3600s
+
+    local ExpireTime = 3600*24
+
     while true do 
+        local curTime = os.time()
+
+        local cleanList = {}
+        for uid,user in pairs(CacheUserMap) do
+            if user.agent == nil and user.logoutTime ~= nil and
+                if curTime - user.logoutTime > ExpireTime then 
+                    table.insert(cleanList, {uid,user.FPlatformID })
+                end 
+            end 
+        end
+
+        for _,data in ipairs(cleanList) do
+            CacheUserMap[data[1]]  = nil
+            CacheTokenMap[data[2]] = nil
+        end
 
         skynet.sleep(timeout * 100)
     end 
@@ -54,12 +206,12 @@ skynet.start(function()
     skynet.dispatch("lua", function(session, source, cmd, ...)
         local f = CMD[cmd]
         if f then
-            local ret = f(source, ...)
+            local ret = f(source,...)
             if ret then
                 skynet.ret(skynet.pack(ret))
             end
         else
-            Log.e(LOGTAG,"unknown command:%s", cmd)
+            Log.e("Login","unknown command:%s", cmd)
         end
     end)
 
