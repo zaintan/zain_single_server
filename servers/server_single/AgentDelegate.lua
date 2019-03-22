@@ -1,6 +1,5 @@
 ---! 依赖库
 local skynet    = require "skynet"
-local cluster   = require "skynet.cluster"
 local socket    = require "skynet.socket"
 ---! 帮助库
 local packetHelper  = (require "PacketHelper").create("protos/ZainCommon.pb")
@@ -102,11 +101,21 @@ function class:_handlerLoginReq(data)
             self.FUserID = data.user_info.user_id
         end 
         self:sendMsg(const.MsgId.LoginRsp, data)
+        ----------------------------------------------
+        local ok,inTable,tableId = pcall(skynet.call, ".GameService", "lua", "queryTableId", self.FUserID)
+        if ok and inTable then 
+            self:_handlerRoomReq(const.MsgId.JoinRoomReq,{room_id = tableId;});
+        end 
     end 
 end
 
 function class:_handlerRoomReq(msg_id, data)
-    pcall(skynet.call, ".GameService","lua","on_req",msg_id, data)
+    local status,retid,retData = pcall(skynet.call, ".GameService","lua","on_req", self.FUserID,msg_id, data)
+    if status then 
+        if retid and retData then 
+            self:sendMsg(retid, retData)
+        end 
+    end 
 end
 
 local ComandFuncMap = {

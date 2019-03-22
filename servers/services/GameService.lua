@@ -5,15 +5,41 @@
 
 local skynet    = require "skynet"
 require "skynet.manager"
+
+local handler = require("game_logic.GameServerLogic")
+
+-------------------------------------------------------------------
 local CMD = {}
 
-function CMD.offline(source)
-    return true
+function CMD.offline(source, uid)
+    return handler:offline(uid)
 end
 
-function CMD.on_req(source, msg_id)
+function CMD.queryTableId(source, uid)
+    return handler:queryTableId(uid)
+end 
+
+local function _handlerCreateReq(source, uid, data)
+    return handler:handlerCreateReq(uid, data)
+end
+
+local function _handlerJoinReq(source, uid, data)
+    return handler:handlerJoinReq(source, uid, data)
+end
+
+local ComandFuncMap = {
+    [const.MsgId.CreateRoomReq]      = _handlerCreateReq;
+    [const.MsgId.JoinRoomReq]        = _handlerJoinReq;
+}
+
+function CMD.on_req(source, uid, msg_id, data)
+    local func = ComandFuncMap[msg_id]
+    if func then 
+        return func(source, uid, data)
+    end 
+    --------------
     skynet.ignoreret()
-    
+    handler:handlerClientReq(uid,msg_id,data)
 end
 
 ---! 服务的启动函数
@@ -35,4 +61,5 @@ skynet.start(function()
         end
     end)
     
+    handler:init()
 end)
