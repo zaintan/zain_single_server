@@ -3,7 +3,7 @@
 ---! @brief TableIdPool
 ------------------------------------------------------
 
-local TableIdPool = class("TableIdPool")
+local TableIdPool = class()
 
 function TableIdPool:init()
 	self.m_ids  = {}

@@ -2,7 +2,7 @@
 ---! @file
 ---! @brief BaseTable
 ------------------------------------------------------
-local BaseTable = class("BaseTable")
+local BaseTable = class()
 
 function BaseTable:ctor(gameId, gameType, gameRules)
 	self.m_gameId    = gameId

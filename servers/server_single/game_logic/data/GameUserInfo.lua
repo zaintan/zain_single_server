@@ -3,7 +3,7 @@
 ---! @brief GameUserInfo
 ------------------------------------------------------
 
-local GameUserInfo = class("GameUserInfo")
+local GameUserInfo = class()
 
 GameUserInfo.MAX_CREATE_TABLE_NUM = 10
 
