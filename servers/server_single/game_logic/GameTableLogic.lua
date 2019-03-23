@@ -17,7 +17,7 @@ function GameTableLogic:init(pGameServer, pTableId, data)
 	self.m_msgQue = cs
 
 	self.m_msgQue(function()
-		self.m_table = self:_createTable(data.game_id,data.game_type,data.game_rules)
+		self.m_table = self:_createTable(pTableId, data.game_id,data.game_type,data.game_rules)
 		--设置结束条件
 		self.m_table:setOverCondition(data.over_type, data.over_val)
 		--self.m_table:init()

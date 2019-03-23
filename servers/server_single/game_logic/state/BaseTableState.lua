@@ -9,6 +9,11 @@ function BaseTableState:ctor(pTable)
 	self.m_pTable = pTable
 end
 
+function BaseTableState:getStatus()
+	return self.m_status
+end
+
+
 function BaseTableState:onEnter()
 	-- body
 end

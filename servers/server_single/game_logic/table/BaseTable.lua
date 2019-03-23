@@ -4,7 +4,8 @@
 ------------------------------------------------------
 local BaseTable = class()
 
-function BaseTable:ctor(gameId, gameType, gameRules)
+function BaseTable:ctor(tableId, gameId, gameType, gameRules)
+	self.m_tableId   = tableId
 	self.m_gameId    = gameId
 	self.m_gameType  = gameType
 	self.m_gameRules = gameRules
@@ -55,6 +56,23 @@ function BaseTable:_changeState(toState)
 	end 
 	self.m_curState = toState
 	self.m_curState:onEnter()
+end
+
+
+function BaseTable:getBaseInfo()
+	local info = {}
+	info.game_id    = self.m_gameId
+	info.game_type  = self.m_gameType
+	info.game_rules = self.m_gameRules
+	--info.players
+	info.game_status = self.m_curState:getStatus()
+	info.over_type   = self.m_overType	
+	info.over_val    = self.m_overVal				
+	--info.round_room_info
+	--info.op_info
+	--info.cards_infos
+	info.room_id     = self.m_tableId
+	return info
 end
 
 return BaseTable
