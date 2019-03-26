@@ -45,8 +45,9 @@ function GameTableLogic:on_req(...)
 	end)
 end
 
-function GameTableLogic:_createTable(game_id, game_type, game_rules)
-
+function GameTableLogic:_createTable(...)
+	local BaseTable = require("game_logic.table.BaseTable")
+	return new(BaseTable, ...)
 end
 
 return GameTableLogic

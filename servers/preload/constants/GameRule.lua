@@ -1,6 +1,4 @@
 local GameRule = {
-	FREE = 0;
-	WAIT = 1;
-	PLAY = 2;
+	PLAYER_COUNT = 1002;
 }
 return GameRule

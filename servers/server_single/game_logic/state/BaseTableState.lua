@@ -36,24 +36,27 @@ end
 
 function BaseTableState:on_req(uid, msg_id, data)
 	if msg_id == const.MsgId.ReadyReq then 
-		return self:_onReadyReq(uid, data)
+		return self:_onReadyReq(msg_id,uid, data)
 	elseif msg_id == const.MsgId.OutCardReq then
-		return self:_onOutCardReq(uid, data)
+		return self:_onOutCardReq(msg_id,uid, data)
 	elseif msg_id == const.MsgId.OperateCardReq then
-		return self:_onOperateCardReq(uid, data)
+		return self:_onOperateCardReq(msg_id,uid, data)
 	end 
 end
 
-function BaseTableState:_onReadyReq(uid, data)
-	-- body
+function BaseTableState:_onReadyReq(msg_id, uid, data)
+	self.m_pTable:sendMsg(uid,msg_id+const.MsgId.BaseResponse, {status = -1;})
+	return false
 end
 
-function BaseTableState:_onOutCardReq(uid, data)
-	-- body
+function BaseTableState:_onOutCardReq(msg_id, uid, data)
+	self.m_pTable:sendMsg(uid,msg_id+const.MsgId.BaseResponse, {status = -1;})
+	return false
 end
 
-function BaseTableState:_onOperateCardReq(uid, data)
-	-- body
+function BaseTableState:_onOperateCardReq(msg_id, uid, data)
+	self.m_pTable:sendMsg(uid,msg_id+const.MsgId.BaseResponse, {status = -1;})
+	return false
 end
 
 

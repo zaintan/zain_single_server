@@ -29,15 +29,15 @@ function TableStateWait:reconnect(agent, uid)
 end
 
 
-function TableStateWait:_onReadyReq(uid, data)
+function TableStateWait:_onReadyReq(msg_id, uid, data)
+	
+end
+
+function TableStateWait:_onOutCardReq(msg_id, uid, data)
 	-- body
 end
 
-function TableStateWait:_onOutCardReq(uid, data)
-	-- body
-end
-
-function TableStateWait:_onOperateCardReq(uid, data)
+function TableStateWait:_onOperateCardReq(msg_id, uid, data)
 	-- body
 end
 

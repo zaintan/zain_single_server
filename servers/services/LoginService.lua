@@ -167,7 +167,16 @@ end
 
 function CMD.query(source,uid )
     --Log.d("Login","recv cmd query")
-    return CacheUserMap:getObject(uid)
+    local obj = CacheUserMap:getObject(uid)
+    if not obj then 
+        return false
+    end 
+
+    return {
+        FUserID   = obj.FUserID;
+        FUserName = obj.FUserName;
+        FHeadUrl  = obj.FHeadUrl;
+    };
 end
 
 

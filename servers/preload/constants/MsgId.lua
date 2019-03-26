@@ -1,4 +1,6 @@
 local MsgId = {
+	BaseResponse = 10000;
+
 	LoginReq  = 1;
 	LoginRsp  = 10001;
 	CreateRoomReq = 2;
