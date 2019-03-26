@@ -42,4 +42,16 @@ function PlayerCards:removeDiscard()
 	return false
 end
 
+function PlayerCards:canGang()
+	return false
+end
+
+function PlayerCards:canChiPeng()
+	return false
+end
+
+function PlayerCards:canHu()
+	return false
+end
+
 return PlayerCards

@@ -10,7 +10,13 @@ function HandlerSendCard:ctor(...)
 end
 
 function HandlerSendCard:onEnter()
-	-- body
+--	--
+	local card = self.m_pTable:drawCard(self.m_pState.m_curSeatIndex)
+--	--判断庄家是否可以操作
+	local playerCards = self.m_pTable:getPlayerCards(self.m_pState.m_curSeatIndex)
+	if playerCards:canGang() then 
+		--self.m_pState:changeHandler(const.GameHandler.)
+	end 
 end
 
 function HandlerSendCard:_onOutCardReq(msg_id, uid, data)
