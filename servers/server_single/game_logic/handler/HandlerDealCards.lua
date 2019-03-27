@@ -15,13 +15,6 @@ function HandlerDealCards:onEnter()
 	self.m_pTable:dealPlayersCards(self.m_pState.m_curBanker, 13)
 	
 	self.m_pState:changeHandler(const.GameHandler.SEND_CARD)
---	--庄家多抓一张
---	self.m_pTable:drawCard(self.m_pState.m_curBanker)
---	--判断庄家是否可以操作
---	local playerCards = self.m_pTable:getPlayerCards(self.m_pState.m_curBanker)
---	if playerCards:canGang() then 
---		self.m_pState:changeHandler(const.GameHandler.)
---	end 
 end
 
 

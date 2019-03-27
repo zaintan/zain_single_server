@@ -12,6 +12,18 @@ function PlayerCards:ctor()
 	self.m_weaves   = {}
 end
 
+function PlayerCards:getHands()
+	return self.m_hands
+end
+
+function PlayerCards:getWeaves()
+	return {}
+end
+
+function PlayerCards:getDiscards()
+	return self.m_discards
+end
+
 function PlayerCards:dealCards( cards )
 	self.m_hands = {}
 	for i,v in ipairs(cards) do
@@ -42,16 +54,48 @@ function PlayerCards:removeDiscard()
 	return false
 end
 
-function PlayerCards:canGang()
+function PlayerCards:getActions()
+	return nil
+end
+
+function PlayerCards:hasAction( action )
 	return false
 end
 
-function PlayerCards:canChiPeng()
+function PlayerCards:hasHandCard( card )
+	for i,v in ipairs(self.m_hands) do
+		if v == card then 
+			return true
+		end 
+	end
+end
+
+
+function PlayerCards:hasAnGang()
 	return false
 end
 
-function PlayerCards:canHu()
+function PlayerCards:hasPengGang(outCard)
 	return false
 end
+
+function PlayerCards:hasBuGang(sendCard)
+	return false
+end
+
+function PlayerCards:hasChi(outCard)
+	return false
+end
+
+function PlayerCards:hasPeng(outCard)
+	return false
+end
+
+function PlayerCards:hasHu(outCard)
+	return false
+end
+
+
+
 
 return PlayerCards

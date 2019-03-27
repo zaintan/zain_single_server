@@ -35,12 +35,12 @@ function TableStatePlay:_initHandlers()
 	self:_addHandler("game_logic.handler.HandlerOutCard")
 end
 
-function TableStatePlay:_changeHandler(toHandler)
+function TableStatePlay:_changeHandler(toHandler, ...)
 	if self.m_curHandler then 
 		self.m_curHandler:onExit()
 	end 
 	self.m_curHandler = toHandler
-	self.m_curHandler:onEnter()
+	self.m_curHandler:onEnter(...)
 end
 
 function TableStatePlay:changeHandler( Gamehandler )
@@ -144,6 +144,14 @@ function TableStatePlay:_initPlayerStatuses()
 	for k,v in pairs(self.m_pTable.m_players) do
 		self.player_statuses[v.seat_index] = const.PlayerStatus.NULL
 	end
+end
+
+function TableStatePlay:changePlayerStatus( seat_index, status )
+	self.player_statuses[seat_index] = status
+end
+
+function TableStatePlay:gameRoundOver()
+	-- body
 end
 
 return TableStatePlay

@@ -7,26 +7,97 @@ local HandlerSendCard = class(Super)
 
 function HandlerSendCard:ctor(...)
 	self.m_status = const.GameHandler.SEND_CARD
+
+
+	self.seat_index    = -1
+	self.player_status = const.PlayerStatus.NULL
 end
 
 function HandlerSendCard:onEnter()
---	--
-	local card = self.m_pTable:drawCard(self.m_pState.m_curSeatIndex)
---	--判断庄家是否可以操作
-	local playerCards = self.m_pTable:getPlayerCards(self.m_pState.m_curSeatIndex)
-	if playerCards:canGang() then 
-		--self.m_pState:changeHandler(const.GameHandler.)
+	self.m_pState:resetPlayerStatuses()
+
+	self.seat_index = self.m_pState.m_curSeatIndex
+	--广播抓牌
+	local succ,sendCard = self.m_pTable:drawCard(self.seat_index)
+	if not succ then --失败  没有牌了 
+		self.m_pState:gameRoundOver()
+		return
 	end 
+--	--判断庄家是否可以操作
+--  暗杆 or  自摸
+	local playerCards = self.m_pTable:getPlayerCards(self.seat_index)
+	if playerCards:hasAnGang() or playerCards:hasBuGang(sendCard) or playerCards:hasHu(nil) then 
+		self.player_status = const.PlayerStatus.OPERATE
+	else 
+		self.player_status = const.PlayerStatus.OUT_CARD
+	end 
+	self.m_pState:changePlayerStatus(self.seat_index, self.player_status)
+	--广播刷新玩家状态
+	
+	local msg_data = {
+		player_status      = self.player_status
+		pointed_seat_index = self.seat_index
+	}
+	self.m_pTable:sendMsg(player.user_id, const.MsgId.PlayerStatusPush,msg_data )
 end
 
 function HandlerSendCard:_onOutCardReq(msg_id, uid, data)
-	self.m_pTable:sendMsg(uid,msg_id+const.MsgId.BaseResponse, {status = -1;})
+	local ret_msg_id = msg_id + const.MsgId.BaseResponse
+	local seat_index = self.m_pTable:getPlayerSeat(uid)
+	--不是该玩家
+	if seat_index ~= self.seat_index then 
+		self.m_pTable:sendMsg(uid, ret_msg_id, {status = -2;})
+		return false
+	end 
+	--不在出牌状态
+	if self.player_status ~= const.PlayerStatus.OUT_CARD then 
+		self.m_pTable:sendMsg(uid, ret_msg_id, {status = -3;})
+		return false
+	end
+
+	--不存在的牌
+	local playerCards = self.m_pTable:getPlayerCards(self.seat_index)
+	if not playerCards:hasHandCard(data.out_card) then 
+		self.m_pTable:sendMsg(uid, ret_msg_id, {status = -4;})
+		return false
+	end 
+
+	self.m_pTable:outCard(uid, data.out_card)
+	--changehandler
+	self.m_pState:changeHandler(const.GameHandler.OUT_CARD, seat_index, data.out_card)
 	return false
 end
 
 function HandlerSendCard:_onOperateCardReq(msg_id, uid, data)
-	self.m_pTable:sendMsg(uid,msg_id+const.MsgId.BaseResponse, {status = -1;})
-	return false
+	local ret_msg_id = msg_id + const.MsgId.BaseResponse
+	local seat_index = self.m_pTable:getPlayerSeat(uid)
+	--不是该玩家
+	if seat_index ~= self.seat_index then 
+		self.m_pTable:sendMsg(uid, ret_msg_id, {status = -2;})
+		return false
+	end 
+	--不在出牌状态
+	if self.player_status ~= const.PlayerStatus.OPERATE then 
+		self.m_pTable:sendMsg(uid, ret_msg_id, {status = -3;})
+		return false
+	end
+
+	--不存在的操作
+	local playerCards = self.m_pTable:getPlayerCards(self.seat_index)
+	if not playerCards:hasAction(data) then 
+		self.m_pTable:sendMsg(uid, ret_msg_id, {status = -4;})
+		return false
+	end 
+
+	if data.weave_kind == const.GameAction.GANG then 
+		--切handlerGang
+		self.m_pState:changeHandler(const.GameHandler.GANG)
+	elseif data.weave_kind == const.GameAction.ZI_MO then 
+		--切gameOver
+		self.m_pState:gameRoundOver()
+	end 
+	--self.m_pTable:sendMsg(uid,msg_id+const.MsgId.BaseResponse, {status = -1;})
+	return true
 end
 
 
