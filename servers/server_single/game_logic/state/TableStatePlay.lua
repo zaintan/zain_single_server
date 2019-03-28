@@ -70,7 +70,7 @@ function TableStatePlay:onEnter()
 	self.dice_values[1] = math.random(6)
 	self.dice_values[2] = math.random(6)	
 	--广播牌局开始消息
-	self:broadcastMsg(const.MsgId.GameStartPush, {game_status = self.m_status;round_room_info = self:_getRoundRoomInfo();})
+	self.m_pTable:broadcastMsg(const.MsgId.GameStartPush, {game_status = self.m_status;round_room_info = self:_getRoundRoomInfo();})
 	--发牌
 	self:changeHandler(const.Gamehandler.DEAL_CARDS)
 end
