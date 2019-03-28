@@ -28,8 +28,8 @@ function HandlerSendCard:onEnter()
 	self.m_pTable:cleanActions()
 	--self.m_pTable:cleanActions(self.seat_index)
 	local playerCards = self.m_pTable:getPlayerCards(self.seat_index)
-	local hasOp = playerCards:checkAddAction(const.GameAction.GANG, const.GameAction.ZI_MO)
-	if hasOp then 
+	local actions = playerCards:checkAddAction(const.GameAction.GANG, const.GameAction.ZI_MO)
+	if actions and #actions > 0 then 
 		self.player_status = const.PlayerStatus.OPERATE
 	else 
 		self.player_status = const.PlayerStatus.OUT_CARD
@@ -37,6 +37,7 @@ function HandlerSendCard:onEnter()
 	self.m_pState:changePlayerStatus(self.seat_index, self.player_status)
 	--广播刷新玩家状态
 	self.m_pState:broadcastPlayerStatus()
+	
 end
 
 function HandlerSendCard:_onOutCardReq(msg_id, uid, data)
