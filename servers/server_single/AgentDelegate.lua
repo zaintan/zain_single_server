@@ -5,6 +5,8 @@ local socket    = require "skynet.socket"
 local packetHelper  = (require "PacketHelper").create("protos/ZainCommon.pb")
 local ProtoHelper   = (require "ProtoHelper").init()
 
+local LOGTAG = "Agent"
+
 local class = {mt = {}}
 class.mt.__index = class
 
@@ -26,7 +28,7 @@ function class.create(info)
     self.agentSign   = os.time()
     self:_active()
 
-    Log.i("Agent","CMD start called on fd %d",self.client_fd)
+    Log.i(LOGTAG,"CMD start called on fd %d",self.client_fd)
     skynet.call(self.gate, "lua", "forward", self.client_fd)
     skynet.fork(function ()
         while true do 
@@ -53,12 +55,12 @@ function class:_active()
 end
 
 function class:_kickMe()
-    Log.i("Agent","heartbeat timeout! kick me!")
+    Log.d(LOGTAG,"heartbeat timeout! kick me!")
     pcall(skynet.send, self.watchdog, "lua", "closeAgent", self.client_fd)
 end
 
 function class:quit()
-    Log.i("Agent","玩家下线!")
+    Log.d(LOGTAG,"玩家下线!")
     --下线通知 中心服 和 游戏服
     pcall(skynet.call, ".LoginService","lua","logout",  self.FUserID)
     pcall(skynet.call, ".GameService", "lua","offline", self.FUserID)
@@ -77,8 +79,8 @@ end
 
 function class:sendMsg(msg_id, data)
     if msg_id ~= const.MsgId.HeartRsp then
-        Log.i("Agent","sendClientMsg msg_id=%d",msg_id)
-        Log.dump("Agent",data)
+        Log.d(LOGTAG,"sendClientMsg msg_id=%d",msg_id)
+        Log.dump(LOGTAG,data)
     end 
 
     local protoName = ProtoHelper.IdToName[msg_id] 
@@ -95,7 +97,7 @@ end
 function class:_handlerLoginReq(data)
     local ok,data = pcall(skynet.call, ".LoginService", "lua", "on_login", data)
     if not ok then 
-        Log.e("Agent","call LoginService failed!")
+        Log.e(LOGTAG,"call LoginService failed!")
     else
         if data.user_info then 
             self.FUserID = data.user_info.user_id
@@ -103,6 +105,7 @@ function class:_handlerLoginReq(data)
         self:sendMsg(const.MsgId.LoginRsp, data)
         ----------------------------------------------
         local ok,inTable,tableId = pcall(skynet.call, ".GameService", "lua", "queryTableId", self.FUserID)
+        Log.d(LOGTAG,"queryTableId return status=%s,inTable=%s,tableId=%s",tostring(ok),tostring(inTable),tostring(tableId))
         if ok and inTable then 
             self:_handlerRoomReq(const.MsgId.JoinRoomReq,{room_id = tableId;});
         end 
@@ -110,9 +113,9 @@ function class:_handlerLoginReq(data)
 end
 
 function class:_handlerRoomReq(msg_id, data)
-    Log.e("Agent","_handlerRoomReq msg_id=%d", msg_id)
+    Log.e(LOGTAG,"_handlerRoomReq msg_id=%d", msg_id)
     local status,retid,retData = pcall(skynet.call, ".GameService","lua","on_req", self.FUserID,msg_id, data)
-    Log.e("Agent","status=%s,retid=%s,retData=%s", tostring(status),tostring(retid),tostring(retData))
+    Log.e(LOGTAG,"status=%s,retid=%s,retData=%s", tostring(status),tostring(retid),tostring(retData))
     if status then 
         if retid and retData then 
             self:sendMsg(retid, retData)
@@ -126,23 +129,23 @@ local ComandFuncMap = {
 }
 
 function class:command_handler(msg, recvTime)
-    Log.d("Agent","command_handler msg len:%d accessTime:%s",#msg,tostring(skynet.time()))
+    Log.d(LOGTAG,"command_handler msg len:%d accessTime:%s",#msg,tostring(skynet.time()))
     self:_active()
     --解析包头 转发处理消息 做对应转发
     local args    = packetHelper:decodeMsg("Zain.ProtoInfo",msg)
     local msgName = ProtoHelper.IdToName[args.msg_id]
     if not msgName then 
-        Log.e("Agent","unknown msg_id: ",args.msg_id)
+        Log.e(LOGTAG,"unknown msg_id: ",args.msg_id)
         return 
     end 
 
     local data,err = packetHelper:decodeMsg("Zain."..msgName, args.msg_body)
     if not data or err ~= nil then 
-        Log.e("Agent","parse msg err: ",args.msg_id, msgName )
+        Log.e(LOGTAG,"parse msg err: ",args.msg_id, msgName )
         return
     end 
 
-    Log.dump("Agent",data)
+    Log.dump(LOGTAG,data)
 
     local f = ComandFuncMap[args.msg_id]
     if f then 
