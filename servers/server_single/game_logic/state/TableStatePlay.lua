@@ -5,6 +5,8 @@
 local Super = require("game_logic.state.BaseTableState")
 local TableStatePlay = class(Super)
 
+local LOGTAG = "TSPlay"
+
 function TableStatePlay:ctor(pTable)
 	self.m_status = const.GameStatus.PLAY
 	
@@ -203,9 +205,12 @@ local function _getPlayerCardsInfo(playerCards,cards_seat, send_seat ,hasHand, h
 		has_discards = hasDiscard and true or false;
 		seat_index   = cards_seat;		
 	}
+	local hands = playerCards:getHands()
+	Log.d(LOGTAG,"getPlayerCardsInfo:cards_seat=%d,send_seat=%d",cards_seat,send_seat);
+	Log.dump(LOGTAG,hands);
 	--add hands
 	if hasHand then 
-		data.hands = _getHands(playerCards:getHands(),cards_seat, send_seat)
+		data.hands = _getHands(hands,cards_seat, send_seat)
 	end 
 	--add weaves
 	if hasWeave then 
@@ -215,6 +220,7 @@ local function _getPlayerCardsInfo(playerCards,cards_seat, send_seat ,hasHand, h
 	if hasDiscard then 
 		data.discards = playerCards:getDiscards()
 	end 
+	Log.dump(LOGTAG,data);
 	return data
 end
 
@@ -255,7 +261,7 @@ function TableStatePlay:_getCardsInfo(uid)
 		local data        = _getPlayerCardsInfo(playerCards,cards_seat,player.seat_index,true,true,true)
 		table.insert(cards_infos, data)
 	end	
-	return nil
+	return cards_infos
 end
 
 return TableStatePlay

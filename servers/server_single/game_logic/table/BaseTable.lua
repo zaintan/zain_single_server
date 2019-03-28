@@ -124,8 +124,8 @@ function BaseTable:dealPlayersCards(start_seat_index, num)
 		local cards = self.m_cardsPool:dealCards(num)
 		self.m_playersCards[seat_index]:dealCards(cards)
 
-		Log.d(LOGTAG, "####seat_index = %d",seat_index)
-		Log.dump(LOGTAG,self.m_playersCards[seat_index]:getHands())		
+		--Log.d(LOGTAG, "####seat_index = %d",seat_index)
+		--Log.dump(LOGTAG,self.m_playersCards[seat_index]:getHands())		
 	end
 	--广播发牌消息
 	local hasHand = true
