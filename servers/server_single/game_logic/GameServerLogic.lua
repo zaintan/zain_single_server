@@ -35,6 +35,7 @@ function GameServerLogic:init()
 
 	local TableIdPool = require("game_logic.TableIdPool")
 	self.m_idPool = new(TableIdPool)
+	self.m_idPool:init()
 end
 
 local function _onMsgFaild(id, err_tip)
