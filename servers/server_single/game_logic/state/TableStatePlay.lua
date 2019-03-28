@@ -99,6 +99,10 @@ function TableStatePlay:reconnect(agent, uid)
 	return info
 end
 
+function TableStatePlay:turnNextSeat()
+	self.m_curSeatIndex = (self.m_curSeatIndex + 1)%self.m_pTable:getCurPlayerNum()
+end
+
 
 function TableStatePlay:_onReadyReq(msg_id, uid, data)
 	self.m_pTable:sendMsg(uid,msg_id+const.MsgId.BaseResponse, {status = -1;status_tip = "牌局已经开始,无效准备消息!";})
@@ -151,6 +155,10 @@ end
 
 function TableStatePlay:changePlayerStatus( seat_index, status )
 	self.player_statuses[seat_index+1] = status
+end
+
+function TableStatePlay:getPlayerStatus(seat_index)
+	return self.player_statuses[seat_index+1]
 end
 
 function TableStatePlay:gameRoundOver()
