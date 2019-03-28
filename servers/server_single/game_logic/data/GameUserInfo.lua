@@ -26,7 +26,7 @@ function GameUserInfo:canCreateTable()
 end
 
 function GameUserInfo:canJoinTable()
-	return self.m_nJoinTableId ~= nil
+	return self.m_nJoinTableId == nil
 end
 
 function GameUserInfo:addCreatedTable(table_id)

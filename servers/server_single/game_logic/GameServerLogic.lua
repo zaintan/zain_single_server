@@ -41,7 +41,7 @@ function GameServerLogic:info()
 			tostring(info.users[3]),
 			tostring(info.users[4]) ))
 	end
-    return strHelper.join(arr, "\t")
+    return strHelper.join(arr, "\n")
 end
 
 function GameServerLogic:queryTableId(uid)
@@ -114,11 +114,11 @@ function GameServerLogic:handlerJoinReq(agent, uid, data)
 
 	--判断用户是否已经加入过房间了  
 	local user = self.m_users:getObject(uid)
+	--Log.d(LOGTAG,"handlerJoinReq uid=%d ",uid)
 	if user and not user:canJoinTable() then 
 		--已经在房间里面了 返回重连消息
 		local table_id = user:getTableId()
 		local tableAddr = self.m_tables:getObject(table_id)
-
 		local retData  = skynet.call(tableAddr,"lua","reconnect",agent, uid)
 		return const.MsgId.JoinRoomRsp,retData
 	end	

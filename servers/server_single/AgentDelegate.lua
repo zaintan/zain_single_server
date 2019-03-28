@@ -104,9 +104,9 @@ function class:_handlerLoginReq(data)
         end 
         self:sendMsg(const.MsgId.LoginRsp, data)
         ----------------------------------------------
-        local ok,inTable,tableId = pcall(skynet.call, ".GameService", "lua", "queryTableId", self.FUserID)
-        Log.d(LOGTAG,"queryTableId return status=%s,inTable=%s,tableId=%s",tostring(ok),tostring(inTable),tostring(tableId))
-        if ok and inTable then 
+        local ok,tableId = pcall(skynet.call, ".GameService", "lua", "queryTableId", self.FUserID)
+        Log.d(LOGTAG,"queryTableId return status=%s,tableId=%s",tostring(ok),tostring(tableId))
+        if ok and tableId and tableId ~= -1 then 
             self:_handlerRoomReq(const.MsgId.JoinRoomReq,{room_id = tableId;});
         end 
     end 
