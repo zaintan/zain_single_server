@@ -143,8 +143,9 @@ end
 function TableStatePlay:_initPlayerStatuses()
 	self.player_statuses = {}
 	local players = self.m_pTable:getPlayers()
-	for k,v in pairs(players) do
-		self.player_statuses[v.seat_index] = const.PlayerStatus.NULL
+
+	for i=0,self.m_pTable:getMaxPlayerNum()-1 do
+		self.player_statuses[i] = const.PlayerStatus.NULL
 	end
 end
 

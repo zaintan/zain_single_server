@@ -40,6 +40,14 @@ function BaseTable:_initGameRules()
 	end
 end
 
+function BaseTable:getMaxPlayerNum()
+	return self.m_maxPlayerNum
+end
+
+function BaseTable:getCurPlayerNum()
+	return self.m_curPlayerNum
+end
+
 function BaseTable:_initCards()
 	local CardsPool = require("game_logic.CardsPool")
 	self.m_cardsPool = new(CardsPool,self.m_gameRules)
