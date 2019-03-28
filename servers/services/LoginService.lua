@@ -72,7 +72,7 @@ local function _updateCacheUser(uid ,agent, dbInfo )
     else--已经缓存了 
         --已经有登录的了 --重复登录 t下线
         if user.agent and user.agent ~= agent then 
-            skynet.call(agent, "lua", "disconnect")
+            pcall(skynet.call, agent, "lua", "disconnect")
         end 
         user.agent = agent
     end 
