@@ -208,7 +208,7 @@ function BaseTable:getBaseInfo()
 	info.game_id     = self.m_gameId
 	info.game_type   = self.m_gameType
 	info.game_rules  = self.m_gameRules
-	info.players     = self:getProtoInfo()
+	info.players     = self:getPlayerInfo()
 	info.game_status = self.m_curState:getStatus()
 	info.over_type   = self.m_overType	
 	info.over_val    = self.m_overVal				
