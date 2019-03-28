@@ -37,3 +37,5 @@ CREATE TABLE `TUser` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 -- Dump completed on 2018-11-02  15:26:00
+SELECT * FROM `TUser`;
+DELETE FROM `TUser` WHERE `FUserID` = 1014;

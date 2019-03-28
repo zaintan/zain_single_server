@@ -43,7 +43,7 @@ local function _createNewUser( reqData )
     args.FGameIndex    = reqData.game_index or 0
     args.FSex          = reqData.sex or 1
 
-    args.FUserName     = tostring(reqData.FPlatformID)
+    args.FUserName     = tostring(args.FPlatformID)
     args.FHeadUrl      = ""
     args.FDiamond      = 10
     args.FGold         = 1000
