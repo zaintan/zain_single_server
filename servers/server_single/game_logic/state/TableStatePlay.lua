@@ -232,7 +232,8 @@ function TableStatePlay:broadcastRoomCards(hasHand, hasWeave, hasDiscard, except
 
 	for id,player in pairs(players) do
 		local msg_data = {cards_infos = {};};
-		for cards_seat,_ in pairs(self.player_statuses) do
+		for seat,_ in pairs(self.player_statuses) do
+			local cards_seat  = seat - 1
 			if not _isInArray(cards_seat,  except) then 
 				local playerCards = self.m_pTable:getPlayerCards(cards_seat)
 				local data = _getPlayerCardsInfo(playerCards,cards_seat,player.seat_index,hasHand, hasWeave, hasDiscard)
@@ -257,7 +258,8 @@ function TableStatePlay:_getCardsInfo(uid)
 	local player = self.m_pTable:getPlayer(uid)
 
 	local cards_infos = {}
-	for cards_seat,_ in pairs(self.player_statuses) do
+	for seat,_ in pairs(self.player_statuses) do
+		local cards_seat = seat - 1
 		local playerCards = self.m_pTable:getPlayerCards(cards_seat)
 		local data        = _getPlayerCardsInfo(playerCards,cards_seat,player.seat_index,true,true,true)
 		table.insert(cards_infos, data)
