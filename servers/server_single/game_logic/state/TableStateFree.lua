@@ -37,7 +37,7 @@ function TableStateFree:join(agent, uid)
 	end 
 
 	local info = self.m_pTable:getBaseInfo()
-	info.status = 0
+	info.status = 1
 	return true,info
 end
 
@@ -46,7 +46,7 @@ function TableStateFree:reconnect(agent, uid)
 	Super.reconnect(self, agent, uid)
 	
 	local info = self.m_pTable:getBaseInfo()
-	info.status = 0
+	info.status = 1
 	return info
 end
 

@@ -90,7 +90,7 @@ function TableStatePlay:reconnect(agent, uid)
 	Super.reconnect(self, agent, uid)
 
 	local info = self.m_pTable:getBaseInfo()
-	info.status = 0
+	info.status = 1
 	info.op_info         = self:_getOpInfo(uid);
 	info.cards_infos     = self:_getCardsInfo(uid);
 	info.round_room_info = self:_getRoundRoomInfo();

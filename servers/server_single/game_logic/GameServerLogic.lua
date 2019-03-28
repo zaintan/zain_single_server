@@ -119,6 +119,7 @@ function GameServerLogic:handlerJoinReq(agent, uid, data)
 		--已经在房间里面了 返回重连消息
 		local table_id = user:getTableId()
 		local tableAddr = self.m_tables:getObject(table_id)
+		Log.d(LOGTAG,"reconnect uid=%d,table_id=%d,add=%x",uid,table_id,tableAddr)
 		local retData  = skynet.call(tableAddr,"lua","reconnect",agent, uid)
 		return const.MsgId.JoinRoomRsp,retData
 	end	
@@ -131,9 +132,11 @@ function GameServerLogic:handlerJoinReq(agent, uid, data)
 			user:init(uid)
 			self.m_users:addObject(user, uid)
 		end 	
-		user:joinTable(table_id)
+		user:joinTable(data.room_id)
+		Log.d(LOGTAG,"uid = %d success join table_id=%d",uid,data.room_id)
 		return const.MsgId.JoinRoomRsp,retData		
 	else 
+		Log.d(LOGTAG,"uid = %d failed join table_id=%d, reason=%s",uid,data.room_id,tostring(retData))
 		return _onMsgFaild(const.MsgId.JoinRoomRsp, retData)
 	end 
 end
