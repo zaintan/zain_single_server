@@ -129,7 +129,7 @@ local ComandFuncMap = {
 }
 
 function class:command_handler(msg, recvTime)
-    Log.d(LOGTAG,"command_handler msg len:%d accessTime:%s",#msg,tostring(skynet.time()))
+    --Log.d(LOGTAG,"command_handler msg len:%d accessTime:%s",#msg,tostring(skynet.time()))
     self:_active()
     --解析包头 转发处理消息 做对应转发
     local args    = packetHelper:decodeMsg("Zain.ProtoInfo",msg)

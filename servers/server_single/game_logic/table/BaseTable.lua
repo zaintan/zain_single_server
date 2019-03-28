@@ -9,6 +9,8 @@ local BaseTable = class()
 local TableUserInfo = require("game_logic.data.TableUserInfo")
 local PlayerCards   = require("game_logic.data.PlayerCards")
 
+local LOGTAG = "BaseTable"
+
 function BaseTable:ctor(tableId, gameId, gameType, gameRules)
 	self.m_tableId   = tableId
 	self.m_gameId    = gameId
@@ -120,7 +122,10 @@ function BaseTable:dealPlayersCards(start_seat_index, num)
 	for i=1,self.m_curPlayerNum do
 		local seat_index = (start_seat_index + i-1)%self.m_curPlayerNum
 		local cards = self.m_cardsPool:dealCards(num)
-		self.m_playersCards[seat_index]:dealCards(cards)		
+		self.m_playersCards[seat_index]:dealCards(cards)
+
+		Log.d(LOGTAG, "####seat_index = %d",seat_index)
+		Log.dump(LOGTAG,self.m_playersCards[seat_index]:getHands())		
 	end
 	--广播发牌消息
 	local hasHand = true

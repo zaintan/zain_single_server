@@ -165,7 +165,7 @@ function TableStatePlay:broadcastPlayerStatus()
 		msg_data.pointed_seat_index = self.m_curSeatIndex;
 		msg_data.op_info            = self.m_pTable:getPlayerCards(seat_index):getActions();
 
-		self:sendMsg(player.user_id, const.MsgId.PlayerStatusPush , msg_data)
+		self.m_pTable:sendMsg(player.user_id, const.MsgId.PlayerStatusPush , msg_data)
 	end
 end
 
