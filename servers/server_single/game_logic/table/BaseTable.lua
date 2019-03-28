@@ -75,9 +75,9 @@ function BaseTable:addPlayer(agent, uid, data)
 		self.m_playersCards[self.m_curPlayerNum] = new(PlayerCards)
 		
 		self.m_curPlayerNum = self.m_curPlayerNum + 1
-		return true
+		return true,player
 	end
-	return false
+	return false,player
 end
 
 function BaseTable:getPlayerSeat( uid )

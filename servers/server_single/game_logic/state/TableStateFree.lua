@@ -27,15 +27,19 @@ function TableStateFree:join(agent, uid)
 		return false,"房间已经满了!"
 	end 
 
-	if not self.m_pTable:isInTable() then 
+	if not self.m_pTable:isInTable(uid) then 
 		local ok,data = pcall(skynet.call, ".LoginService", "lua", "query", uid)
 		if ok and data then 
-			self.m_pTable:addPlayer(agent, uid, data)
+			local _,player = self.m_pTable:addPlayer(agent, uid, data)
+			--广播通知其他玩家 有玩家加入
+			local msg_data = {}
+			msg_data.player = player:getProtoInfo()
+			self.m_pTable:broadcastMsg(const.MsgId.PlayerEnterPush, msg_data,uid)
+			----------			
 		else
 			return false,"登录服查不到该玩家!"
-		end 
+		end	 
 	end 
-
 	local info = self.m_pTable:getBaseInfo()
 	info.status = 1
 	return true,info

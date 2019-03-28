@@ -46,8 +46,10 @@ skynet.register_protocol {
         skynet.ignoreret()
         
         local recvTime = skynet.time()
-        Log.i("TcpAgent","recv client msg len:%d recvTime:%s",#text,tostring(recvTime))
-
+        --心跳包消息 不打印日志
+        if #text > 6 then 
+            Log.i("TcpAgent","recv client msg len:%d recvTime:%s",#text,tostring(recvTime))
+        end
         local worker = function ()
             agent:command_handler(text,recvTime)
         end
