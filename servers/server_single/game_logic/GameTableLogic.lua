@@ -25,23 +25,23 @@ function GameTableLogic:init(pGameServer, pTableId, data)
 end
 
 
-function GameTableLogic:reconnect(...)
+function GameTableLogic:reconnect(agent, uid)
 	return self.m_msgQue(function()
-		return self.m_table:getCurState():reconnect(...)
+		return self.m_table:getCurState():reconnect(agent, uid)
 	end)
 end
 
 
-function GameTableLogic:join(...)
+function GameTableLogic:join(agent, uid)
 	return self.m_msgQue(function()
-		return self.m_table:getCurState():join(...)
+		return self.m_table:getCurState():join(agent, uid)
 	end)
 end
 
 
-function GameTableLogic:on_req(...)
+function GameTableLogic:on_req(uid, msg_id, data)
    	return self.m_msgQue(function()
-   		return self.m_table:getCurState():on_req(...)
+   		return self.m_table:getCurState():on_req(uid, msg_id, data)
 	end)
 end
 
