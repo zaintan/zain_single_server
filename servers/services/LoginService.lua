@@ -38,12 +38,12 @@ end
 local function _createNewUser( reqData )
     local args = {}
 
-    args.FPlatformID   = args.token or "default"
-    args.FPlatformType = args.platform or 3
-    args.FGameIndex    = args.game_index or 0
-    args.FSex          = args.sex or 1
+    args.FPlatformID   = reqData.token or "default"
+    args.FPlatformType = reqData.platform or 3
+    args.FGameIndex    = reqData.game_index or 0
+    args.FSex          = reqData.sex or 1
 
-    args.FUserName     = tostring(args.FPlatformID)
+    args.FUserName     = tostring(reqData.FPlatformID)
     args.FHeadUrl      = ""
     args.FDiamond      = 10
     args.FGold         = 1000

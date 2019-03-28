@@ -23,8 +23,9 @@ function GameServerLogic:info()
 		tableInfo[key] = { addr = obj; users = {}; }
 	end)
 
-	self.m_users:forEach(function (table_id,  user_id)
-		local tbl = tableInfo[table_id]
+	self.m_users:forEach(function (user,  user_id)
+		local tid = user:getTableId() or 0
+		local tbl = tableInfo[tid]
 		if tbl then 
 			table.insert(tbl.users, user_id)
 		end 
@@ -97,7 +98,7 @@ function GameServerLogic:handlerCreateReq(uid, data)
 		end 
 		user:addCreatedTable(table_id)
 		self.m_tables:addObject(tableSvr, table_id)
-		return const.MsgId.CreateRoomRsp,{status = 0;room_id = table_id;}
+		return const.MsgId.CreateRoomRsp,{status = 1;room_id = table_id;}
 	else 
 		skynet.kill(tableSvr)
 		self.m_idPool:recoverId(table_id)
