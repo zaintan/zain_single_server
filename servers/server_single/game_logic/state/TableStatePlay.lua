@@ -144,13 +144,13 @@ function TableStatePlay:_initPlayerStatuses()
 	self.player_statuses = {}
 	local players = self.m_pTable:getPlayers()
 
-	for i=0,self.m_pTable:getMaxPlayerNum()-1 do
+	for i=1,self.m_pTable:getMaxPlayerNum() do
 		self.player_statuses[i] = const.PlayerStatus.NULL
 	end
 end
 
 function TableStatePlay:changePlayerStatus( seat_index, status )
-	self.player_statuses[seat_index] = status
+	self.player_statuses[seat_index+1] = status
 end
 
 function TableStatePlay:gameRoundOver()
@@ -164,7 +164,7 @@ function TableStatePlay:broadcastPlayerStatus()
 		local seat_index = player.seat_index
 		
 		local msg_data = {};
-		msg_data.player_status      = self.player_statuses[seat_index];
+		msg_data.player_status      = self.player_statuses[seat_index+1];
 		msg_data.pointed_seat_index = self.m_curSeatIndex;
 		msg_data.op_info            = self.m_pTable:getPlayerCards(seat_index):getActions();
 
@@ -207,8 +207,8 @@ local function _getPlayerCardsInfo(playerCards,cards_seat, send_seat ,hasHand, h
 		seat_index   = cards_seat;		
 	}
 	local hands = playerCards:getHands()
-	Log.d(LOGTAG,"getPlayerCardsInfo:cards_seat=%d,send_seat=%d",cards_seat,send_seat);
-	Log.dump(LOGTAG,hands);
+	--Log.d(LOGTAG,"getPlayerCardsInfo:cards_seat=%d,send_seat=%d",cards_seat,send_seat);
+	--Log.dump(LOGTAG,hands);
 	--add hands
 	if hasHand then 
 		data.hands = _getHands(hands,cards_seat, send_seat)
@@ -221,7 +221,7 @@ local function _getPlayerCardsInfo(playerCards,cards_seat, send_seat ,hasHand, h
 	if hasDiscard then 
 		data.discards = playerCards:getDiscards()
 	end 
-	Log.dump(LOGTAG,data);
+	--Log.dump(LOGTAG,data);
 	return data
 end
 
@@ -264,5 +264,6 @@ function TableStatePlay:_getCardsInfo(uid)
 	end	
 	return cards_infos
 end
+
 
 return TableStatePlay

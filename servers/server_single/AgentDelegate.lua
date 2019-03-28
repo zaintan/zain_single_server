@@ -145,7 +145,9 @@ function class:command_handler(msg, recvTime)
         return
     end 
 
-    Log.dump(LOGTAG,data)
+    if args.msg_id ~= const.MsgId.HeartReq then
+        Log.dump(LOGTAG,data)
+    end 
 
     local f = ComandFuncMap[args.msg_id]
     if f then 

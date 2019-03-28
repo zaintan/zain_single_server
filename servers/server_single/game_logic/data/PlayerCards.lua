@@ -29,10 +29,18 @@ function PlayerCards:dealCards( cards )
 	for i,v in ipairs(cards) do
 		table.insert(self.m_hands, v)
 	end
+
+	table.sort(self.m_hands, function ( a,b )
+		return a < b
+	end)
 end
 
 function PlayerCards:drawCard(card)
 	table.insert(self.m_hands, card)
+
+	table.sort(self.m_hands, function ( a,b )
+		return a < b
+	end)	
 end
 
 function PlayerCards:outCard(card)
