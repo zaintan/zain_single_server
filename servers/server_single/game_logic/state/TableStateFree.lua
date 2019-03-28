@@ -2,6 +2,8 @@
 ---! @file
 ---! @brief TableStateFree
 ------------------------------------------------------
+local skynet = require "skynet"
+
 local Super = require("game_logic.state.BaseTableState")
 local TableStateFree = class(Super)
 

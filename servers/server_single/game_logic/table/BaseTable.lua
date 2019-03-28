@@ -2,6 +2,8 @@
 ---! @file
 ---! @brief BaseTable
 ------------------------------------------------------
+local skynet = require "skynet"
+
 local BaseTable = class()
 
 local TableUserInfo = require("game_logic.data.TableUserInfo")
