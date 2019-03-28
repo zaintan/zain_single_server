@@ -111,7 +111,7 @@ message CreateRoomRequest {
     required int32 create_type = 1; // 创建类型
     required int32 game_id = 2; // 子游戏ID
     required int32 game_type = 3; // 子玩法ID
-    repeated int32 game_rules = 4; // 玩法规则
+    repeated GameRuleInfo game_rules = 4; // 玩法规则
     required int32 over_type = 5; // 结束类型，1：局数，2：圈数，3：分数
     optional int32 over_val = 6; // 结束类型的值，8局或1圈或100分
     repeated int32 reserved = 110; // 消除Warning的预留值
@@ -134,7 +134,7 @@ message JoinRoomResponse {
     optional string status_tip = 2; // 状态提示信息
     optional int32 game_id = 3; // 子游戏ID
     optional int32 game_type = 4; // 子玩法ID
-    repeated int32 game_rules = 5; // 玩法规则
+    repeated GameRuleInfo game_rules = 5; // 玩法规则
     repeated RoomUserInfo players = 6; // 房间内的玩家
     optional int32 game_status = 7; // 游戏状态
     optional int32 over_type = 9; // 结束类型，1：局数，2：圈数，3：分数
@@ -145,6 +145,17 @@ message JoinRoomResponse {
     optional int32 room_id = 14; // 房间号
     repeated int32 reserved = 110; // 消除Warning的预留值
 }
+// 玩法规则
+message GameRuleInfo {
+    optional int32 id = 1; // 玩法id
+    optional int32 value =2; // 对应值
+    repeated int32 reserved = 110; // 消除Warning的预留值
+}
+// 进入房间推送
+message PlayerEnterPush {
+    required RoomUserInfo player = 1;
+    repeated int32 reserved = 110; // 消除Warning的预留值
+}
 // 准备请求
 message ReadyRequest {
     optional bool ready = 1; // 是否准备
@@ -152,7 +163,9 @@ message ReadyRequest {
 }
 // 准备响应
 message ReadyResponse {
-    optional bool ready = 1; // 是否准备
+    optional int32 status = 1; // 状态
+    optional string status_tip = 2; // 状态提示信息
+    optional bool ready = 3; // 是否准备
     repeated int32 reserved = 110; // 消除Warning的预留值
 }
 // 准备状态推送
@@ -212,6 +225,8 @@ message GameFinishPush {
 message DispatchCardPush {
     optional int32 dispatch_card = 1; // 抓的牌
     optional int32 seat_index = 2; // 抓牌人
+    optional int32 remain_num = 3; // 剩余牌张数
+    optional int32 dispatch_type = 4; // 发牌类型：1：顺序发牌，2：尾部补牌
     repeated int32 reserved = 110; // 消除Warning的预留值 
 }
 // 玩家手牌推送
@@ -254,5 +269,16 @@ message OutCardResponse {
 message OutCardPush {
     optional int32 seat_index = 1; // 出牌人
     optional int32 out_card = 2; // 出的牌
+    repeated int32 reserved = 110; // 消除Warning的预留值
+}
+// 移除弃牌推送
+message RemoveDiscardPush {
+    optional int32 seat_index = 1; // 移除人
+    repeated int32 reserved = 110; // 消除Warning的预留值
+}
+// 大结算推送
+message BigRoundResultPush {
+    optional RoomUserInfo creator = 1; // 创建者
+    repeated RoomUserInfo players = 2; // 所有玩家
     repeated int32 reserved = 110; // 消除Warning的预留值
 }
