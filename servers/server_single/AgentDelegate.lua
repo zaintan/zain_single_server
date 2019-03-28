@@ -95,7 +95,7 @@ end
 function class:_handlerLoginReq(data)
     local ok,data = pcall(skynet.call, ".LoginService", "lua", "on_login", data)
     if not ok then 
-        log.e("Agent","call LoginService failed!")
+        Log.e("Agent","call LoginService failed!")
     else
         if data.user_info then 
             self.FUserID = data.user_info.user_id
@@ -110,9 +110,9 @@ function class:_handlerLoginReq(data)
 end
 
 function class:_handlerRoomReq(msg_id, data)
-    log.e("Agent","_handlerRoomReq msg_id=%d", msg_id)
+    Log.e("Agent","_handlerRoomReq msg_id=%d", msg_id)
     local status,retid,retData = pcall(skynet.call, ".GameService","lua","on_req", self.FUserID,msg_id, data)
-    log.e("Agent","status=%s,retid=%s,retData=%s", tostring(status),tostring(retid),tostring(retData))
+    Log.e("Agent","status=%s,retid=%s,retData=%s", tostring(status),tostring(retid),tostring(retData))
     if status then 
         if retid and retData then 
             self:sendMsg(retid, retData)
@@ -132,13 +132,13 @@ function class:command_handler(msg, recvTime)
     local args    = packetHelper:decodeMsg("Zain.ProtoInfo",msg)
     local msgName = ProtoHelper.IdToName[args.msg_id]
     if not msgName then 
-        log.e("Agent","unknown msg_id: ",args.msg_id)
+        Log.e("Agent","unknown msg_id: ",args.msg_id)
         return 
     end 
 
     local data,err = packetHelper:decodeMsg("Zain."..msgName, args.msg_body)
     if not data or err ~= nil then 
-        log.e("Agent","parse msg err: ",args.msg_id, msgName )
+        Log.e("Agent","parse msg err: ",args.msg_id, msgName )
         return
     end 
 

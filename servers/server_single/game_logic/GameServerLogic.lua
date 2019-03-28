@@ -44,7 +44,7 @@ local function _onMsgFaild(id, err_tip)
 end
 
 function GameServerLogic:handlerCreateReq(uid, data)
-	log.d(TAG,"GameServerLogic:handlerCreateReq")
+	Log.d(TAG,"GameServerLogic:handlerCreateReq")
 	
 	local user = self.m_users:getObject(uid)
 	if user and not user:canCreateTable() then 
@@ -117,7 +117,7 @@ function GameServerLogic:handlerClientReq(uid, msgId, data)
 
 		return skynet.call(tableAddr, "lua", "on_req", uid, msgId, data)
 	end		
-	log.e("GameServer","Not In Table,can not access unkonwn msgId = ",msgId)
+	Log.e("GameServer","Not In Table,can not access unkonwn msgId = ",msgId)
 end
 
 return GameServerLogic
