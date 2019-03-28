@@ -34,7 +34,7 @@ local ComandFuncMap = {
 }
 
 function CMD.on_req(source, uid, msg_id, data)
-    log.d(LOGTAG,"on_req uid = %d, msg_id=%d", uid, msg_id)
+    Log.d(LOGTAG,"on_req uid = %d, msg_id=%d", uid, msg_id)
     
     local func = ComandFuncMap[msg_id]
     if func then 
