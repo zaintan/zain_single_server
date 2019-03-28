@@ -27,6 +27,7 @@ function HandlerSendCard:onEnter()
 --  暗杆 or  自摸 or 补缸
 	self.m_pTable:cleanActions()
 	--self.m_pTable:cleanActions(self.seat_index)
+	local playerCards = self.m_pTable:getPlayerCards(self.seat_index)
 	local hasOp = playerCards:checkAddAction(const.GameAction.GANG, const.GameAction.ZI_MO)
 	if hasOp then 
 		self.player_status = const.PlayerStatus.OPERATE
