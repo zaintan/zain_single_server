@@ -43,8 +43,8 @@ function TableStatePlay:_changeHandler(toHandler, ...)
 	self.m_curHandler:onEnter(...)
 end
 
-function TableStatePlay:changeHandler( Gamehandler )
-	local toHandler = self.m_mapHandler[Gamehandler]
+function TableStatePlay:changeHandler( handler )
+	local toHandler = self.m_mapHandler[handler]
 	if toHandler then 
 		self:_changeHandler(toHandler)
 		return true
@@ -72,7 +72,7 @@ function TableStatePlay:onEnter()
 	--广播牌局开始消息
 	self.m_pTable:broadcastMsg(const.MsgId.GameStartPush, {game_status = self.m_status;round_room_info = self:_getRoundRoomInfo();})
 	--发牌
-	self:changeHandler(const.Gamehandler.DEAL_CARDS)
+	self:changeHandler(const.GameHandler.DEAL_CARDS)
 end
 
 function TableStatePlay:onExit()
