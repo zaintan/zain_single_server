@@ -41,9 +41,9 @@ function CMD.on_req(source, uid, msg_id, data)
         return func(source, uid, data)
     end 
     --------------
-    skynet.ignoreret()
+    --skynet.ignoreret()
     handler:handlerClientReq(uid,msg_id,data)
-    return
+    return 
 end
 
 ---! 服务的启动函数
@@ -59,6 +59,8 @@ skynet.start(function()
             local ret,data = f(source, ...)
             if ret then
                 skynet.ret(skynet.pack(ret,data))
+            else
+                skynet.ret(skynet.pack(false))
             end
         else
             Log.e(LOGTAG,"unknown command:%s", cmd)
