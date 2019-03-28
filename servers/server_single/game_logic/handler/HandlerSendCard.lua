@@ -24,21 +24,18 @@ function HandlerSendCard:onEnter()
 		return
 	end 
 --	--判断庄家是否可以操作
---  暗杆 or  自摸
-	local playerCards = self.m_pTable:getPlayerCards(self.seat_index)
-	if playerCards:hasAnGang() or playerCards:hasBuGang(sendCard) or playerCards:hasHu(nil) then 
+--  暗杆 or  自摸 or 补缸
+	self.m_pTable:cleanActions()
+	--self.m_pTable:cleanActions(self.seat_index)
+	local hasOp = playerCards:checkAddAction(const.GameAction.GANG, const.GameAction.ZI_MO)
+	if hasOp then 
 		self.player_status = const.PlayerStatus.OPERATE
 	else 
 		self.player_status = const.PlayerStatus.OUT_CARD
 	end 
 	self.m_pState:changePlayerStatus(self.seat_index, self.player_status)
 	--广播刷新玩家状态
-	
-	local msg_data = {
-		player_status      = self.player_status
-		pointed_seat_index = self.seat_index
-	}
-	self.m_pTable:sendMsg(player.user_id, const.MsgId.PlayerStatusPush,msg_data )
+	self.m_pState:broadcastPlayerStatus()
 end
 
 function HandlerSendCard:_onOutCardReq(msg_id, uid, data)

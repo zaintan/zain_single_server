@@ -30,7 +30,10 @@ end
 
 --return JoinRoomResponse
 function BaseTableState:reconnect(agent, uid)
-	-- body
+	local player = self.m_pTable:getPlayer(uid)
+	if player then 
+		player.agent = agent
+	end 
 end
 
 

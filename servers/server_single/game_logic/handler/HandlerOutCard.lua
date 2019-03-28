@@ -16,8 +16,6 @@ function HandlerOutCard:onEnter(seat_index, out_card)
 	for seat = 0,self.m_pTable.m_curPlayerNum-1 do
 		if seat ~= seat_index then 
 			local playerCards = self.m_pTable:getPlayerCards(seat)
-
-
 		end 
 	end
 end

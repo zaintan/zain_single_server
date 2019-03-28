@@ -95,6 +95,21 @@ function BaseTable:_getPlayerBySeatIndex(seat_index)
 end
 ]]
 
+function BaseTable:cleanActions(seat)
+	if seat then 
+		self.m_playersCards[seat]:cleanActions()
+		return
+	end 
+	for k,v in pairs(self.m_playersCards) do
+		v:cleanActions()
+	end
+end
+
+
+function BaseTable:getPlayers()
+	return self.m_players
+end
+
 function BaseTable:getPlayerCards(seat_index)
 	return self.m_playersCards[seat_index]
 end
@@ -107,7 +122,7 @@ function BaseTable:dealPlayersCards(start_seat_index, num)
 	end
 	--广播发牌消息
 	local hasHand = true
-	self:broadcastRoomCards(hasHand)
+	self.m_curState:broadcastRoomCards(hasHand)
 end
 
 
@@ -148,7 +163,7 @@ function BaseTable:outCard(uid,card)
 
 	--刷新出牌玩家的手牌--
 	local hasHand = true
-	self:broadcastPlayerCards(msg_data.seat_index, hasHand)
+	self.m_curState:broadcastPlayerCards(msg_data.seat_index, hasHand)
 end
 
 function BaseTable:getRandBanker()
@@ -240,75 +255,6 @@ function BaseTable:broadcastMsg( msg_id, msg_data, except_uid )
 	end
 end
 
-local function _isInArray( val, array )
-	for i,v in ipairs(array) do
-		if v == val then 
-			return true
-		end 
-	end
-	return false
-end
-
-local function _getOtherCards(cardsArr)
-	local ret = {}
-	for i,v in ipairs(cardsArr) do
-		table.insert(ret, -1)
-	end
-	return ret
-end
-
-local function _getHands( playerHands, player_seat, send_seat )
-	if player_seat == send_seat then 
-		return playerHands
-	else
-		return _getOtherCards(playerHands)
-	end
-end
-
-local function _getPlayerCardsInfo(cards_seat, send_seat ,hasHand, hasWeave, hasDiscard)
-	local data = {
-		has_hands    = hasHand and true or false;
-		has_weaves   = hasWeave and true or false;
-		has_discards = hasDiscard and true or false;
-		seat_index   = player_seat;		
-	}
-	local playerCards = self.m_playersCards[cards_seat]
-	--add hands
-	if hasHand then 
-		data.hands = _getHands(playerCards:getHands(),player_seat, send_seat)
-	end 
-	--add weaves
-	if hasWeave then 
-		data.weaves = playerCards:getWeaves()
-	end 
-	--add discards
-	if hasDiscard then 
-		data.discards = playerCards:getDiscards()
-	end 
-	return data
-end
-
-function BaseTable:broadcastRoomCards(hasHand, hasWeave, hasDiscard, exceptSeats)
-	local except = exceptSeats or {}--不包括这些座位号玩家的牌
-	for id,player in pairs(self.m_players) do
-		local msg_data = {cards_infos = {};};
-		for seat,playerCards in pairs(self.m_playersCards) do
-			if not _isInArray(seat,  except) then 
-				local data = _getPlayerCardsInfo(seat,player.seat_index,hasHand, hasWeave, hasDiscard)
-				table.insert(msg_data.cards_infos, data)
-			end
-		end
-		self:sendMsg(player.user_id, const.MsgId.RoomCardsPush , msg_data )
-	end
-end
-
-function BaseTable:broadcastPlayerCards(cards_seat, hasHand, hasWeave, hasDiscard)
-	for id,player in pairs(self.m_players) do
-		local msg_data = {};
-		msg_data.cards_infos = _getPlayerCardsInfo(cards_seat, player.seat_index,hasHand, hasWeave, hasDiscard)
-		self:sendMsg(player.user_id, const.MsgId.PlayerCardsPush , msg_data)
-	end
-end
 
 
 return BaseTable

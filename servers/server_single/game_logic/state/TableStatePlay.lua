@@ -87,10 +87,12 @@ end
 
 --return JoinRoomResponse
 function TableStatePlay:reconnect(agent, uid)
+	Super.reconnect(self, agent, uid)
+
 	local info = self.m_pTable:getBaseInfo()
 	info.status = 0
-	info.op_info         = self:_getOpInfo();
-	info.cards_infos     = self:_getCardsInfo();
+	info.op_info         = self:_getOpInfo(uid);
+	info.cards_infos     = self:_getCardsInfo(uid);
 	info.round_room_info = self:_getRoundRoomInfo();
 	return info
 end
@@ -108,12 +110,9 @@ function TableStatePlay:_onOperateCardReq(msg_id, uid, data)
 	self.m_curHandler:_onOperateCardReq(msg_id, uid, data)
 end
 
-function TableStatePlay:_getOpInfo()
-	return nil
-end
-
-function TableStatePlay:_getCardsInfo()
-	return nil
+function TableStatePlay:_getOpInfo(uid)
+	local player = self.m_pTable:getPlayer(uid)
+	return self.m_pTable:getPlayerCards(player.seat_index):getActions();
 end
 
 function TableStatePlay:_getRoundRoomInfo()
@@ -141,7 +140,8 @@ end
 
 function TableStatePlay:_initPlayerStatuses()
 	self.player_statuses = {}
-	for k,v in pairs(self.m_pTable.m_players) do
+	local players = self.m_pTable:getPlayers()
+	for k,v in pairs(players) do
 		self.player_statuses[v.seat_index] = const.PlayerStatus.NULL
 	end
 end
@@ -152,6 +152,110 @@ end
 
 function TableStatePlay:gameRoundOver()
 	-- body
+end
+
+function TableStatePlay:broadcastPlayerStatus()
+	local players     = self.m_pTable:getPlayers()	
+
+	for id,player in pairs(players) do
+		local seat_index = player.seat_index
+		
+		local msg_data = {};
+		msg_data.player_status      = self.player_statuses[seat_index];
+		msg_data.pointed_seat_index = self.m_curSeatIndex;
+		msg_data.op_info            = self.m_pTable:getPlayerCards(seat_index):getActions();
+
+		self:sendMsg(player.user_id, const.MsgId.PlayerStatusPush , msg_data)
+	end
+end
+
+
+
+local function _isInArray( val, array )
+	for i,v in ipairs(array) do
+		if v == val then 
+			return true
+		end 
+	end
+	return false
+end
+
+local function _getOtherCards(cardsArr)
+	local ret = {}
+	for i,v in ipairs(cardsArr) do
+		table.insert(ret, -1)
+	end
+	return ret
+end
+
+local function _getHands( playerHands, player_seat, send_seat )
+	if player_seat == send_seat then 
+		return playerHands
+	else
+		return _getOtherCards(playerHands)
+	end
+end
+
+local function _getPlayerCardsInfo(playerCards,cards_seat, send_seat ,hasHand, hasWeave, hasDiscard)
+	local data = {
+		has_hands    = hasHand and true or false;
+		has_weaves   = hasWeave and true or false;
+		has_discards = hasDiscard and true or false;
+		seat_index   = cards_seat;		
+	}
+	--add hands
+	if hasHand then 
+		data.hands = _getHands(playerCards:getHands(),cards_seat, send_seat)
+	end 
+	--add weaves
+	if hasWeave then 
+		data.weaves = playerCards:getWeaves()
+	end 
+	--add discards
+	if hasDiscard then 
+		data.discards = playerCards:getDiscards()
+	end 
+	return data
+end
+
+function TableStatePlay:broadcastRoomCards(hasHand, hasWeave, hasDiscard, exceptSeats)
+	local except = exceptSeats or {}--不包括这些座位号玩家的牌
+	
+	local players = self.m_pTable:getPlayers()
+
+	for id,player in pairs(players) do
+		local msg_data = {cards_infos = {};};
+		for cards_seat,_ in pairs(self.player_statuses) do
+			if not _isInArray(cards_seat,  except) then 
+				local playerCards = self.m_pTable:getPlayerCards(cards_seat)
+				local data = _getPlayerCardsInfo(playerCards,cards_seat,player.seat_index,hasHand, hasWeave, hasDiscard)
+				table.insert(msg_data.cards_infos, data)
+			end
+		end
+		self.m_pTable:sendMsg(player.user_id, const.MsgId.RoomCardsPush , msg_data )
+	end
+end
+
+function TableStatePlay:broadcastPlayerCards(cards_seat, hasHand, hasWeave, hasDiscard)
+	local players = self.m_pTable:getPlayers()
+	for id,player in pairs(players) do
+		local msg_data = {};
+		local playerCards    = self.m_pTable:getPlayerCards(cards_seat)
+		msg_data.cards_infos = _getPlayerCardsInfo(playerCards,cards_seat, player.seat_index,hasHand, hasWeave, hasDiscard)
+		self.m_pTable:sendMsg(player.user_id, const.MsgId.PlayerCardsPush , msg_data)
+	end
+end
+
+function TableStatePlay:_getCardsInfo(uid)
+	local player = self.m_pTable:getPlayer(uid)
+
+	local cards_infos = {}
+	for cards_seat,_ in pairs(self.player_statuses) do
+		local playerCards = self.m_pTable:getPlayerCards(cards_seat)
+		local data        = _getPlayerCardsInfo(playerCards,cards_seat,player.seat_index,true,true,true)
+		table.insert(cards_infos, data)
+	end	
+	return nil
 end
 
 return TableStatePlay

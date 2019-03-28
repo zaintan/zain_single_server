@@ -25,7 +25,7 @@ end
 
 --return JoinRoomResponse
 function TableStateWait:reconnect(agent, uid)
-	-- body
+	Super.reconnect(self, agent, uid)
 end
 
 

@@ -54,14 +54,6 @@ function PlayerCards:removeDiscard()
 	return false
 end
 
-function PlayerCards:getActions()
-	return nil
-end
-
-function PlayerCards:hasAction( action )
-	return false
-end
-
 function PlayerCards:hasHandCard( card )
 	for i,v in ipairs(self.m_hands) do
 		if v == card then 
@@ -70,32 +62,47 @@ function PlayerCards:hasHandCard( card )
 	end
 end
 
+--------------------------------------------------------------------
+function PlayerCards:getActions()
+	return nil
+end
 
-function PlayerCards:hasAnGang()
+function PlayerCards:hasAction( action )
 	return false
 end
 
-function PlayerCards:hasPengGang(outCard)
+function PlayerCards:cleanActions()
+	self.m_actions = {}
+end
+
+function PlayerCards:checkAddAction(weave_kind)
+	return self.m_actions
+end
+
+function PlayerCards:checkAnGang()
 	return false
 end
 
-function PlayerCards:hasBuGang(sendCard)
+function PlayerCards:checkPengGang(outCard)
 	return false
 end
 
-function PlayerCards:hasChi(outCard)
+function PlayerCards:checkBuGang(sendCard)
 	return false
 end
 
-function PlayerCards:hasPeng(outCard)
+function PlayerCards:checkChi(outCard)
 	return false
 end
 
-function PlayerCards:hasHu(outCard)
+function PlayerCards:checkPeng(outCard)
 	return false
 end
 
-
+function PlayerCards:checkHu(outCard)
+	return false
+end
+--------------------------------------------------------------------
 
 
 return PlayerCards
