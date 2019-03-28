@@ -174,7 +174,7 @@ function BaseTable:outCard(uid,card)
 		seat_index = seat_index;
 		out_card   = card;
 	}
-	self:broadcastMsg(const.MsgId.OutCardRsp, msg_data)
+	self:broadcastMsg(const.MsgId.OutCardPush, msg_data)
 
 	--刷新出牌玩家的手牌--
 	local hasHand = true
