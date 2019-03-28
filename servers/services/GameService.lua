@@ -56,9 +56,9 @@ skynet.start(function()
         local f = CMD[cmd]
         Log.d(LOGTAG,"recv cmd:",cmd)
         if f then
-            local ret = f(source, ...)
+            local ret,data = f(source, ...)
             if ret then
-                skynet.ret(skynet.pack(ret))
+                skynet.ret(skynet.pack(ret,data))
             end
         else
             Log.e(LOGTAG,"unknown command:%s", cmd)

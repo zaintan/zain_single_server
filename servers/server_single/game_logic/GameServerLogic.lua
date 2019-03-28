@@ -7,7 +7,7 @@ require "skynet.manager"
 
 local GameServerLogic = {}
 
-local TAG = "GSLogic"
+local LOGTAG = "GSLogic"
 ---! 辅助依赖
 local NumSet       = require "NumSet"
 
@@ -25,7 +25,7 @@ function GameServerLogic:queryTableId(uid)
 end
 
 function GameServerLogic:offline(uid)
-	-- body
+	return true
 end
 
 function GameServerLogic:init()
@@ -44,7 +44,7 @@ local function _onMsgFaild(id, err_tip)
 end
 
 function GameServerLogic:handlerCreateReq(uid, data)
-	Log.d(TAG,"GameServerLogic:handlerCreateReq")
+	Log.d(LOGTAG,"GameServerLogic:handlerCreateReq")
 	
 	local user = self.m_users:getObject(uid)
 	if user and not user:canCreateTable() then 
