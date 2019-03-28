@@ -110,7 +110,9 @@ function class:_handlerLoginReq(data)
 end
 
 function class:_handlerRoomReq(msg_id, data)
+    log.e("Agent","_handlerRoomReq msg_id=%d", msg_id)
     local status,retid,retData = pcall(skynet.call, ".GameService","lua","on_req", self.FUserID,msg_id, data)
+    log.e("Agent","status=%s,retid=%s,retData=%s", tostring(status),tostring(retid),tostring(retData))
     if status then 
         if retid and retData then 
             self:sendMsg(retid, retData)

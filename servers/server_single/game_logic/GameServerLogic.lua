@@ -7,6 +7,7 @@ require "skynet.manager"
 
 local GameServerLogic = {}
 
+local TAG = "GSLogic"
 ---! 辅助依赖
 local NumSet       = require "NumSet"
 
@@ -43,6 +44,8 @@ local function _onMsgFaild(id, err_tip)
 end
 
 function GameServerLogic:handlerCreateReq(uid, data)
+	log.d(TAG,"GameServerLogic:handlerCreateReq")
+	
 	local user = self.m_users:getObject(uid)
 	if user and not user:canCreateTable() then 
 		return _onMsgFaild(const.MsgId.CreateRoomRsp,"开房数量已达上限!")

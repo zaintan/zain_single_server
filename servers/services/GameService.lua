@@ -8,6 +8,7 @@ require "skynet.manager"
 
 local handler = require("game_logic.GameServerLogic")
 
+local LOGTAG = "GS"
 -------------------------------------------------------------------
 local CMD = {}
 
@@ -33,13 +34,16 @@ local ComandFuncMap = {
 }
 
 function CMD.on_req(source, uid, msg_id, data)
+    log.d(LOGTAG,"on_req uid = %d, msg_id=%d", uid, msg_id)
+    
     local func = ComandFuncMap[msg_id]
     if func then 
         return func(source, uid, data)
     end 
     --------------
     skynet.ignoreret()
-    return handler:handlerClientReq(uid,msg_id,data)
+    handler:handlerClientReq(uid,msg_id,data)
+    return
 end
 
 ---! 服务的启动函数
@@ -50,7 +54,7 @@ skynet.start(function()
     ---! 注册skynet消息服务
     skynet.dispatch("lua", function(session, source, cmd, ...)
         local f = CMD[cmd]
-        Log.d("GameService","recv cmd:",cmd)
+        Log.d(LOGTAG,"recv cmd:",cmd)
         if f then
             local ret = f(source, ...)
             if ret then
