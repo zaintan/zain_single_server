@@ -66,4 +66,8 @@ skynet.start(function()
     end)
     
     handler:init()
+
+    skynet.info_func(function ()
+        return handler:info()
+    end)
 end)

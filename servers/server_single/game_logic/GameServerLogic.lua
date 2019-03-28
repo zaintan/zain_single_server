@@ -10,8 +10,39 @@ local GameServerLogic = {}
 local LOGTAG = "GSLogic"
 ---! 辅助依赖
 local NumSet       = require "NumSet"
+--local strHelper    = require "StringHelper"
+local tblHelper    = require "TableHelper"
 
 local GameUserInfo = require "game_logic.data.GameUserInfo"
+
+function GameServerLogic:info()
+
+	local tableInfo  = {}
+	self.m_tables:forEach(function (obj, key)
+		-- k = table_id; v = tableAddr;
+		tableInfo[key] = { addr = obj; users = {}; }
+	end)
+
+	self.m_users:forEach(function (table_id,  user_id)
+		local tbl = tableInfo[table_id]
+		if tbl then 
+			table.insert(tbl.users, user_id)
+		end 
+	end)
+
+	local arr  = {}
+	table.insert(arr, string.format("总桌数: %d", self.m_tables:getCount()))	
+	for table_id,info in pairs(tableInfo) do
+		table.insert(arr, string.format("桌子id: %d,桌子地址:%x,userids:%s,%s,%s,%s",
+			table_id,
+			info.addr,
+			tostring(info.users[1]),
+			tostring(info.users[2]),
+			tostring(info.users[3]),
+			tostring(info.users[4]) ))
+	end
+    return strHelper.join(arr, "\t")
+end
 
 function GameServerLogic:queryTableId(uid)
 	local user = self.m_users:getObject(uid)

@@ -146,8 +146,8 @@ class.isEqual = isEqual
 --! @return break if any element matches handler, or all elements checked
 local function forEach (self, handler)
     local data = self.data
-    for _,obj in pairs(data) do
-        if handler(obj) then
+    for key,obj in pairs(data) do
+        if handler(obj,key) then
             return
         end
     end
