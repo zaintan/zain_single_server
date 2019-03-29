@@ -38,10 +38,12 @@ function TableStatePlay:_initHandlers()
 end
 
 function TableStatePlay:_changeHandler(toHandler, ...)
+	--Log.d(LOGTAG,"_changeHandler")
 	if self.m_curHandler then 
 		self.m_curHandler:onExit()
 	end 
 	self.m_curHandler = toHandler
+	Log.d(LOGTAG,"_changeHandler = %d",self.m_curHandler:getStatus() )
 	self.m_curHandler:onEnter(...)
 end
 

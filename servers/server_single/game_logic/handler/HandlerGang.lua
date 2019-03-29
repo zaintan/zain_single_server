@@ -12,6 +12,8 @@ function HandlerGang:ctor(...)
 end
 
 function HandlerGang:onEnter(seat_index, operReqData, provide_player)
+	Log.d(LOGTAG,"seat_index=%d,provide_player=%d",seat_index,provide_player)
+	Log.dump(LOGTAG,operReqData)
 	--切换到操作玩家
 	self.m_pState:turnSeat(seat_index)
 	--清空玩家操作状态
