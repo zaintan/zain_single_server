@@ -45,10 +45,10 @@ function TableStatePlay:_changeHandler(toHandler, ...)
 	self.m_curHandler:onEnter(...)
 end
 
-function TableStatePlay:changeHandler( handler )
+function TableStatePlay:changeHandler( handler, ...)
 	local toHandler = self.m_mapHandler[handler]
 	if toHandler then 
-		self:_changeHandler(toHandler)
+		self:_changeHandler(toHandler, ...)
 		return true
 	end 
 	return false
