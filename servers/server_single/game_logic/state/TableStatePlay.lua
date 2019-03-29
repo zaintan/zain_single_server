@@ -113,10 +113,12 @@ function TableStatePlay:_onReadyReq(msg_id, uid, data)
 end
 
 function TableStatePlay:_onOutCardReq(msg_id, uid, data)
+	Log.d(LOGTAG, "_onOutCardReq msg_id=%d,uid=%d",msg_id,uid)
 	self.m_curHandler:_onOutCardReq(msg_id, uid, data)
 end
 
 function TableStatePlay:_onOperateCardReq(msg_id, uid, data)
+	Log.d(LOGTAG, "_onOperateCardReq msg_id=%d,uid=%d",msg_id,uid)
 	self.m_curHandler:_onOperateCardReq(msg_id, uid, data)
 end
 
