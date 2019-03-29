@@ -121,8 +121,10 @@ function TableStatePlay:_onOperateCardReq(msg_id, uid, data)
 end
 
 function TableStatePlay:_getOpInfo(uid)
+	local info = {}
 	local player = self.m_pTable:getPlayer(uid)
-	return self.m_pTable:getPlayerCards(player.seat_index):getActions();
+	info.weaves  = self.m_pTable:getPlayerCards(player.seat_index):getActions();
+	return info
 end
 
 function TableStatePlay:_getRoundRoomInfo()
@@ -178,7 +180,8 @@ function TableStatePlay:broadcastPlayerStatus()
 		local msg_data = {};
 		msg_data.player_status      = self.player_statuses[seat_index+1];
 		msg_data.pointed_seat_index = self.m_curSeatIndex;
-		msg_data.op_info            = self.m_pTable:getPlayerCards(seat_index):getActions();
+		msg_data.op_info = {}            
+		msg_data.op_info.weaves = self.m_pTable:getPlayerCards(seat_index):getActions();
 
 		self.m_pTable:sendMsg(player.user_id, const.MsgId.PlayerStatusPush , msg_data)
 	end
