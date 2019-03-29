@@ -61,7 +61,7 @@ function HandlerOutCard:_hasMorePriUndoOp()
 	end
 	----------------------------------------------
 	local do_seat,do_data = self:_getHighestOp()
-	if highestUndo > kGameActionPriMap[do_data.weave_kind] then 
+	if do_data and highestUndo > kGameActionPriMap[do_data.weave_kind] then 
 		return true
 	end
 	return false
@@ -92,7 +92,7 @@ end
 function HandlerOutCard:_checkOthersAction( checkWiks, out_card )
 	local hasAction = false
 	for seat = 0,self.m_pTable:getCurPlayerNum() - 1 do
-		if seat ~= seat_index then 
+		if seat ~= self.seat_index then 
 			local playerCards = self.m_pTable:getPlayerCards(seat)
 			local actions = playerCards:checkAddAction(checkWiks, out_card, true, self.seat_index)
 			
