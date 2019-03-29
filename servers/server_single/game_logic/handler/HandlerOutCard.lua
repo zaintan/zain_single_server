@@ -33,7 +33,7 @@ function HandlerOutCard:_doOp(seat, reqData )
 end
 
 local kGameActionPriMap = {
-	[const.GameAction.NULL]       = 0
+	[const.GameAction.NULL]       = 0;
 	[const.GameAction.LEFT_EAT]   = 1;
 	[const.GameAction.RIGHT_EAT]  = 1;
 	[const.GameAction.CENTER_EAT] = 1;

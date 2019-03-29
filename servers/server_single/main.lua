@@ -22,19 +22,14 @@ skynet.start(function()
     Log.i("Main","debug port is:%d", debugPort)
     --print("debug port is", port)
     skynet.newservice("debug_console", debugPort)
-
     ---! 启动
-    skynet.uniqueservice("NodeStat") 
-
+    skynet.uniqueservice("NodeStat")
     ---! 启动AgentWatch
     skynet.uniqueservice("WatchDog")
-  
     ---! 启动Login
     skynet.newservice("LoginService")
-
     ---! 启动Game
-    skynet.newservice("GameService")        
-    
+    skynet.newservice("GameService")
     ---! 启动好了，没事做就退出
     skynet.exit()
 end)

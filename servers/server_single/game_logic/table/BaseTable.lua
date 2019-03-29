@@ -33,8 +33,8 @@ function BaseTable:setOverCondition(overType, overVal)
 end
 
 function BaseTable:_initGameRules()
-	for i,v in ipairs(self.m_gameRules) do
-		if v.id == const.GameRule.PLAYER_COUNT then 
+	for _,v in ipairs(self.m_gameRules) do
+		if v.id == const.GameRule.PLAYER_COUNT then
 			self.m_maxPlayerNum = v.value
 		end 
 	end
