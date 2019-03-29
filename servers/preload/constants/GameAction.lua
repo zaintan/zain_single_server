@@ -1,5 +1,5 @@
 local GameAction = {
-	NULL      = 0;
+	NULL      = 10;
 	LEFT_EAT  = 1;
 	RIGHT_EAT = 2;
 	CENTER_EAT= 3;
