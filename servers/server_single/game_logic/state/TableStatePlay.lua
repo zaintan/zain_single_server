@@ -226,7 +226,7 @@ local function _getPlayerCardsInfo(playerCards,cards_seat, send_seat ,hasHand, h
 		seat_index   = cards_seat;		
 	}
 	local hands = playerCards:getHands()
-	--Log.d(LOGTAG,"getPlayerCardsInfo:cards_seat=%d,send_seat=%d",cards_seat,send_seat);
+	Log.d(LOGTAG,"getPlayerCardsInfo:cards_seat=%d,send_seat=%d",cards_seat,send_seat);
 	--Log.dump(LOGTAG,hands);
 	--add hands
 	if hasHand then 
@@ -240,7 +240,7 @@ local function _getPlayerCardsInfo(playerCards,cards_seat, send_seat ,hasHand, h
 	if hasDiscard then 
 		data.discards = playerCards:getDiscards()
 	end 
-	--Log.dump(LOGTAG,data);
+	Log.dump(LOGTAG,data);
 	return data
 end
 

@@ -37,6 +37,12 @@ function HandlerGang:onEnter(seat_index, operReqData, provide_player)
 		if not succ then 
 			Log.e(LOGTAG,"刪除玩家丟弃牌失败!")
 		end 
+		--刪除手牌
+		local succ = playerCards:removeHandCard(operReqData.center_card, 3)
+		if not succ then 
+			Log.e(LOGTAG,"刪除玩家手牌失败!")
+		end 
+
 		--操作者 添加组合牌
 		playerCards:addWeave(operReqData.weave_kind, operReqData.center_card, 1,provide_player)
 

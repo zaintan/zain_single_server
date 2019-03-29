@@ -98,6 +98,8 @@ function PlayerCards:addWeave(kind,center,public,provide)
 	weave.public_card    = public
 	weave.provide_player = provide
 	table.insert(self.m_weaves, weave)
+	Log.d(LOGTAG,"kind=%d,center=%d,public=%d,provide=%d",kind,center,public,provide)
+	Log.dump(LOGTAG,self.m_weaves)
 end
 
 function PlayerCards:getWeave( data  )
