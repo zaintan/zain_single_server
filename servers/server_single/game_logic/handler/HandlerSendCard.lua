@@ -72,15 +72,19 @@ end
 
 function HandlerSendCard:_onOperateCardReq(msg_id, uid, data)
 	Log.d(LOGTAG, "_onOperateCardReq msg_id=%d,uid=%d",msg_id,uid)
+	Log.dump(LOGTAG, data)
+
 	local ret_msg_id = msg_id + const.MsgId.BaseResponse
 	local seat_index = self.m_pTable:getPlayerSeat(uid)
 	--不是该玩家
 	if seat_index ~= self.seat_index then 
+		Log.d(LOGTAG, "seat_index=%d, self.seat_index=%d",seat_index,self.seat_index)
 		self.m_pTable:sendMsg(uid, ret_msg_id, {status = -2;})
 		return false
 	end 
 	--不在出牌状态
 	if self.player_status ~= const.PlayerStatus.OPERATE then 
+		Log.d(LOGTAG, "self.player_status=%d",self.player_status)
 		self.m_pTable:sendMsg(uid, ret_msg_id, {status = -3;})
 		return false
 	end
@@ -88,6 +92,7 @@ function HandlerSendCard:_onOperateCardReq(msg_id, uid, data)
 	--不存在的操作
 	local playerCards = self.m_pTable:getPlayerCards(self.seat_index)
 	if not playerCards:hasAction(data) then 
+		Log.d(LOGTAG, "not has Action")
 		self.m_pTable:sendMsg(uid, ret_msg_id, {status = -4;})
 		return false
 	end 

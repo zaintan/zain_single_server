@@ -138,12 +138,14 @@ end
 --要判断操作优先级
 function HandlerOutCard:_onOperateCardReq(msg_id, uid, data)
 	Log.d(LOGTAG, "_onOperateCardReq msg_id=%d,uid=%d",msg_id,uid)
+	Log.dump(LOGTAG, data)
 	local ret_msg_id = msg_id + const.MsgId.BaseResponse
 	local seat_index = self.m_pTable:getPlayerSeat(uid)
 
 	local player_status = self.m_pState:getPlayerStatus(seat_index)
 	--不在操作状态
 	if player_status ~= const.PlayerStatus.OPERATE then 
+		Log.d(LOGTAG, "player_status=%d",player_status)
 		self.m_pTable:sendMsg(uid, ret_msg_id, {status = -3;})
 		return false
 	end
@@ -151,6 +153,7 @@ function HandlerOutCard:_onOperateCardReq(msg_id, uid, data)
 	--不存在的操作
 	local playerCards = self.m_pTable:getPlayerCards(seat_index)
 	if not playerCards:hasAction(data) then 
+		Log.d(LOGTAG, "not has Action")
 		self.m_pTable:sendMsg(uid, ret_msg_id, {status = -4;})
 		return false
 	end 
@@ -158,8 +161,9 @@ function HandlerOutCard:_onOperateCardReq(msg_id, uid, data)
 	self:_doOp(seat_index, data)
 	--等待更高优先级的操作
 	if self:_hasMorePriUndoOp() then 
+		Log.d(LOGTAG, "wait more pri player op")
 		self.m_pTable:sendMsg(uid,msg_id+const.MsgId.BaseResponse, {status = 2;})
-		return
+		return false
 	end 
 	--没有更高友需等待的操作了  取当前最高操作作为生效操作
 	local effect_seat,effect_data = self:_getHighestOp()
@@ -176,6 +180,8 @@ function HandlerOutCard:_onOperateCardReq(msg_id, uid, data)
 	elseif data.weave_kind == const.GameAction.NULL then--过
 		self.m_pState:turnSeat()
 		self.m_pState:changeHandler(const.GameHandler.SEND_CARD)
+	else 
+		Log.e(LOGTAG, "invalid weave_kind = %d",data.weave_kind)
 	end 
 	--self.m_pTable:sendMsg(uid,msg_id+const.MsgId.BaseResponse, {status = -1;})
 	return true
