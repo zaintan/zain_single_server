@@ -213,6 +213,9 @@ local kCheckFuncsMap = {
 
 --weave_kind
 function PlayerCards:checkAddAction(wiks, card, addNull, provide)
+	Log.e(LOGTAG,"checkAddAction provide_player = %d, card = 0x%x,wiks: ",provide,card)
+	Log.dump(LOGTAG, wiks)
+
 	for _,wik in ipairs(wiks) do
 		local func = kCheckFuncsMap[wik]	
 		if func then 

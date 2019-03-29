@@ -5,6 +5,8 @@
 local Super = require("game_logic.handler.BaseHandler")
 local HandlerOutCard = class(Super)
 
+local LOGTAG = "HDOutCard"
+
 function HandlerOutCard:ctor()
 	self.m_status = const.GameHandler.OUT_CARD
 
@@ -121,7 +123,7 @@ function HandlerOutCard:onEnter(seat_index, out_card)
 
 	local checkWiks = {const.GameAction.PENG, const.GameAction.PENG_GANG, const.GameAction.JIE_PAO};
 	local hasOneAction = self:_checkOthersAction(checkWiks, out_card)
-
+	Log.d(LOGTAG,"seat = %d,出牌:0x%x ,其他人有操作:%s",seat_index,out_card,tostring(hasOneAction))
 	--广播刷新玩家状态
 	self.m_pState:broadcastPlayerStatus()
 
