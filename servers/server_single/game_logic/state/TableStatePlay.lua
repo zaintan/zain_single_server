@@ -99,8 +99,12 @@ function TableStatePlay:reconnect(agent, uid)
 	return info
 end
 
-function TableStatePlay:turnNextSeat()
-	self.m_curSeatIndex = (self.m_curSeatIndex + 1)%self.m_pTable:getCurPlayerNum()
+function TableStatePlay:turnSeat(nextSeat)
+	if nextSeat then 
+		self.m_curSeatIndex = nextSeat
+	else 
+		self.m_curSeatIndex = (self.m_curSeatIndex + 1)%self.m_pTable:getCurPlayerNum()
+	end 
 end
 
 

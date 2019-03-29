@@ -28,7 +28,10 @@ function HandlerSendCard:onEnter()
 	self.m_pTable:cleanActions()
 	--self.m_pTable:cleanActions(self.seat_index)
 	local playerCards = self.m_pTable:getPlayerCards(self.seat_index)
-	local actions = playerCards:checkAddAction(const.GameAction.GANG, const.GameAction.ZI_MO)
+	
+	local checkWiks = {const.GameAction.AN_GANG,const.GameAction.BU_GANG, const.GameAction.ZI_MO};
+
+	local actions = playerCards:checkAddAction(checkWiks, nil, true, self.seat_index)
 	if actions and #actions > 0 then 
 		self.player_status = const.PlayerStatus.OPERATE
 	else 
@@ -88,9 +91,10 @@ function HandlerSendCard:_onOperateCardReq(msg_id, uid, data)
 		return false
 	end 
 
-	if data.weave_kind == const.GameAction.GANG then 
+	if data.weave_kind == const.GameAction.AN_GANG
+		or data.weave_kind == const.GameAction.BU_GANG  then 
 		--切handlerGang
-		self.m_pState:changeHandler(const.GameHandler.GANG)
+		self.m_pState:changeHandler(const.GameHandler.GANG, seat_index, data, self.seat_index)		
 	elseif data.weave_kind == const.GameAction.ZI_MO then 
 		--切gameOver
 		self.m_pState:gameRoundOver()
