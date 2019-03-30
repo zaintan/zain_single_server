@@ -38,5 +38,9 @@ cp protobuf.lua ./../../../skynet/lualib/
 #!/bin/bash
 dos2unix servers/server_single/start.sh
 
+--to do:
+胡牌还未考虑 按位置先后的优先级  一炮多响的情况
+杠 没有检测是否还有牌可杠  即便没有牌 也认为杠操作有效 
+未做抢杠胡检测
 
 
