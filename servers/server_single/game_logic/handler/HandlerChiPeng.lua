@@ -13,7 +13,7 @@ function HandlerChiPeng:ctor(...)
 end
 
 
-function HandlerChiPeng:_excuteChiPeng(operReqData,playerCards,providerPlayerCards)
+function HandlerChiPeng:_excuteChiPeng(operReqData,playerCards,providerPlayerCards,provide_player)
 		--删除提供牌玩家的弃牌区最後一張
 	local succ = providerPlayerCards:removeDiscard()
 	if not succ then 
@@ -65,7 +65,7 @@ function HandlerChiPeng:onEnter(seat_index, operReqData, provide_player)
 	   operReqData.weave_kind == const.GameAction.CENTER_EAT or 
 	   operReqData.weave_kind == const.GameAction.PENG  then 
 
-	    self:_excuteChiPeng(operReqData,playerCards,providerPlayerCards)
+	    self:_excuteChiPeng(operReqData,playerCards,providerPlayerCards,provide_player)
 	else
 		Log.e(LOGTAG,"invalid chipeng weave_kind:%d",operReqData.weave_kind)
 	end 
