@@ -45,6 +45,7 @@ end
 function HandlerChiPeng:onEnter(seat_index, operReqData, provide_player)
 	Log.d(LOGTAG,"seat_index=%d,provide_player=%d",seat_index,provide_player)
 	Log.dump(LOGTAG,operReqData)
+
 	--切换到操作玩家
 	self.m_pState:turnSeat(seat_index)
 	--清空玩家操作状态
@@ -85,12 +86,32 @@ function HandlerChiPeng:onEnter(seat_index, operReqData, provide_player)
 
 	--广播刷新玩家状态
 	self.m_pState:broadcastPlayerStatus()
+
+	self.seat_index    = seat_index
 end
 
 function HandlerChiPeng:_onOutCardReq(msg_id, uid, data)
-	self.m_pTable:sendMsg(uid,msg_id+const.MsgId.BaseResponse, {status = -1;})
+	local ret_msg_id = msg_id + const.MsgId.BaseResponse
+	local seat_index = self.m_pTable:getPlayerSeat(uid)
+	--不是该玩家
+	if seat_index ~= self.seat_index then 
+		self.m_pTable:sendMsg(uid, ret_msg_id, {status = -2;})
+		return false
+	end 
+
+	--不存在的牌
+	local playerCards = self.m_pTable:getPlayerCards(self.seat_index)
+	if not playerCards:hasHandCard(data.out_card) then 
+		self.m_pTable:sendMsg(uid, ret_msg_id, {status = -4;})
+		return false
+	end 
+
+	self.m_pTable:outCard(uid, data.out_card)
+	--changehandler
+	self.m_pState:changeHandler(const.GameHandler.OUT_CARD, seat_index, data.out_card)
 	return false
 end
+
 
 function HandlerChiPeng:_onOperateCardReq(msg_id, uid, data)
 	self.m_pTable:sendMsg(uid,msg_id+const.MsgId.BaseResponse, {status = -1;})
