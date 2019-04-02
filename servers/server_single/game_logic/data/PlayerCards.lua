@@ -63,9 +63,9 @@ function PlayerCards:removeDiscard()
 	return false
 end
 
-function PlayerCards:removeHandCard(card, count)
-	local del_count = count or 1
-	for i=1,del_count do
+function PlayerCards:removeHandCard(cards)
+	for i=1,#cards do
+		local card = cards[i]
 		--防止死循環
 		local notFound = true
 		for index,v in ipairs(self.m_hands) do

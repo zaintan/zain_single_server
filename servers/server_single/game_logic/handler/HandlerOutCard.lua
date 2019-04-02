@@ -170,7 +170,7 @@ function HandlerOutCard:_onOperateCardReq(msg_id, uid, data)
 	--
 	if data.weave_kind == const.GameAction.PENG then
 		--切handlerChiPeng
-		self.m_pState:changeHandler(const.GameHandler.CHI_PENG)
+		self.m_pState:changeHandler(const.GameHandler.CHI_PENG,effect_seat, effect_data, self.seat_index)
 	elseif data.weave_kind == const.GameAction.PENG_GANG then 
 		--切handlerGang
 		self.m_pState:changeHandler(const.GameHandler.GANG, effect_seat, effect_data, self.seat_index)

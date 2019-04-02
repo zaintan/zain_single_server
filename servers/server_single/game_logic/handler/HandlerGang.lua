@@ -38,7 +38,9 @@ function HandlerGang:onEnter(seat_index, operReqData, provide_player)
 			Log.e(LOGTAG,"刪除玩家丟弃牌失败!")
 		end 
 		--刪除手牌
-		local succ = playerCards:removeHandCard(operReqData.center_card, 3)
+
+		local del_card = operReqData.center_card
+		local succ = playerCards:removeHandCard({del_card, del_card, del_card})
 		if not succ then 
 			Log.e(LOGTAG,"刪除玩家手牌失败!")
 		end 
@@ -48,7 +50,7 @@ function HandlerGang:onEnter(seat_index, operReqData, provide_player)
 
 	elseif operReqData.weave_kind == const.GameAction.BU_GANG then 
 		--刪除手牌 一张
-		local succ = providerPlayerCards:removeHandCard(operReqData.center_card, 1)
+		local succ = providerPlayerCards:removeHandCard({operReqData.center_card})
 		if not succ then 
 			Log.e(LOGTAG,"刪除玩家手牌失败!")
 		end 	
@@ -65,7 +67,8 @@ function HandlerGang:onEnter(seat_index, operReqData, provide_player)
 
 	elseif operReqData.weave_kind == const.GameAction.AN_GANG then
 		--刪除手牌
-		local succ = providerPlayerCards:removeHandCard(operReqData.center_card, 4)
+		local del_card = operReqData.center_card
+		local succ = providerPlayerCards:removeHandCard({del_card,del_card,del_card,del_card})
 		if not succ then 
 			Log.e(LOGTAG,"刪除玩家手牌失败!")
 		end 
