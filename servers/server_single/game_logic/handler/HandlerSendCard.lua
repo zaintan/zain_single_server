@@ -31,7 +31,7 @@ function HandlerSendCard:onEnter()
 	
 	local checkWiks = {const.GameAction.AN_GANG,const.GameAction.BU_GANG, const.GameAction.ZI_MO};
 
-	local actions = playerCards:checkAddAction(checkWiks, nil, true, self.seat_index)
+	local actions = playerCards:checkAddAction(checkWiks, sendCard, true, self.seat_index)
 	if actions and #actions > 0 then 
 		self.player_status = const.PlayerStatus.OPERATE
 	else 

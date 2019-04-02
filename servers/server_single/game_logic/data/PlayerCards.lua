@@ -7,6 +7,8 @@ local PlayerCards = class()
 
 local LOGTAG = "PlayerCards"
 
+local HuLib  = require("game_logic.hulib.base_split.base_split")
+
 function PlayerCards:ctor()
 	self.m_hands    = {}
 	self.m_discards = {}
@@ -165,12 +167,40 @@ function PlayerCards:_checkPeng(provide,outCard)
 	end 
 end
 
-function PlayerCards:_checkHu(provide,outCard)
-	return 
+function PlayerCards:__translateHuArgs(hands)
+	local cards = {
+		0,0,0,0,0,0,0,0,0,	-- 1-9万--1,9,  
+		0,0,0,0,0,0,0,0,0,	-- 1-9筒--10,18, 
+		0,0,0,0,0,0,0,0,0,	-- 1-9条--19,27,  
+		--0,0,0,0,0,0,0		-- 东南西北中发白
+	}	
+	
+	for _,card in ipairs(hands) do
+		local color   = math.modf(card/16);
+		local val     = card - color*16
+		local trans_v = color*9+val
+		cards[trans_v] = cards[trans_v] + 1
+	end
+	--28,29,30,31,   
+	--32,33,34
+	return cards
 end
 
-function PlayerCards:_checkZimo(provide)
+function PlayerCards:_checkHu(provide,outCard)
+	table.insert(self.m_hands, outCard)
+	local args  = self:__translateHuArgs(self.m_hands)
+	table.remove(self.m_hands)
 
+	if HuLib.get_hu_info(args) then 
+		self:_addAction(const.GameAction.JIE_PAO,outCard,0,provide)
+	end 
+end
+
+function PlayerCards:_checkZimo(provide,sendCard)
+	local args  = self:__translateHuArgs(self.m_hands)
+	if HuLib.get_hu_info(args) then 
+		self:_addAction(const.GameAction.ZI_MO,sendCard,0,provide)
+	end 
 end 
 
 function PlayerCards:getActions()
