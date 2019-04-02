@@ -18,7 +18,7 @@ function PlayerCards:getHands()
 end
 
 function PlayerCards:getWeaves()
-	return {}
+	return self.m_weaves
 end
 
 function PlayerCards:getDiscards()
