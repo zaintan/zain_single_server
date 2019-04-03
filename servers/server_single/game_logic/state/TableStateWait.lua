@@ -51,11 +51,11 @@ function TableStateWait:_onReadyReq(msg_id, uid, data)
 	return true	
 end
 
-function TableStateFree:_onOutCardReq(msg_id, uid, data)
+function TableStateWait:_onOutCardReq(msg_id, uid, data)
 	self.m_pTable:sendMsg(uid,msg_id+const.MsgId.BaseResponse, {status = -1;status_tip = "牌局还未开始,无法出牌!";})
 end
 
-function TableStateFree:_onOperateCardReq(msg_id, uid, data)
+function TableStateWait:_onOperateCardReq(msg_id, uid, data)
 	self.m_pTable:sendMsg(uid,msg_id+const.MsgId.BaseResponse, {status = -1;status_tip = "牌局还未开始,无法操作牌!";})
 end
 
