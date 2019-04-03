@@ -10,9 +10,14 @@ local LOGTAG = "PlayerCards"
 local HuLib  = require("game_logic.hulib.base_split.base_split")
 
 function PlayerCards:ctor()
+	self:reset()
+end
+
+function PlayerCards:reset()
 	self.m_hands    = {}
 	self.m_discards = {}
 	self.m_weaves   = {}
+	self:cleanActions()
 end
 
 function PlayerCards:getHands()

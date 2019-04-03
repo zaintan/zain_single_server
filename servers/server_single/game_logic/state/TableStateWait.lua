@@ -15,6 +15,10 @@ function TableStateWait:onEnter()
 	for id,player in pairs(players) do
 		player.ready  = false
 		self.m_pTable:broadcastMsg(const.MsgId.ReadyPush, {seat_index = player.seat_index;ready = false;})	
+		
+		--清理掉玩家的牌
+		local playerCards = self.m_pTable:getPlayerCards(player.seat_index)
+		playerCards:reset()
 	end
 end
 
@@ -43,7 +47,7 @@ function TableStateWait:_onReadyReq(msg_id, uid, data)
 	if not player then 
 		self.m_pTable:sendMsg(uid, const.MsgId.ReadyRsp, {status = -1;})
 		return false
-	end 
+	end
 
 	player.ready = data.ready
 	self.m_pTable:sendMsg(uid, const.MsgId.ReadyRsp, {status = 0;ready = data.ready;})
