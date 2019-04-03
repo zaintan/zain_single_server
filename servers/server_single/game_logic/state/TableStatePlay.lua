@@ -171,10 +171,6 @@ function TableStatePlay:getPlayerStatus(seat_index)
 	return self.player_statuses[seat_index+1]
 end
 
-function TableStatePlay:gameRoundOver()
-	-- body
-end
-
 function TableStatePlay:broadcastPlayerStatus()
 	local players     = self.m_pTable:getPlayers()	
 
@@ -286,5 +282,62 @@ function TableStatePlay:_getCardsInfo(uid)
 	return cards_infos
 end
 
+function TableStatePlay:gameRoundOver(roundOverType, hu_seat, provider)
+	--确定下把的庄家
+	if roundOverType == const.RoundOverType.HU then 
+		self.m_winSeat = hu_seat
+	else
+		local haidiSeat = (self.m_curSeatIndex - 1)%self.m_pTable:getCurPlayerNum()
+		self.m_winSeat  = haidiSeat
+	end 
+	--推送游戏结束消息
+	local data = {}
+	data.game_status     = const.GameStatus.WAIT
+	data.finish_desc     = {}
+	data.final_scores    = {}
+	--data.win_types       = {}
+	data.cards_infos     = {}
 
+	local score_beilv = 1
+	local player_num  = self.m_pTable:getCurPlayerNum()
+	for i=1,player_num do
+		local seat = i - 1
+		if hu_seat and provider == hu_seat then --自摸
+			data.finish_desc[i]  = seat == hu_seat and "自摸" or ""
+			data.final_scores[i] = seat == hu_seat and player_num*score_beilv or -score_beilv
+			--data.win_types[i]    = 0
+		elseif hu_seat and provider ~= hu_seat then --放炮
+			if seat == hu_seat then 
+				data.finish_desc[i]  = "接炮"
+				data.final_scores[i] = score_beilv
+				--data.win_types[i]    = 0
+			elseif seat == provider then 
+				data.finish_desc[i]  = "放炮"
+				data.final_scores[i] = -score_beilv
+				--data.win_types[i]    = 0
+			else 
+				data.finish_desc[i]  = ""
+				data.final_scores[i] = 0
+				--data.win_types[i]    = 0
+			end 
+		else
+			data.finish_desc[i]  = ""
+			data.final_scores[i] = 0
+			--data.win_types[i]    = 0
+		end 
+
+		local playerCards = self.m_pTable:getPlayerCards(seat)
+		local card_data   = _getPlayerCardsInfo(playerCards,seat,seat,true,true)
+		data.cards_infos[i] = card_data
+		--table.insert(msg_data.cards_infos, data)
+	end
+	self.m_pTable:broadcastMsg(const.MsgId.GameFinishPush, data)
+	----大结算
+	if self.m_curRound == self.m_pTable:getOverVal() then 
+		--game over
+	else
+		--切换到小局之间的等待状态
+		self.m_pTable:changeWait()
+	end 	
+end
 return TableStatePlay

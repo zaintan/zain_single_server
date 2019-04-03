@@ -27,9 +27,9 @@ function HandlerGang:onEnter(seat_index, operReqData, provide_player)
 	local providerPlayerCards = self.m_pTable:getPlayerCards(provide_player)
 	--清空操作信息
 	self.m_pTable:cleanActions()
-	--
-	self.seat_index = seat_index
-	self.card       = operReqData.center_card
+	--杠的玩家
+	self.seat_index     = seat_index
+	self.card           = operReqData.center_card
 
 	if operReqData.weave_kind == const.GameAction.PENG_GANG then 
 		--删除提供牌玩家的弃牌区最後一張
@@ -138,8 +138,8 @@ function HandlerGang:_onOperateCardReq(msg_id, uid, data)
 	local effect_seat,effect_data = self:_getHighestOp()
 
 	if data.weave_kind == const.GameAction.JIE_PAO then 
-		--切gameOver
-		self.m_pState:gameRoundOver()
+		--切gameOver  抢杠胡 胡的是接杠的玩家
+		self.m_pState:gameRoundOver(const.RoundOverType.HU,effect_seat,self.seat_index)
 	elseif data.weave_kind == const.GameAction.NULL then--过
 		self.m_pState:changeHandler(const.GameHandler.SEND_CARD)
 	else 

@@ -32,6 +32,10 @@ function BaseTable:setOverCondition(overType, overVal)
 	self.m_overVal  = overVal
 end
 
+function BaseTable:getOverVal()
+	return self.m_overVal
+end
+
 function BaseTable:_initGameRules()
 	for _,v in ipairs(self.m_gameRules) do
 		if v.id == const.GameRule.PLAYER_COUNT then

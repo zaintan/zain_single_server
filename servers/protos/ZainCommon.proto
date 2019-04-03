@@ -1,5 +1,4 @@
 package Zain;
-
 option java_package = "protobuf.cher";
 // 服务端客户端通信消息体
 message ProtoInfo {
@@ -42,6 +41,7 @@ message RoomUserInfo {
     optional int32 score = 4; // 游戏分数
     optional int32 seat_index = 5; // 座位号
     optional bool ready = 6; // 是否已经准备
+    optional bool creator = 7; // 是否是创建者
     repeated int32 reserved = 110; // 消除Warning的预留值
 }
 // 吃落组合数据
@@ -104,6 +104,7 @@ message LoginResponse {
     required int32 status = 1; // 状态
     optional string status_tip = 2; // 状态提示信息
     optional AccountInfo user_info = 3; // 玩家信息
+    optional int32 room_id = 4; // 房间号。如果用户登录过后还在房间里，客户端主动发起JoinRoomRequest
     repeated int32 reserved = 110; // 消除Warning的预留值
 }
 // 创建房间请求
@@ -212,13 +213,11 @@ message RoomCardsPush {
 }
 // 小局结算推送
 message GameFinishPush {
-    repeated RoomUserInfo players = 1; // 房间内的玩家
-    optional RoundRoomInfo round_room_info = 2; // 小局房间信息
-    optional int32 room_id = 3; // 房间号
-    repeated PlayerCardsInfo cards_infos = 4; // 房间内所有玩家的牌数据
-    repeated int32 remain_cards = 5; // 剩余牌堆
-    repeated string finish_desc = 6; // 小结算文字描述信息
-    optional int32 game_status = 7; // 游戏状态
+    repeated PlayerCardsInfo cards_infos = 1; // 房间内所有玩家的牌数据
+    repeated string finish_desc = 2; // 小结算文字描述信息
+    optional int32 game_status = 3; // 游戏状态
+    repeated int32 win_types = 4; // 胡类型
+    repeated int32 final_scores = 5; // 小局分数统计
     repeated int32 reserved = 110; // 消除Warning的预留值
 }
 // 抓牌推送
@@ -278,7 +277,30 @@ message RemoveDiscardPush {
 }
 // 大结算推送
 message BigRoundResultPush {
-    optional RoomUserInfo creator = 1; // 创建者
+    optional BigRoundResultInfo big_round_result = 1; // 大局统计信息
     repeated RoomUserInfo players = 2; // 所有玩家
+    repeated GameRuleInfo game_rules = 3; // 玩法规则
+    optional int32 room_id = 4; // 房间号
+    optional int32 cur_val = 5; // 当前小局或圈数
+    repeated int32 reserved = 110; // 消除Warning的预留值
+}
+// 大局统计信息 
+message BigRoundResultInfo {
+    repeated int32 total_scores = 1; // 总分
+    repeated int32 zi_mo_counts = 2; // 自摸次数
+    repeated int32 gang_kai_counts = 3; // 杠上花次数
+    repeated int32 jie_pao_counts = 4; // 接炮次数
+    repeated int32 fang_pao_counts = 5; // 放炮次数
+    repeated int32 qiang_gang_counts = 6; // 抢杠次数
+    repeated int32 bei_qiang_gang_counts = 7; // 被抢杠次数
+    repeated int32 an_gang_counts = 8; // 暗杠次数
+    repeated int32 jie_gang_counts = 9; // 接杠次数
+    repeated int32 fang_gang_counts = 10; // 放杠次数
+    repeated int32 peng_gang_counts = 11; // 碰杠次数
+    optional int32 reserved = 110; // 消除Warning的预留值
+}
+// 系统强制解散
+message SystemReleasePush {
+    optional string tip = 1; // 解散说明
     repeated int32 reserved = 110; // 消除Warning的预留值
 }

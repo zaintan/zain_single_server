@@ -20,7 +20,7 @@ function HandlerSendCard:onEnter()
 	--广播抓牌
 	local succ,sendCard = self.m_pTable:drawCard(self.seat_index)
 	if not succ then --失败  没有牌了 
-		self.m_pState:gameRoundOver()
+		self.m_pState:gameRoundOver(const.RoundOverType.LIU_JU)
 		return
 	end 
 --	--判断庄家是否可以操作
@@ -103,7 +103,7 @@ function HandlerSendCard:_onOperateCardReq(msg_id, uid, data)
 		self.m_pState:changeHandler(const.GameHandler.GANG, seat_index, data, self.seat_index)		
 	elseif data.weave_kind == const.GameAction.ZI_MO then 
 		--切gameOver
-		self.m_pState:gameRoundOver()
+		self.m_pState:gameRoundOver(const.RoundOverType.HU,self.seat_index,self.seat_index)
 	end 
 	--self.m_pTable:sendMsg(uid,msg_id+const.MsgId.BaseResponse, {status = -1;})
 	return true

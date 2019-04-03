@@ -176,7 +176,7 @@ function HandlerOutCard:_onOperateCardReq(msg_id, uid, data)
 		self.m_pState:changeHandler(const.GameHandler.GANG, effect_seat, effect_data, self.seat_index)
 	elseif data.weave_kind == const.GameAction.JIE_PAO then 
 		--切gameOver
-		self.m_pState:gameRoundOver()
+		self.m_pState:gameRoundOver(const.RoundOverType.HU,effect_seat, self.seat_index)
 	elseif data.weave_kind == const.GameAction.NULL then--过
 		self.m_pState:turnSeat()
 		self.m_pState:changeHandler(const.GameHandler.SEND_CARD)

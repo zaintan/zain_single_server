@@ -7,6 +7,7 @@ M.GameRule     = require("constants.GameRule")
 M.GameAction   = require("constants.GameAction")
 M.LoginType    = require("constants.LoginType")
 M.GameHandler  = require("constants.GameHandler")
-M.GameOverType  = require("constants.GameOverType")
+M.GameOverType   = require("constants.GameOverType")
+M.RoundOverType  = require("constants.RoundOverType")
 
 return M
