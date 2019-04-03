@@ -96,6 +96,7 @@ end
 
 function class:_handlerLoginReq(data)
     local ok,data = pcall(skynet.call, ".LoginService", "lua", "on_login", data)
+    Log.d(LOGTAG,"recv ret from LoginService!")
     if not ok then 
         Log.e(LOGTAG,"call LoginService failed!")
     else

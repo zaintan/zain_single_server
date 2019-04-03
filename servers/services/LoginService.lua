@@ -15,14 +15,18 @@ local CacheUserMap      = NumSet.create()
 local CacheTokenMap     = NumSet.create()
 
 local CacheLimitCount   = 2048
+
+local LOGTAG = "LOGIN"
 -----------------------------------------------------------------------------------------
 local function _onLoginFalid(tip)
+    Log.d(LOGTAG,"failed:",tip)
     return {status = -1;status_tip = tip;}
 end
 
 local function _onLoginSuccess(uid)
-    local user = CacheUserMap:getObject(uid)
+    Log.d(LOGTAG,"success:",uid)
 
+    local user = CacheUserMap:getObject(uid)
     local info = {}
     info.user_id      = user.FUserID
     info.user_name    = user.FUserName
@@ -74,8 +78,9 @@ local function _updateCacheUser(uid ,agent, dbInfo )
         if user.agent and user.agent ~= agent then 
             -- !!踢错了  提了新的 -_-!!
             --pcall(skynet.call, agent, "lua", "disconnect")
-
+            Log.d(LOGTAG,"repeat login! kick start...")
             pcall(skynet.call, user.agent, "lua", "disconnect")
+            Log.d(LOGTAG,"repeat login! kick over!")
         end 
         user.agent = agent
     end 
@@ -92,19 +97,21 @@ values('tzy','zaintan','','1','10','1000','3','0',NOW(),NOW());
 +---------+-------------+-----------+----------+------+----------+-------+---------------+------------+------------+---------------------+
 ]]
 local function _registerGuestUser(reqData)
-
+    Log.d(LOGTAG,"register user start...")
     local info = _createNewUser(reqData)
     --插入数据库
     local sqlStr = string.format("insert into TUser(FPlatformID,FUserName,FHeadUrl,FSex,FDiamond,FGold,FPlatformType,FGameIndex,FRegDate,FLastLoginTime) values('%s','%s','%s','%d','%d','%d','%d','%d','%s','%s');", 
             info.FPlatformID,info.FUserName,info.FHeadUrl,info.FSex,info.FDiamond,info.FGold,info.FPlatformType,info.FGameIndex,"NOW()","NOW()");
     
     local pRet   = skynet.call(".DBService", "lua", "execDB", sqlStr)
+    Log.d(LOGTAG,"register insert db over...")
     if not pRet then 
         return nil
     end    
 
     local sqlStr = string.format("select * from TUser where FPlatformID=\"%s\";",info.FPlatformID)
     local pRet   = skynet.call(".DBService", "lua", "execDB", sqlStr)
+    Log.d(LOGTAG,"register query db over")
     if pRet and type(pRet) == "table" and #pRet > 0 then 
         info.FUserID        = tonumber(pRet[1].FUserID)
         info.FRegDate       = pRet[1].FRegDate
@@ -122,7 +129,7 @@ end
 local CMD = {}
 
 function CMD.on_login(agent, reqData)
-    Log.d("Login","recv cmd on_login")
+    Log.d(LOGTAG,"recv cmd on_login")
     if not reqData.login_type or not reqData.token then 
         return _onLoginFalid("缺失必要的登录参数！")
     end 
@@ -133,8 +140,10 @@ function CMD.on_login(agent, reqData)
             _updateCacheUser(userid,agent)
             return _onLoginSuccess(userid)
         else--缓存里面没有  需要去查数据库
+            Log.d(LOGTAG,"query db start...")
             local sqlStr = string.format("select * from TUser where FPlatformID=\"%s\";",reqData.token)
             local pRet   = skynet.call(".DBService", "lua", "execDB", sqlStr)
+            Log.d(LOGTAG,"query db over!")
             if pRet and type(pRet) == "table" then 
                 if #pRet <= 0 then --数据库查询不到
                     --register
@@ -159,7 +168,7 @@ end
 
 ----注意清缓存
 function CMD.logout(source,uid)
-    Log.d("Login","recv cmd logout uid:",uid)
+    Log.d(LOGTAG,"recv cmd logout uid:",uid)
     local user = CacheUserMap:getObject(uid)
     if user then 
         user.agent = nil
@@ -169,7 +178,7 @@ function CMD.logout(source,uid)
 end
 
 function CMD.query(source,uid )
-    --Log.d("Login","recv cmd query")
+    --Log.d(LOGTAG,"recv cmd query")
     local obj = CacheUserMap:getObject(uid)
     if not obj then 
         return false
@@ -223,7 +232,7 @@ skynet.start(function()
                 skynet.ret(skynet.pack(ret))
             end
         else
-            Log.e("Login","unknown command:%s", cmd)
+            Log.e(LOGTAG,"unknown command:%s", cmd)
         end
     end)
 
