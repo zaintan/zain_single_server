@@ -31,6 +31,10 @@ end
 --return JoinRoomResponse
 function TableStateWait:reconnect(agent, uid)
 	Super.reconnect(self, agent, uid)
+	
+	local info = self.m_pTable:getBaseInfo()
+	info.status = 1
+	return info	
 end
 
 
