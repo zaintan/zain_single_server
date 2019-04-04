@@ -332,6 +332,11 @@ function TableStatePlay:gameRoundOver(roundOverType, hu_seat, provider)
 		--table.insert(msg_data.cards_infos, data)
 	end
 	self.m_pTable:broadcastMsg(const.MsgId.GameFinishPush, data)
+	--累积分数
+	local players = self.m_pTable:getPlayers()
+	for k,player in pairs(players) do
+		player.score = player.score + data.final_scores[player.seat_index + 1]
+	end
 	----大结算
 	if self.m_curRound == self.m_pTable:getOverVal() then 
 		--game over

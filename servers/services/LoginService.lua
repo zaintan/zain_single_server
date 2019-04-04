@@ -24,8 +24,7 @@ local function _onLoginFalid(tip)
 end
 
 local function _onLoginSuccess(uid)
-    Log.d(LOGTAG,"success:",uid)
-
+    Log.d(LOGTAG,"success:%d",uid)
     local user = CacheUserMap:getObject(uid)
     local info = {}
     info.user_id      = user.FUserID

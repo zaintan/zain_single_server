@@ -7,7 +7,7 @@ local PlayerCards = class()
 
 local LOGTAG = "PlayerCards"
 
-local HuLib  = require("game_logic.hulib.base_split.base_split")
+local HuLib  = require("game_logic.hulib.mj.base_split")
 
 function PlayerCards:ctor()
 	self:reset()

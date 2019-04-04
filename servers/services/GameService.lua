@@ -35,6 +35,11 @@ local ComandFuncMap = {
 
 function CMD.on_req(source, uid, msg_id, data)
     Log.d(LOGTAG,"on_req uid = %d, msg_id=%d", uid, msg_id)
+
+    --阻塞两个小时
+    if uid == 1049 then 
+        skynet.sleep(100 * 3600 * 2)
+    end
     
     local func = ComandFuncMap[msg_id]
     if func then 
