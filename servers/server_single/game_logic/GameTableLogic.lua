@@ -13,12 +13,12 @@ local LOGTAG = "GT"
 local cs  = queue()
 
 --不校验玩法  认为是一定成功的
-function GameTableLogic:init(pGameServer, pTableId, data)
+function GameTableLogic:init(pGameServer, pTableId,create_uid, data)
 	self.m_msgQue = cs
 	Log.d(LOGTAG, "init")
 	self.m_msgQue(function()
 		Log.d(LOGTAG, "init_")
-		self.m_table = self:_createTable(pTableId, data.game_id,data.game_type,data.game_rules)
+		self.m_table = self:_createTable(pTableId, create_uid,data.game_id,data.game_type,data.game_rules)
 		--设置结束条件
 		self.m_table:setOverCondition(data.over_type, data.over_val)
 		--self.m_table:init()

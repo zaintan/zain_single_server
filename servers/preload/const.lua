@@ -9,5 +9,6 @@ M.LoginType    = require("constants.LoginType")
 M.GameHandler  = require("constants.GameHandler")
 M.GameOverType   = require("constants.GameOverType")
 M.RoundOverType  = require("constants.RoundOverType")
+M.Release        = require("constants.Release")
 
 return M

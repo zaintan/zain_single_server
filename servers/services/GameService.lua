@@ -20,6 +20,14 @@ function CMD.queryTableId(source, uid)
     return handler:queryTableId(uid)
 end 
 
+function CMD.releaseTable(source,tid,create_uid,uids)
+    return handler:releaseTable(source,tid,create_uid,uids)
+end 
+
+function CMD.leaveTable(source, uid, tableId )
+    return handler:releaseTable(uid, tableId)
+end
+
 local function _handlerCreateReq(source, uid, data)
     return handler:handlerCreateReq(uid, data)
 end
@@ -35,11 +43,6 @@ local ComandFuncMap = {
 
 function CMD.on_req(source, uid, msg_id, data)
     Log.d(LOGTAG,"on_req uid = %d, msg_id=%d", uid, msg_id)
-
-    --阻塞两个小时
-    if uid == 1049 then 
-        skynet.sleep(100 * 3600 * 2)
-    end
     
     local func = ComandFuncMap[msg_id]
     if func then 

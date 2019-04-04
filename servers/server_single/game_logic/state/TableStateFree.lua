@@ -64,7 +64,11 @@ function TableStateFree:_onReadyReq(msg_id, uid, data)
 
 	player.ready = data.ready
 	self.m_pTable:sendMsg(uid, const.MsgId.ReadyRsp, {status = 0;ready = data.ready;})
-	self.m_pTable:broadcastMsg(const.MsgId.ReadyPush, {seat_index = player.seat_index;ready = data.ready;}, uid)
+	
+	local push_data = {
+		ready_infos = {{seat_index = player.seat_index;ready = data.ready;}}
+	}
+	self.m_pTable:broadcastMsg(const.MsgId.ReadyPush, push_data, uid)
 	
 	if self.m_pTable:isFull() and self.m_pTable:isAllReady() then 
 		self.m_pTable:changePlay()
@@ -80,5 +84,36 @@ function TableStateFree:_onOperateCardReq(msg_id, uid, data)
 	self.m_pTable:sendMsg(uid,msg_id+const.MsgId.BaseResponse, {status = -1;status_tip = "牌局还未开始,无法操作牌!";})
 end
 
+function TableStateFree:_onReleaseReq(msg_id,uid, data)
+	--牌局未开始 创建者可以解散 普通人可以离开
+	if data.type == const.Release.APPLY_RELEASE then
+		if uid == self.m_pTable.m_createUid then 
+			--解散成功
+			self.m_pTable:sendMsg(uid,msg_id+const.MsgId.BaseResponse, {status = const.Release.RELEASE_CREATOR;status_tip="创建者已解散房间!"})
+			--destroy会推送成功解散的消息
+			self.m_pTable:destroy(const.Release.RELEASE_CREATOR)
+			return true
+		else
+			self.m_pTable:sendMsg(uid,msg_id+const.MsgId.BaseResponse, {status = -1;status_tip="非创建者无权解散房间!"})
+			return false
+		end 
+	elseif data.type == const.Release.APPLY_EXIT then 
+		local player = self.m_pTable:getPlayer(uid)
+		if not player then 
+			--玩家不在这个房间 回复解散失败
+			self.m_pTable:sendMsg(uid,msg_id+const.MsgId.BaseResponse, {status = -2;})
+			return false
+		end 
+		--通知GameServers
+		pcall(skynet.call, ".GameService", "lua","leaveTable", uid, self.m_tableId)
+		--广播玩家离开
+		self.m_pTable:broadcastMsg(const.MsgId.PlayerExitPush, {seat_index=player.seat_index;}, uid)
+		self.m_pTable:sendMsg(uid,msg_id+const.MsgId.BaseResponse, {status = 1;})		
+		return true
+	end 
+	--未知解散请求 回复解散失败
+	self.m_pTable:sendMsg(uid,msg_id+const.MsgId.BaseResponse, {status = -3;})
+	return false
+end
 
 return TableStateFree

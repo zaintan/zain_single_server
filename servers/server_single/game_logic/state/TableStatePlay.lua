@@ -331,7 +331,7 @@ function TableStatePlay:gameRoundOver(roundOverType, hu_seat, provider)
 		data.cards_infos[i] = card_data
 		--table.insert(msg_data.cards_infos, data)
 	end
-	self.m_pTable:broadcastMsg(const.MsgId.GameFinishPush, data)
+	self.m_pTable:broadcastMsg(const.MsgId.RoundFinishPush, data)
 	--累积分数
 	local players = self.m_pTable:getPlayers()
 	for k,player in pairs(players) do
@@ -340,6 +340,14 @@ function TableStatePlay:gameRoundOver(roundOverType, hu_seat, provider)
 	----大结算
 	if self.m_curRound == self.m_pTable:getOverVal() then 
 		--game over
+		local over_data = {player_infos = {};};
+		for _,player in pairs(players) do
+			local pinfo = {}
+			pinfo.total_scores = player.score
+			over_data.player_infos[player.seat_index] = pinfo
+		end		
+		self.m_pTable:broadcastMsg(const.MsgId.GameFinishPush, over_data)
+		self.m_pTable:destroy()
 	else
 		--切换到小局之间的等待状态
 		self.m_pTable:changeWait()

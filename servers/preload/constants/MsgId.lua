@@ -16,6 +16,9 @@ local MsgId = {
 	OperateCardRsp = 10006;
 	OutCardReq     = 7;
 	OutCardRsp     = 10007;
+
+	ReleaseReq     = 8;
+	ReleaseRsp     = 10008;
 	
 	CommonTipsPush    = 20001;
 	PlayerEnterPush   = 20002; 
@@ -27,10 +30,13 @@ local MsgId = {
 	OutCardPush       = 20007;
 	CardTypePush      = 20008;
 
-	GameFinishPush    = 20010;
+	RoundFinishPush   = 20010;
 	OutCardPush       = 20011;
 	DispatchCardPush  = 20012;
 	RoomCardsPush     = 20013;	
+	GameFinishPush    = 20014;
+	ReleasePush       = 20015;
+	PlayerExitPush    = 20016;
 }
 
 return MsgId

@@ -11,15 +11,20 @@ end
 
 function TableStateWait:onEnter()
 	--取消所有玩家的准备状态
+	local push_data = {
+		ready_infos = {}
+	}
+
 	local players     = self.m_pTable:getPlayers()	
 	for id,player in pairs(players) do
 		player.ready  = false
-		self.m_pTable:broadcastMsg(const.MsgId.ReadyPush, {seat_index = player.seat_index;ready = false;})	
+		table.insert(push_data.ready_infos,{seat_index = player.seat_index;ready = false;})	
 		
 		--清理掉玩家的牌
 		local playerCards = self.m_pTable:getPlayerCards(player.seat_index)
 		playerCards:reset()
 	end
+	self.m_pTable:broadcastMsg(const.MsgId.ReadyPush, push_data)	
 end
 
 function TableStateWait:onExit()
@@ -51,7 +56,11 @@ function TableStateWait:_onReadyReq(msg_id, uid, data)
 
 	player.ready = data.ready
 	self.m_pTable:sendMsg(uid, const.MsgId.ReadyRsp, {status = 0;ready = data.ready;})
-	self.m_pTable:broadcastMsg(const.MsgId.ReadyPush, {seat_index = player.seat_index;ready = data.ready;}, uid)
+
+	local push_data = {
+		ready_infos = {{seat_index = player.seat_index;ready = data.ready;}}
+	}
+	self.m_pTable:broadcastMsg(const.MsgId.ReadyPush, push_data, uid)
 	
 	if self.m_pTable:isAllReady() then 
 		self.m_pTable:changePlay()

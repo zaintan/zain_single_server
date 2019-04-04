@@ -157,6 +157,11 @@ message PlayerEnterPush {
     required RoomUserInfo player = 1;
     repeated int32 reserved = 110; // 消除Warning的预留值
 }
+// 离开房间推送
+message PlayerExitPush {
+    optional int32 seat_index = 1; // 
+    repeated int32 reserved = 110; // 消除Warning的预留值
+}
 // 准备请求
 message ReadyRequest {
     optional bool ready = 1; // 是否准备
@@ -169,11 +174,15 @@ message ReadyResponse {
     optional bool ready = 3; // 是否准备
     repeated int32 reserved = 110; // 消除Warning的预留值
 }
+message PlayerReadyInfo {
+    optional int32 seat_index = 1; // 操作人
+    optional bool ready = 2; // 是否准备 
+    repeated int32 reserved = 110; // 消除Warning的预留值    
+}
 // 准备状态推送
 message ReadyPush {
-    optional bool ready = 1; // 是否准备
-    optional int32 seat_index = 2; // 操作人
-    repeated int32 reserved = 110; // 消除Warning的预留值
+    repeated PlayerReadyInfo ready_infos = 1; // 玩家准备信息
+    optional int32 reserved = 110; // 消除Warning的预留值
 }
 // 游戏开始推送
 message GameStartPush {
@@ -212,7 +221,7 @@ message RoomCardsPush {
     optional int32 reserved = 110; // 消除Warning的预留值
 }
 // 小局结算推送
-message GameFinishPush {
+message RoundFinishPush {
     repeated PlayerCardsInfo cards_infos = 1; // 房间内所有玩家的牌数据
     repeated string finish_desc = 2; // 小结算文字描述信息
     optional int32 game_status = 3; // 游戏状态
@@ -276,31 +285,35 @@ message RemoveDiscardPush {
     repeated int32 reserved = 110; // 消除Warning的预留值
 }
 // 大结算推送
-message BigRoundResultPush {
-    optional BigRoundResultInfo big_round_result = 1; // 大局统计信息
-    repeated RoomUserInfo players = 2; // 所有玩家
-    repeated GameRuleInfo game_rules = 3; // 玩法规则
-    optional int32 room_id = 4; // 房间号
-    optional int32 cur_val = 5; // 当前小局或圈数
+message GameFinishPush {
+    repeated PlayerResultInfo player_infos = 1; // 大局统计信息
     repeated int32 reserved = 110; // 消除Warning的预留值
 }
 // 大局统计信息 
-message BigRoundResultInfo {
-    repeated int32 total_scores = 1; // 总分
-    repeated int32 zi_mo_counts = 2; // 自摸次数
-    repeated int32 gang_kai_counts = 3; // 杠上花次数
-    repeated int32 jie_pao_counts = 4; // 接炮次数
-    repeated int32 fang_pao_counts = 5; // 放炮次数
-    repeated int32 qiang_gang_counts = 6; // 抢杠次数
-    repeated int32 bei_qiang_gang_counts = 7; // 被抢杠次数
-    repeated int32 an_gang_counts = 8; // 暗杠次数
-    repeated int32 jie_gang_counts = 9; // 接杠次数
-    repeated int32 fang_gang_counts = 10; // 放杠次数
-    repeated int32 peng_gang_counts = 11; // 碰杠次数
+message PlayerResultInfo {
+    repeated int32 total_scores   = 1; // 总分
+    repeated int32 special_counts = 2; // 特殊累计值
     optional int32 reserved = 110; // 消除Warning的预留值
 }
-// 系统强制解散
-message SystemReleasePush {
-    optional string tip = 1; // 解散说明
+// 解散
+message ReleasePush {
+    optional int32  result = 1;//状态1解散失败  2投票中  3解散成功 
+    optional string tip    = 2; // 解散说明
+    repeated int32 votes   = 3;//投票信息 11拒绝 12还未操作 13同意
+    repeated int32 reserved = 110; // 消除Warning的预留值
+}
+
+// 解散
+message ReleaseRequest {
+    optional int32 seat_index = 1;//申请人
+    optional int32 type       = 2;//解散类型 100离开  101申请解散房间 102请求投票
+    optional int32 vote_value = 3;
+    repeated int32 reserved   = 110; // 消除Warning的预留值
+}
+
+// 解散
+message ReleaseResponse {
+    optional int32 status = 1; // 状态
+    optional string status_tip = 2; // 状态提示信息
     repeated int32 reserved = 110; // 消除Warning的预留值
 }

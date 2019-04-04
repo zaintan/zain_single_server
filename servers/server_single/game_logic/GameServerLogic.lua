@@ -90,7 +90,7 @@ function GameServerLogic:handlerCreateReq(uid, data)
 	end 
 
 	local tableSvr = skynet.newservice("GameTableService")
-	if pcall(skynet.call, tableSvr, "lua", "init", skynet.self(), table_id, data) then 
+	if pcall(skynet.call, tableSvr, "lua", "init", skynet.self(), table_id, uid, data) then 
 		if not user then 
 			user = new(GameUserInfo)
 			user:init(uid)
@@ -152,7 +152,56 @@ function GameServerLogic:handlerClientReq(uid, msgId, data)
 
 		return skynet.call(tableAddr, "lua", "on_req", uid, msgId, data)
 	end		
-	Log.e("GameServer","Not In Table,can not access unkonwn msgId = ",msgId)
+	Log.e(LOGTAG,"Not In Table,can not access unkonwn msgId = ",msgId)
+end
+
+
+function GameServerLogic:_cleanUserJoined(uid)
+	local user = self.m_users:getObject(uid)
+	if user then 
+		user:joinTable(nil)
+	else
+		Log.e(LOGTAG,"may be error! not found uid=%d in self.m_users",uid)
+	end
+end
+function GameServerLogic:_cleanUserCreated(uid,tid)
+	local user = self.m_users:getObject(uid)
+	if user then 
+		if not user:removeCreatedTable(tid) then 
+			Log.e(LOGTAG,"may be error! not found tid:%d in uid:%d creaters!",tid,uid)
+		end 
+	else
+		Log.e(LOGTAG,"may be error! not found uid=%d in self.m_users",uid)
+	end
+end
+
+function GameServerLogic:_cleanTable(taddr,tableId)
+	self.m_idPool:recoverId(tableId)
+
+	local tableAddr = self.m_tables:getObject(tableId)
+	if tableAddr then 
+		if tableAddr ~= tableSvr then 
+			Log.e(LOGTAG,"may be error! table address not equal!")
+		end 
+		self.m_tables:removeObject(nil,tableId)
+	else
+		Log.e(LOGTAG,"may be error! not found tableId=%d in self.m_tables!",tableId)
+	end 
+end
+
+function GameServerLogic:releaseTable(tableSvr, tableId, create_uid,uids)
+	--清空加入关联
+	for _,uid in ipairs(uids) do
+		self:_cleanUserJoined(uid)
+	end
+	--清空创建者关联
+	self:_cleanUserCreated(create_uid, tableId)
+	--清空桌子
+	self:_cleanTable(tableSvr, tableId)
+end
+
+function GameServerLogic:leaveTable(uid, tableId)
+	self:_cleanUserJoined(uid)
 end
 
 return GameServerLogic

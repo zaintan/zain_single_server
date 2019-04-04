@@ -11,7 +11,8 @@ local PlayerCards   = require("game_logic.data.PlayerCards")
 
 local LOGTAG = "BaseTable"
 
-function BaseTable:ctor(tableId, gameId, gameType, gameRules)
+function BaseTable:ctor(tableId,create_uid, gameId, gameType, gameRules)
+	self.m_createUid = create_uid
 	self.m_tableId   = tableId
 	self.m_gameId    = gameId
 	self.m_gameType  = gameType
@@ -274,6 +275,20 @@ function BaseTable:broadcastMsg( msg_id, msg_data, except_uid )
 	end
 end
 
+function BaseTable:destroy(releaseReason)
+	if releaseReason ~= const.Release.RELEASE_NORMAL then 
+		--房间成功解散
+		self:broadcastMsg(const.MsgId.ReleasePush,{result = const.Release.STATUS_SUCCESS;})
+	end 
 
+	-- body
+	local uids = {}
+	for uid,player in pairs(self.m_players) do
+		table.insert(uids, uid)
+	end	
+	--通知GameServers
+	pcall(skynet.call, ".GameService", "lua","releaseTable", self.m_tableId, self.m_createUid,uids)
+	skynet.exit()
+end
 
 return BaseTable
