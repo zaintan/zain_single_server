@@ -116,5 +116,4 @@ function BaseTableState:_onReleaseReq(msg_id,uid, data)
 
 end
 
-
 return BaseTableState
