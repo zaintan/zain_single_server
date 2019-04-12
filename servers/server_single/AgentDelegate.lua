@@ -29,6 +29,7 @@ function class.create(info)
 
     Log.i(LOGTAG,"CMD start called on fd %d",self.client_fd)
     skynet.call(self.gate, "lua", "forward", self.client_fd)
+    --[[
     skynet.fork(function ()
         while true do 
             -- 2 seconds 检查一次
@@ -40,6 +41,7 @@ function class.create(info)
             skynet.sleep(1 * 100)
         end 
     end)
+]]--
     return self
 end
 
