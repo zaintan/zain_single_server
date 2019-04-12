@@ -74,7 +74,7 @@ function TableStatePlay:onEnter()
 	self.dice_values[1] = math.random(6)
 	self.dice_values[2] = math.random(6)	
 	--广播牌局开始消息
-	self.m_pTable:broadcastMsg(const.MsgId.GameStartPush, {game_status = self.m_status;round_room_info = self:_getRoundRoomInfo();})
+	self.m_pTable:broadcastMsg(msg.NameToId.GameStartPush, {game_status = self.m_status;round_room_info = self:_getRoundRoomInfo();})
 	--发牌
 	self:changeHandler(const.GameHandler.DEAL_CARDS)
 end
@@ -111,7 +111,7 @@ end
 
 
 function TableStatePlay:_onReadyReq(msg_id, uid, data)
-	self.m_pTable:sendMsg(uid,msg_id+const.MsgId.BaseResponse, {status = -1;status_tip = "牌局已经开始,无效准备消息!";})
+	self.m_pTable:sendMsg(uid,msg_id+msg.ResponseBase, {status = -1;status_tip = "牌局已经开始,无效准备消息!";})
 end
 
 function TableStatePlay:_onOutCardReq(msg_id, uid, data)
@@ -183,7 +183,7 @@ function TableStatePlay:broadcastPlayerStatus()
 		msg_data.op_info = {}            
 		msg_data.op_info.weaves = self.m_pTable:getPlayerCards(seat_index):getActions();
 
-		self.m_pTable:sendMsg(player.user_id, const.MsgId.PlayerStatusPush , msg_data)
+		self.m_pTable:sendMsg(player.user_id, msg.NameToId.PlayerStatusPush , msg_data)
 	end
 end
 
@@ -255,7 +255,7 @@ function TableStatePlay:broadcastRoomCards(hasHand, hasWeave, hasDiscard, except
 				table.insert(msg_data.cards_infos, data)
 			end
 		end
-		self.m_pTable:sendMsg(player.user_id, const.MsgId.RoomCardsPush , msg_data )
+		self.m_pTable:sendMsg(player.user_id, msg.NameToId.RoomCardsPush , msg_data )
 	end
 end
 
@@ -265,7 +265,7 @@ function TableStatePlay:broadcastPlayerCards(cards_seat, hasHand, hasWeave, hasD
 		local msg_data = {};
 		local playerCards    = self.m_pTable:getPlayerCards(cards_seat)
 		msg_data.cards_infos = _getPlayerCardsInfo(playerCards,cards_seat, player.seat_index,hasHand, hasWeave, hasDiscard)
-		self.m_pTable:sendMsg(player.user_id, const.MsgId.PlayerCardsPush , msg_data)
+		self.m_pTable:sendMsg(player.user_id, msg.NameToId.PlayerCardsPush , msg_data)
 	end
 end
 
@@ -284,7 +284,7 @@ end
 
 function TableStatePlay:gameRoundOver(roundOverType, hu_seat, provider)
 	--确定下把的庄家
-	if roundOverType == const.RoundOverType.HU then 
+	if roundOverType == const.RoundFinishReason.NORMAL then 
 		self.m_winSeat = hu_seat
 	else
 		local haidiSeat = (self.m_curSeatIndex - 1)%self.m_pTable:getCurPlayerNum()
@@ -331,7 +331,7 @@ function TableStatePlay:gameRoundOver(roundOverType, hu_seat, provider)
 		data.cards_infos[i] = card_data
 		--table.insert(msg_data.cards_infos, data)
 	end
-	self.m_pTable:broadcastMsg(const.MsgId.RoundFinishPush, data)
+	self.m_pTable:broadcastMsg(msg.NameToId.RoundFinishPush, data)
 	--累积分数
 	local players = self.m_pTable:getPlayers()
 	for k,player in pairs(players) do
@@ -346,8 +346,8 @@ function TableStatePlay:gameRoundOver(roundOverType, hu_seat, provider)
 			pinfo.total_scores = player.score
 			over_data.player_infos[player.seat_index] = pinfo
 		end		
-		self.m_pTable:broadcastMsg(const.MsgId.GameFinishPush, over_data)
-		self.m_pTable:destroy()
+		--self.m_pTable:broadcastMsg(msg.NameToId.GameFinishPush, over_data)
+		self.m_pTable:destroy(const.GameFinishReason.NORMAL)
 	else
 		--切换到小局之间的等待状态
 		self.m_pTable:changeWait()

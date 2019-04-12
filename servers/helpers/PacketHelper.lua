@@ -62,7 +62,7 @@ local function makeProtoData (self, main, sub, id,body)
         msg_body  = body
     }
 
-    local packet = protobuf.encode("Zain.ProtoInfo", msg)
+    local packet = protobuf.encode("Base.ProtoInfo", msg)
     return packet
 end
 class.makeProtoData = makeProtoData

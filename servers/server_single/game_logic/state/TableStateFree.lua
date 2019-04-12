@@ -34,7 +34,7 @@ function TableStateFree:join(agent, uid)
 			--广播通知其他玩家 有玩家加入
 			local msg_data = {}
 			msg_data.player = player:getProtoInfo()
-			self.m_pTable:broadcastMsg(const.MsgId.PlayerEnterPush, msg_data,uid)
+			self.m_pTable:broadcastMsg(msg.NameToId.PlayerEnterPush, msg_data,uid)
 			----------			
 		else
 			return false,"登录服查不到该玩家!"
@@ -58,17 +58,17 @@ end
 function TableStateFree:_onReadyReq(msg_id, uid, data)
 	local player = self.m_pTable:getPlayer(uid)
 	if not player then 
-		self.m_pTable:sendMsg(uid, const.MsgId.ReadyRsp, {status = -1;})
+		self.m_pTable:sendMsg(uid, msg.NameToId.ReadyResponse, {status = -1;})
 		return false
 	end 
 
 	player.ready = data.ready
-	self.m_pTable:sendMsg(uid, const.MsgId.ReadyRsp, {status = 0;ready = data.ready;})
+	self.m_pTable:sendMsg(uid, msg.NameToId.ReadyResponse, {status = 0;ready = data.ready;})
 	
 	local push_data = {
 		ready_infos = {{seat_index = player.seat_index;ready = data.ready;}}
 	}
-	self.m_pTable:broadcastMsg(const.MsgId.ReadyPush, push_data, uid)
+	self.m_pTable:broadcastMsg(msg.NameToId.ReadyPush, push_data, uid)
 	
 	if self.m_pTable:isFull() and self.m_pTable:isAllReady() then 
 		self.m_pTable:changePlay()
@@ -77,42 +77,45 @@ function TableStateFree:_onReadyReq(msg_id, uid, data)
 end
 
 function TableStateFree:_onOutCardReq(msg_id, uid, data)
-	self.m_pTable:sendMsg(uid,msg_id+const.MsgId.BaseResponse, {status = -1;status_tip = "牌局还未开始,无法出牌!";})
+	self.m_pTable:sendMsg(uid,msg_id+msg.ResponseBase, {status = -1;status_tip = "牌局还未开始,无法出牌!";})
 end
 
 function TableStateFree:_onOperateCardReq(msg_id, uid, data)
-	self.m_pTable:sendMsg(uid,msg_id+const.MsgId.BaseResponse, {status = -1;status_tip = "牌局还未开始,无法操作牌!";})
+	self.m_pTable:sendMsg(uid,msg_id+msg.ResponseBase, {status = -1;status_tip = "牌局还未开始,无法操作牌!";})
+end
+
+--处理Free状态的
+function TableStateFree:_onPlayerExitReq(msg_id, uid, data)
+	local player = self.m_pTable:getPlayer(uid)
+	if not player then 
+		--玩家不在这个房间 回复解散失败
+		self.m_pTable:sendMsg(uid,msg_id+msg.ResponseBase, {status = -2;})
+		return false
+	end 
+	--通知GameServers
+	pcall(skynet.call, ".GameService", "lua","leaveTable", uid, self.m_tableId)
+	--广播玩家离开
+	self.m_pTable:broadcastMsg(msg.NameToId.PlayerExitPush, {seat_index=player.seat_index;}, uid)
+	self.m_pTable:sendMsg(uid,msg_id+msg.ResponseBase, {status = 1;})		
+	return true
 end
 
 function TableStateFree:_onReleaseReq(msg_id,uid, data)
 	--牌局未开始 创建者可以解散 普通人可以离开
-	if data.type == const.Release.APPLY_RELEASE then
+	if data.type == const.ReleaseRequestType.RELEASE then
 		if uid == self.m_pTable.m_createUid then 
 			--解散成功
-			self.m_pTable:sendMsg(uid,msg_id+const.MsgId.BaseResponse, {status = const.Release.RELEASE_CREATOR;status_tip="创建者已解散房间!"})
+			self.m_pTable:sendMsg(uid,msg_id+msg.ResponseBase, {status = 1;status_tip="创建者已解散房间!"})
 			--destroy会推送成功解散的消息
-			self.m_pTable:destroy(const.Release.RELEASE_CREATOR)
+			self.m_pTable:destroy(const.GameFinishReason.CREATOR_RELEASE)
 			return true
 		else
-			self.m_pTable:sendMsg(uid,msg_id+const.MsgId.BaseResponse, {status = -1;status_tip="非创建者无权解散房间!"})
+			self.m_pTable:sendMsg(uid,msg_id+msg.ResponseBase, {status = -1;status_tip="非创建者无权解散房间!"})
 			return false
 		end 
-	elseif data.type == const.Release.APPLY_EXIT then 
-		local player = self.m_pTable:getPlayer(uid)
-		if not player then 
-			--玩家不在这个房间 回复解散失败
-			self.m_pTable:sendMsg(uid,msg_id+const.MsgId.BaseResponse, {status = -2;})
-			return false
-		end 
-		--通知GameServers
-		pcall(skynet.call, ".GameService", "lua","leaveTable", uid, self.m_tableId)
-		--广播玩家离开
-		self.m_pTable:broadcastMsg(const.MsgId.PlayerExitPush, {seat_index=player.seat_index;}, uid)
-		self.m_pTable:sendMsg(uid,msg_id+const.MsgId.BaseResponse, {status = 1;})		
-		return true
 	end 
 	--未知解散请求 回复解散失败
-	self.m_pTable:sendMsg(uid,msg_id+const.MsgId.BaseResponse, {status = -3;})
+	self.m_pTable:sendMsg(uid,msg_id+msg.ResponseBase, {status = -3;})
 	return false
 end
 

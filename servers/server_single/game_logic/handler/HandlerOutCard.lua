@@ -35,16 +35,16 @@ function HandlerOutCard:_doOp(seat, reqData )
 end
 
 local kGameActionPriMap = {
-	[const.GameAction.NULL]       = 0;
-	[const.GameAction.LEFT_EAT]   = 1;
-	[const.GameAction.RIGHT_EAT]  = 1;
-	[const.GameAction.CENTER_EAT] = 1;
-	[const.GameAction.PENG]       = 2;
-	[const.GameAction.AN_GANG]    = 2;
-	[const.GameAction.JIE_PAO]    = 3;
-	[const.GameAction.ZI_MO]      = 3;
-	[const.GameAction.PENG_GANG]  = 2;
-	[const.GameAction.BU_GANG]    = 2;		
+	[const.Action.NULL]       = 0;
+	[const.Action.LEFT_EAT]   = 1;
+	[const.Action.RIGHT_EAT]  = 1;
+	[const.Action.CENTER_EAT] = 1;
+	[const.Action.PENG]       = 2;
+	[const.Action.AN_GANG]    = 2;
+	[const.Action.JIE_PAO]    = 3;
+	[const.Action.ZI_MO]      = 3;
+	[const.Action.PENG_GANG]  = 2;
+	[const.Action.ZHI_GANG]    = 2;		
 }
 
 function HandlerOutCard:_hasMorePriUndoOp()
@@ -98,7 +98,7 @@ function HandlerOutCard:_checkOthersAction( checkWiks, out_card )
 			
 			local player_status = const.PlayerStatus.NULL
 			if actions and #actions > 0 then 
-				player_status = const.PlayerStatus.OPERATE
+				player_status = const.PlayerStatus.OPERATE_CARD
 				hasAction  = true
 				self:_addOp(seat, actions)
 			end 
@@ -121,7 +121,7 @@ function HandlerOutCard:onEnter(seat_index, out_card)
 	
 	--self.m_pState:changePlayerStatus(seat_index, const.PlayerStatus.NULL)
 
-	local checkWiks = {const.GameAction.PENG, const.GameAction.PENG_GANG, const.GameAction.JIE_PAO};
+	local checkWiks = {const.Action.PENG, const.Action.PENG_GANG, const.Action.JIE_PAO};
 	local hasOneAction = self:_checkOthersAction(checkWiks, out_card)
 	Log.d(LOGTAG,"seat = %d,出牌:0x%x ,其他人有操作:%s",seat_index,out_card,tostring(hasOneAction))
 	--广播刷新玩家状态
@@ -139,12 +139,12 @@ end
 function HandlerOutCard:_onOperateCardReq(msg_id, uid, data)
 	Log.d(LOGTAG, "_onOperateCardReq msg_id=%d,uid=%d",msg_id,uid)
 	Log.dump(LOGTAG, data)
-	local ret_msg_id = msg_id + const.MsgId.BaseResponse
+	local ret_msg_id = msg_id + msg.ResponseBase
 	local seat_index = self.m_pTable:getPlayerSeat(uid)
 
 	local player_status = self.m_pState:getPlayerStatus(seat_index)
 	--不在操作状态
-	if player_status ~= const.PlayerStatus.OPERATE then 
+	if player_status ~= const.PlayerStatus.OPERATE_CARD then 
 		Log.d(LOGTAG, "player_status=%d",player_status)
 		self.m_pTable:sendMsg(uid, ret_msg_id, {status = -3;})
 		return false
@@ -162,28 +162,28 @@ function HandlerOutCard:_onOperateCardReq(msg_id, uid, data)
 	--等待更高优先级的操作
 	if self:_hasMorePriUndoOp() then 
 		Log.d(LOGTAG, "wait more pri player op")
-		self.m_pTable:sendMsg(uid,msg_id+const.MsgId.BaseResponse, {status = 2;})
+		self.m_pTable:sendMsg(uid,msg_id+msg.ResponseBase, {status = 2;})
 		return false
 	end 
 	--没有更高友需等待的操作了  取当前最高操作作为生效操作
 	local effect_seat,effect_data = self:_getHighestOp()
 	--
-	if data.weave_kind == const.GameAction.PENG then
+	if data.weave_kind == const.Action.PENG then
 		--切handlerChiPeng
 		self.m_pState:changeHandler(const.GameHandler.CHI_PENG,effect_seat, effect_data, self.seat_index)
-	elseif data.weave_kind == const.GameAction.PENG_GANG then 
+	elseif data.weave_kind == const.Action.PENG_GANG then 
 		--切handlerGang
 		self.m_pState:changeHandler(const.GameHandler.GANG, effect_seat, effect_data, self.seat_index)
-	elseif data.weave_kind == const.GameAction.JIE_PAO then 
+	elseif data.weave_kind == const.Action.JIE_PAO then 
 		--切gameOver
-		self.m_pState:gameRoundOver(const.RoundOverType.HU,effect_seat, self.seat_index)
-	elseif data.weave_kind == const.GameAction.NULL then--过
+		self.m_pState:gameRoundOver(const.RoundFinishReason.NORMAL,effect_seat, self.seat_index)
+	elseif data.weave_kind == const.Action.NULL then--过
 		self.m_pState:turnSeat()
 		self.m_pState:changeHandler(const.GameHandler.SEND_CARD)
 	else 
 		Log.e(LOGTAG, "invalid weave_kind = %d",data.weave_kind)
 	end 
-	--self.m_pTable:sendMsg(uid,msg_id+const.MsgId.BaseResponse, {status = -1;})
+	--self.m_pTable:sendMsg(uid,msg_id+msg.ResponseBase, {status = -1;})
 	return true
 end
 

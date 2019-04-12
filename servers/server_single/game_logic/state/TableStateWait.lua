@@ -24,7 +24,7 @@ function TableStateWait:onEnter()
 		local playerCards = self.m_pTable:getPlayerCards(player.seat_index)
 		playerCards:reset()
 	end
-	self.m_pTable:broadcastMsg(const.MsgId.ReadyPush, push_data)	
+	self.m_pTable:broadcastMsg(msg.NameToId.ReadyPush, push_data)	
 end
 
 function TableStateWait:onExit()
@@ -50,17 +50,17 @@ end
 function TableStateWait:_onReadyReq(msg_id, uid, data)
 	local player = self.m_pTable:getPlayer(uid)
 	if not player then 
-		self.m_pTable:sendMsg(uid, const.MsgId.ReadyRsp, {status = -1;})
+		self.m_pTable:sendMsg(uid, msg.NameToId.ReadyResponse, {status = -1;})
 		return false
 	end
 
 	player.ready = data.ready
-	self.m_pTable:sendMsg(uid, const.MsgId.ReadyRsp, {status = 0;ready = data.ready;})
+	self.m_pTable:sendMsg(uid, msg.NameToId.ReadyResponse, {status = 0;ready = data.ready;})
 
 	local push_data = {
 		ready_infos = {{seat_index = player.seat_index;ready = data.ready;}}
 	}
-	self.m_pTable:broadcastMsg(const.MsgId.ReadyPush, push_data, uid)
+	self.m_pTable:broadcastMsg(msg.NameToId.ReadyPush, push_data, uid)
 	
 	if self.m_pTable:isAllReady() then 
 		self.m_pTable:changePlay()
@@ -69,11 +69,11 @@ function TableStateWait:_onReadyReq(msg_id, uid, data)
 end
 
 function TableStateWait:_onOutCardReq(msg_id, uid, data)
-	self.m_pTable:sendMsg(uid,msg_id+const.MsgId.BaseResponse, {status = -1;status_tip = "牌局还未开始,无法出牌!";})
+	self.m_pTable:sendMsg(uid,msg_id+msg.ResponseBase, {status = -1;status_tip = "牌局还未开始,无法出牌!";})
 end
 
 function TableStateWait:_onOperateCardReq(msg_id, uid, data)
-	self.m_pTable:sendMsg(uid,msg_id+const.MsgId.BaseResponse, {status = -1;status_tip = "牌局还未开始,无法操作牌!";})
+	self.m_pTable:sendMsg(uid,msg_id+msg.ResponseBase, {status = -1;status_tip = "牌局还未开始,无法操作牌!";})
 end
 
 

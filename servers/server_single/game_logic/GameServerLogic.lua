@@ -80,13 +80,13 @@ function GameServerLogic:handlerCreateReq(uid, data)
 	
 	local user = self.m_users:getObject(uid)
 	if user and not user:canCreateTable() then 
-		return _onMsgFaild(const.MsgId.CreateRoomRsp,"开房数量已达上限!")
+		return _onMsgFaild(msg.NameToId.CreateRoomResponse,"开房数量已达上限!")
 	end	  
 
 	local table_id = self.m_idPool:allocId()
 	--没使用 要记得回收房间号
 	if not table_id then 
-		return _onMsgFaild(const.MsgId.CreateRoomRsp,"分配房间号失败!")
+		return _onMsgFaild(msg.NameToId.CreateRoomResponse,"分配房间号失败!")
 	end 
 
 	local tableSvr = skynet.newservice("GameTableService")
@@ -98,11 +98,11 @@ function GameServerLogic:handlerCreateReq(uid, data)
 		end 
 		user:addCreatedTable(table_id)
 		self.m_tables:addObject(tableSvr, table_id)
-		return const.MsgId.CreateRoomRsp,{status = 1;room_id = table_id;}
+		return msg.NameToId.CreateRoomResponse,{status = 1;room_id = table_id;}
 	else 
 		skynet.kill(tableSvr)
 		self.m_idPool:recoverId(table_id)
-		return _onMsgFaild(const.MsgId.CreateRoomRsp,"房间初始化失败!")
+		return _onMsgFaild(msg.NameToId.CreateRoomResponse,"房间初始化失败!")
 	end 
 end
 
@@ -110,7 +110,7 @@ function GameServerLogic:handlerJoinReq(agent, uid, data)
 	--判断房间号存不存在
 	local tableAddr = self.m_tables:getObject(data.room_id)
 	if not tableAddr then 
-		return _onMsgFaild(const.MsgId.JoinRoomRsp,"房间号不存在!")
+		return _onMsgFaild(msg.NameToId.JoinRoomResponse,"房间号不存在!")
 	end 
 
 	--判断用户是否已经加入过房间了  
@@ -122,7 +122,7 @@ function GameServerLogic:handlerJoinReq(agent, uid, data)
 		local tableAddr = self.m_tables:getObject(table_id)
 		Log.d(LOGTAG,"reconnect uid=%d,table_id=%d,add=%x",uid,table_id,tableAddr)
 		local retData  = skynet.call(tableAddr,"lua","reconnect",agent, uid)
-		return const.MsgId.JoinRoomRsp,retData
+		return msg.NameToId.JoinRoomResponse,retData
 	end	
 
 	--
@@ -135,10 +135,10 @@ function GameServerLogic:handlerJoinReq(agent, uid, data)
 		end 	
 		user:joinTable(data.room_id)
 		Log.d(LOGTAG,"uid = %d success join table_id=%d",uid,data.room_id)
-		return const.MsgId.JoinRoomRsp,retData		
+		return msg.NameToId.JoinRoomResponse,retData		
 	else 
 		Log.d(LOGTAG,"uid = %d failed join table_id=%d, reason=%s",uid,data.room_id,tostring(retData))
-		return _onMsgFaild(const.MsgId.JoinRoomRsp, retData)
+		return _onMsgFaild(msg.NameToId.JoinRoomResponse, retData)
 	end 
 end
 

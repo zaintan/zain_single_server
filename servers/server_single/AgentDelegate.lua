@@ -2,8 +2,7 @@
 local skynet    = require "skynet"
 local socket    = require "skynet.socket"
 ---! 帮助库
-local packetHelper  = (require "PacketHelper").create("protos/ZainCommon.pb")
-local ProtoHelper   = (require "ProtoHelper").init()
+local packetHelper  = (require "PacketHelper").create("protos/common.pb")
 
 local LOGTAG = "Agent"
 
@@ -78,20 +77,20 @@ function class:_sendPacket( packet )
 end
 
 function class:sendMsg(msg_id, data)
-    if msg_id ~= const.MsgId.HeartRsp then
+    if msg_id ~= msg.NameToId.HeartResponse then
         Log.d(LOGTAG,"sendClientMsg msg_id=%d",msg_id)
         Log.dump(LOGTAG,data)
     end 
 
-    local protoName = ProtoHelper.IdToName[msg_id] 
-    local body      = packetHelper:encodeMsg("Zain."..protoName, data)
+    local protoName = msg.IdToName[msg_id] 
+    local body      = packetHelper:encodeMsg("Base."..protoName, data)
     local packet    = packetHelper:makeProtoData(0, 0,msg_id , body)
     self:_sendPacket(packet)
     return true
 end
 
 function class:_handlerHeartReq(data)
-    self:sendMsg(const.MsgId.HeartRsp,{})
+    self:sendMsg(msg.NameToId.HeartResponse,{})
 end
 
 function class:_handlerLoginReq(data)
@@ -108,10 +107,9 @@ function class:_handlerLoginReq(data)
         local ok,tableId = pcall(skynet.call, ".GameService", "lua", "queryTableId", self.FUserID)
         Log.d(LOGTAG,"queryTableId return status=%s,tableId=%s",tostring(ok),tostring(tableId))
         if ok and tableId and tableId ~= -1 then 
-            --self:_handlerRoomReq(const.MsgId.JoinRoomReq,{room_id = tableId;});
             data.room_id = tableId
         end 
-        self:sendMsg(const.MsgId.LoginRsp, data)
+        self:sendMsg(msg.NameToId.LoginResponse, data)
     end 
 end
 
@@ -127,28 +125,28 @@ function class:_handlerRoomReq(msg_id, data)
 end
 
 local ComandFuncMap = {
-    [const.MsgId.HeartReq]      = class._handlerHeartReq;
-    [const.MsgId.LoginReq]      = class._handlerLoginReq;
+    [msg.NameToId.HeartRequest]      = class._handlerHeartReq;
+    [msg.NameToId.LoginRequest]      = class._handlerLoginReq;
 }
 
-function class:command_handler(msg, recvTime)
-    --Log.d(LOGTAG,"command_handler msg len:%d accessTime:%s",#msg,tostring(skynet.time()))
+function class:command_handler(cmsg, recvTime)
+    --Log.d(LOGTAG,"command_handler cmsg len:%d accessTime:%s",#cmsg,tostring(skynet.time()))
     self:_active()
     --解析包头 转发处理消息 做对应转发
-    local args    = packetHelper:decodeMsg("Zain.ProtoInfo",msg)
-    local msgName = ProtoHelper.IdToName[args.msg_id]
+    local args    = packetHelper:decodeMsg("Base.ProtoInfo",cmsg)
+    local msgName = msg.IdToName[args.msg_id]
     if not msgName then 
         Log.e(LOGTAG,"unknown msg_id: ",args.msg_id)
         return 
     end 
 
-    local data,err = packetHelper:decodeMsg("Zain."..msgName, args.msg_body)
+    local data,err = packetHelper:decodeMsg("Base."..msgName, args.msg_body)
     if not data or err ~= nil then 
         Log.e(LOGTAG,"parse msg err: ",args.msg_id, msgName )
         return
     end 
 
-    if args.msg_id ~= const.MsgId.HeartReq then
+    if args.msg_id ~= msg.NameToId.HeartRequest then
         Log.dump(LOGTAG,data)
     end 
 

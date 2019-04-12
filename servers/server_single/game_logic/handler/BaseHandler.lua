@@ -23,12 +23,12 @@ function BaseHandler:onExit()
 end
 
 function BaseHandler:_onOutCardReq(msg_id, uid, data)
-	self.m_pTable:sendMsg(uid,msg_id+const.MsgId.BaseResponse, {status = -1;})
+	self.m_pTable:sendMsg(uid,msg_id+msg.ResponseBase, {status = -1;})
 	return false
 end
 
 function BaseHandler:_onOperateCardReq(msg_id, uid, data)
-	self.m_pTable:sendMsg(uid,msg_id+const.MsgId.BaseResponse, {status = -1;})
+	self.m_pTable:sendMsg(uid,msg_id+msg.ResponseBase, {status = -1;})
 	return false
 end
 

@@ -129,7 +129,7 @@ function PlayerCards:_checkAnGang(provide)
 	end	
 	for card,num in pairs(cardsCountMap) do
 		if num == 4 then 
-			self:_addAction(const.GameAction.AN_GANG,card,0,provide)
+			self:_addAction(const.Action.AN_GANG,card,0,provide)
 		end 
 	end
 end
@@ -142,15 +142,15 @@ function PlayerCards:_checkPengGang(provide,outCard)
 		end 
 	end	
 	if num >= 3 then 
-		self:_addAction(const.GameAction.PENG_GANG,outCard,1,provide)
+		self:_addAction(const.Action.PENG_GANG,outCard,1,provide)
 	end 
 end
 
 function PlayerCards:_checkBuGang(provide)
 	for _,card in ipairs(self.m_hands) do
 		for i,v in ipairs(self.m_weaves) do
-			if v.center_card == card and v.weave_kind == const.GameAction.PENG then 
-				self:_addAction(const.GameAction.BU_GANG,card,1,provide)
+			if v.center_card == card and v.weave_kind == const.Action.PENG then 
+				self:_addAction(const.Action.ZHI_GANG,card,1,provide)
 			end 
 		end
 	end
@@ -168,7 +168,7 @@ function PlayerCards:_checkPeng(provide,outCard)
 		end 
 	end	
 	if num >= 2 then 
-		self:_addAction(const.GameAction.PENG,outCard,1,provide)
+		self:_addAction(const.Action.PENG,outCard,1,provide)
 	end 
 end
 
@@ -197,14 +197,14 @@ function PlayerCards:_checkHu(provide,outCard)
 	table.remove(self.m_hands)
 
 	if HuLib.get_hu_info(args) then 
-		self:_addAction(const.GameAction.JIE_PAO,outCard,0,provide)
+		self:_addAction(const.Action.JIE_PAO,outCard,0,provide)
 	end 
 end
 
 function PlayerCards:_checkZimo(provide,sendCard)
 	local args  = self:__translateHuArgs(self.m_hands)
 	if HuLib.get_hu_info(args) then 
-		self:_addAction(const.GameAction.ZI_MO,sendCard,0,provide)
+		self:_addAction(const.Action.ZI_MO,sendCard,0,provide)
 	end 
 end 
 
@@ -236,16 +236,16 @@ function PlayerCards:_addAction(kind,center,public,provide)
 end
 
 local kCheckFuncsMap = {
-	--[const.GameAction.NULL] = 
-	[const.GameAction.LEFT_EAT]   = PlayerCards._checkChi;
-	[const.GameAction.RIGHT_EAT]  = PlayerCards._checkChi;
-	[const.GameAction.CENTER_EAT] = PlayerCards._checkChi;
-	[const.GameAction.PENG]       = PlayerCards._checkPeng;
-	[const.GameAction.AN_GANG]    = PlayerCards._checkAnGang;
-	[const.GameAction.JIE_PAO]    = PlayerCards._checkHu;
-	[const.GameAction.ZI_MO]      = PlayerCards._checkZimo;
-	[const.GameAction.PENG_GANG]  = PlayerCards._checkPengGang;
-	[const.GameAction.BU_GANG]    = PlayerCards._checkBuGang;		
+	--[const.Action.NULL] = 
+	[const.Action.LEFT_EAT]   = PlayerCards._checkChi;
+	[const.Action.RIGHT_EAT]  = PlayerCards._checkChi;
+	[const.Action.CENTER_EAT] = PlayerCards._checkChi;
+	[const.Action.PENG]       = PlayerCards._checkPeng;
+	[const.Action.AN_GANG]    = PlayerCards._checkAnGang;
+	[const.Action.JIE_PAO]    = PlayerCards._checkHu;
+	[const.Action.ZI_MO]      = PlayerCards._checkZimo;
+	[const.Action.PENG_GANG]  = PlayerCards._checkPengGang;
+	[const.Action.ZHI_GANG]    = PlayerCards._checkBuGang;		
 };
 
 --weave_kind
@@ -262,7 +262,7 @@ function PlayerCards:checkAddAction(wiks, card, addNull, provide)
 		end 
 	end
 	if addNull and #self.m_actions > 0 then 
-		self:_addAction(const.GameAction.NULL)
+		self:_addAction(const.Action.NULL)
 	end 
 	return self.m_actions
 end

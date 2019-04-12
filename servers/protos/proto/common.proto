@@ -1,4 +1,4 @@
-package Zain;
+package Base;
 option java_package = "protobuf.cher";
 // 服务端客户端通信消息体
 message ProtoInfo {
@@ -144,6 +144,7 @@ message JoinRoomResponse {
     optional OperateInfo op_info = 12; // 当前进入房间的玩家的操作条消息
     repeated PlayerCardsInfo cards_infos = 13; // 房间内所有玩家的牌数据
     optional int32 room_id = 14; // 房间号
+    optional ReleaseInfo release_info = 15;//解散信息    
     repeated int32 reserved = 110; // 消除Warning的预留值
 }
 // 玩法规则
@@ -155,11 +156,6 @@ message GameRuleInfo {
 // 进入房间推送
 message PlayerEnterPush {
     required RoomUserInfo player = 1;
-    repeated int32 reserved = 110; // 消除Warning的预留值
-}
-// 离开房间推送
-message PlayerExitPush {
-    optional int32 seat_index = 1; // 
     repeated int32 reserved = 110; // 消除Warning的预留值
 }
 // 准备请求
@@ -174,6 +170,7 @@ message ReadyResponse {
     optional bool ready = 3; // 是否准备
     repeated int32 reserved = 110; // 消除Warning的预留值
 }
+// 玩家准备信息
 message PlayerReadyInfo {
     optional int32 seat_index = 1; // 操作人
     optional bool ready = 2; // 是否准备 
@@ -244,9 +241,8 @@ message PlayerCardsPush {
 }
 // 操作牌请求
 message OperateCardRequest {
-    optional int32 seat_index = 1; // 操作人
-    optional int32 weave_kind = 2; // 点了什么操作
-    optional int32 center_card = 3; // 操作的牌
+    optional int32 weave_kind = 1; // 点了什么操作
+    optional int32 center_card = 2; // 操作的牌
     repeated int32 reserved = 110; // 消除Warning的预留值
 }
 // 操作牌响应
@@ -263,8 +259,7 @@ message OperateCardPush {
 }
 // 出牌请求
 message OutCardRequest {
-    optional int32 seat_index = 1; // 出牌人
-    optional int32 out_card = 2; // 出的牌
+    optional int32 out_card = 1; // 出的牌
     repeated int32 reserved = 110; // 消除Warning的预留值
 }
 // 出牌响应
@@ -287,33 +282,63 @@ message RemoveDiscardPush {
 // 大结算推送
 message GameFinishPush {
     repeated PlayerResultInfo player_infos = 1; // 大局统计信息
-    repeated int32 reserved = 110; // 消除Warning的预留值
+    optional int32 game_finish_reason = 2; // 大局结束原因
+    optional int32 reserved = 110; // 消除Warning的预留值
 }
 // 大局统计信息 
 message PlayerResultInfo {
-    repeated int32 total_scores   = 1; // 总分
-    repeated int32 special_counts = 2; // 特殊累计值
+    optional int32 total_scores = 1; // 总分
+    repeated SpecialCountInfo special_counts = 2; // 特殊累计值
     optional int32 reserved = 110; // 消除Warning的预留值
 }
-// 解散
-message ReleasePush {
-    optional int32  result = 1;//状态1解散失败  2投票中  3解散成功 
-    optional string tip    = 2; // 解散说明
-    repeated int32 votes   = 3;//投票信息 11拒绝 12还未操作 13同意
+// 大结算统计次数，比如自摸次数、点炮次数
+message SpecialCountInfo {
+    optional int32 id = 1; // 统计类型的id
+    optional int32 count = 2; // 次数
     repeated int32 reserved = 110; // 消除Warning的预留值
 }
-
-// 解散
-message ReleaseRequest {
-    optional int32 seat_index = 1;//申请人
-    optional int32 type       = 2;//解散类型 100离开  101申请解散房间 102请求投票
-    optional int32 vote_value = 3;
-    repeated int32 reserved   = 110; // 消除Warning的预留值
+// 房间解散信息
+message ReleaseInfo {
+    optional int32 result = 1; // 房间解散状态 1失败  2投票中  3成功 
+    optional string tip = 2; // 解散说明
+    repeated int32 votes = 3; // 投票信息 1未操作 2拒绝 3同意
+    optional int32 time = 4; // 倒计时时间，单位秒
+    optional int32 seat_index = 5; // 解散发起人
+    repeated int32 reserved = 110; // 消除Warning的预留值    
 }
-
-// 解散
+// 解散推送
+message ReleasePush {
+    optional ReleaseInfo release_info = 1;
+    repeated int32 reserved = 110; // 消除Warning的预留值     
+}
+// 解散请求
+message ReleaseRequest {
+    optional int32 type = 1; // 解散类型 1申请解散 2投票
+    optional int32 vote_value = 2; // 投票信息 1未操作 2拒绝 3同意
+    repeated int32 reserved = 110; // 消除Warning的预留值
+}
+// 解散响应
 message ReleaseResponse {
     optional int32 status = 1; // 状态
     optional string status_tip = 2; // 状态提示信息
     repeated int32 reserved = 110; // 消除Warning的预留值
+}
+// 离开请求
+message PlayerExitRequest {
+}
+// 离开响应
+message PlayerExitResponse {
+    optional int32 status = 1; // 状态
+    optional string status_tip = 2; // 状态提示信息
+    repeated int32 reserved = 110; // 消除Warning的预留值
+}
+// 离开房间推送
+message PlayerExitPush {
+    optional int32 seat_index = 1; // 
+    repeated int32 reserved = 110; // 消除Warning的预留值
+}
+// 胡牌之后，摊开所有人的手牌
+message ShowHandCardsPush {
+    repeated PlayerCardsInfo cards_infos = 1; // 房间内所有玩家的牌数据
+    optional int32 reserved = 110; // 消除Warning的预留值
 }

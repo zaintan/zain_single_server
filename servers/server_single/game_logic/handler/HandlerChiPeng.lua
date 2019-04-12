@@ -23,11 +23,11 @@ function HandlerChiPeng:_excuteChiPeng(operReqData,playerCards,providerPlayerCar
 	local del_cards  = nil 
 	local weave_kind = operReqData.weave_kind 
 
-	if weave_kind == const.GameAction.LEFT_EAT then 
+	if weave_kind == const.Action.LEFT_EAT then 
 		del_cards = { operReqData.center_card + 1 , operReqData.center_card + 2}
-	elseif weave_kind == const.GameAction.CENTER_EAT then 
+	elseif weave_kind == const.Action.CENTER_EAT then 
 		del_cards = { operReqData.center_card - 1 , operReqData.center_card + 1}
-	elseif weave_kind == const.GameAction.RIGHT_EAT then 
+	elseif weave_kind == const.Action.RIGHT_EAT then 
 		del_cards = { operReqData.center_card - 1 , operReqData.center_card - 2}
 	else --peng
 		del_cards = { operReqData.center_card, operReqData.center_card}
@@ -61,10 +61,10 @@ function HandlerChiPeng:onEnter(seat_index, operReqData, provide_player)
 	self.m_pTable:cleanActions()
 	--
 
-	if operReqData.weave_kind == const.GameAction.LEFT_EAT or 
-	   operReqData.weave_kind == const.GameAction.RIGHT_EAT or 
-	   operReqData.weave_kind == const.GameAction.CENTER_EAT or 
-	   operReqData.weave_kind == const.GameAction.PENG  then 
+	if operReqData.weave_kind == const.Action.LEFT_EAT or 
+	   operReqData.weave_kind == const.Action.RIGHT_EAT or 
+	   operReqData.weave_kind == const.Action.CENTER_EAT or 
+	   operReqData.weave_kind == const.Action.PENG  then 
 
 	    self:_excuteChiPeng(operReqData,playerCards,providerPlayerCards,provide_player)
 	else
@@ -91,7 +91,7 @@ function HandlerChiPeng:onEnter(seat_index, operReqData, provide_player)
 end
 
 function HandlerChiPeng:_onOutCardReq(msg_id, uid, data)
-	local ret_msg_id = msg_id + const.MsgId.BaseResponse
+	local ret_msg_id = msg_id + msg.ResponseBase
 	local seat_index = self.m_pTable:getPlayerSeat(uid)
 	--不是该玩家
 	if seat_index ~= self.seat_index then 
@@ -114,7 +114,7 @@ end
 
 
 function HandlerChiPeng:_onOperateCardReq(msg_id, uid, data)
-	self.m_pTable:sendMsg(uid,msg_id+const.MsgId.BaseResponse, {status = -1;})
+	self.m_pTable:sendMsg(uid,msg_id+msg.ResponseBase, {status = -1;})
 	return false
 end
 

@@ -39,7 +39,7 @@ end
 
 function BaseTable:_initGameRules()
 	for _,v in ipairs(self.m_gameRules) do
-		if v.id == const.GameRule.PLAYER_COUNT then
+		if v.id == const.GameRule.RULE_PLAYER_COUNT then
 			self.m_maxPlayerNum = v.value
 		end 
 	end
@@ -159,7 +159,7 @@ function BaseTable:drawCard(seat_index)
 			dispatch_card = seat_index == player.seat_index and card or -1;
 			seat_index    = seat_index;
 		};
-		self:sendMsg(player.user_id, const.MsgId.DispatchCardPush , msg_data )
+		self:sendMsg(player.user_id, msg.NameToId.DispatchCardPush , msg_data )
 	end	
 	return true,card
 end
@@ -172,14 +172,14 @@ function BaseTable:outCard(uid,card)
 	local rspData = {
 		status     = 0
 	}
-	self:sendMsg(player.user_id, const.MsgId.OutCardRsp , rspData )
+	self:sendMsg(player.user_id, msg.NameToId.OutCardResponse , rspData )
 
 	--broadcast
 	local msg_data = {
 		seat_index = seat_index;
 		out_card   = card;
 	}
-	self:broadcastMsg(const.MsgId.OutCardPush, msg_data)
+	self:broadcastMsg(msg.NameToId.OutCardPush, msg_data)
 
 	--刷新出牌玩家的手牌--
 	local hasHand = true
@@ -276,10 +276,7 @@ function BaseTable:broadcastMsg( msg_id, msg_data, except_uid )
 end
 
 function BaseTable:destroy(releaseReason)
-	if releaseReason ~= const.Release.RELEASE_NORMAL then 
-		--房间成功解散
-		self:broadcastMsg(const.MsgId.ReleasePush,{result = const.Release.STATUS_SUCCESS;})
-	end 
+	--大结算
 
 	-- body
 	local uids = {}

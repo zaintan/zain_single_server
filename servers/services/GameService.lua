@@ -37,8 +37,8 @@ local function _handlerJoinReq(source, uid, data)
 end
 
 local ComandFuncMap = {
-    [const.MsgId.CreateRoomReq]      = _handlerCreateReq;
-    [const.MsgId.JoinRoomReq]        = _handlerJoinReq;
+    [msg.NameToId.CreateRoomReq]      = _handlerCreateReq;
+    [msg.NameToId.JoinRoomReq]        = _handlerJoinReq;
 }
 
 function CMD.on_req(source, uid, msg_id, data)

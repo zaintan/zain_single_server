@@ -1,4 +1,4 @@
-PROTO_PATH=.
+PROTO_PATH=./proto
 
 .PHONY : all clean
 

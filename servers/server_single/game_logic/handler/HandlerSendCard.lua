@@ -20,7 +20,7 @@ function HandlerSendCard:onEnter()
 	--广播抓牌
 	local succ,sendCard = self.m_pTable:drawCard(self.seat_index)
 	if not succ then --失败  没有牌了 
-		self.m_pState:gameRoundOver(const.RoundOverType.LIU_JU)
+		self.m_pState:gameRoundOver(const.RoundFinishReason.DRAW)
 		return
 	end 
 --	--判断庄家是否可以操作
@@ -29,11 +29,11 @@ function HandlerSendCard:onEnter()
 	--self.m_pTable:cleanActions(self.seat_index)
 	local playerCards = self.m_pTable:getPlayerCards(self.seat_index)
 	
-	local checkWiks = {const.GameAction.AN_GANG,const.GameAction.BU_GANG, const.GameAction.ZI_MO};
+	local checkWiks = {const.Action.AN_GANG,const.Action.ZHI_GANG, const.Action.ZI_MO};
 
 	local actions = playerCards:checkAddAction(checkWiks, sendCard, true, self.seat_index)
 	if actions and #actions > 0 then 
-		self.player_status = const.PlayerStatus.OPERATE
+		self.player_status = const.PlayerStatus.OPERATE_CARD
 	else 
 		self.player_status = const.PlayerStatus.OUT_CARD
 	end 
@@ -44,7 +44,7 @@ function HandlerSendCard:onEnter()
 end
 
 function HandlerSendCard:_onOutCardReq(msg_id, uid, data)
-	local ret_msg_id = msg_id + const.MsgId.BaseResponse
+	local ret_msg_id = msg_id + msg.ResponseBase
 	local seat_index = self.m_pTable:getPlayerSeat(uid)
 	--不是该玩家
 	if seat_index ~= self.seat_index then 
@@ -74,7 +74,7 @@ function HandlerSendCard:_onOperateCardReq(msg_id, uid, data)
 	Log.d(LOGTAG, "_onOperateCardReq msg_id=%d,uid=%d",msg_id,uid)
 	Log.dump(LOGTAG, data)
 
-	local ret_msg_id = msg_id + const.MsgId.BaseResponse
+	local ret_msg_id = msg_id + msg.ResponseBase
 	local seat_index = self.m_pTable:getPlayerSeat(uid)
 	--不是该玩家
 	if seat_index ~= self.seat_index then 
@@ -83,7 +83,7 @@ function HandlerSendCard:_onOperateCardReq(msg_id, uid, data)
 		return false
 	end 
 	--不在出牌状态
-	if self.player_status ~= const.PlayerStatus.OPERATE then 
+	if self.player_status ~= const.PlayerStatus.OPERATE_CARD then 
 		Log.d(LOGTAG, "self.player_status=%d",self.player_status)
 		self.m_pTable:sendMsg(uid, ret_msg_id, {status = -3;})
 		return false
@@ -97,15 +97,15 @@ function HandlerSendCard:_onOperateCardReq(msg_id, uid, data)
 		return false
 	end 
 
-	if data.weave_kind == const.GameAction.AN_GANG
-		or data.weave_kind == const.GameAction.BU_GANG  then 
+	if data.weave_kind == const.Action.AN_GANG
+		or data.weave_kind == const.Action.ZHI_GANG  then 
 		--切handlerGang
 		self.m_pState:changeHandler(const.GameHandler.GANG, seat_index, data, self.seat_index)		
-	elseif data.weave_kind == const.GameAction.ZI_MO then 
+	elseif data.weave_kind == const.Action.ZI_MO then 
 		--切gameOver
-		self.m_pState:gameRoundOver(const.RoundOverType.HU,self.seat_index,self.seat_index)
+		self.m_pState:gameRoundOver(const.RoundFinishReason.NORMAL,self.seat_index,self.seat_index)
 	end 
-	--self.m_pTable:sendMsg(uid,msg_id+const.MsgId.BaseResponse, {status = -1;})
+	--self.m_pTable:sendMsg(uid,msg_id+msg.ResponseBase, {status = -1;})
 	return true
 end
 
