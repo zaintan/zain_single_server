@@ -41,15 +41,20 @@ function ReleaseVote:getReconnetInfo()
 		result = self.m_result;
 		votes  = self.m_votes;
 		seat_index = self.m_source_seat;
-		time       = COUNT_DOWN_TIME - (os.time() - self.m_startSeconds);
+		time       = self:_getRemainSeconds()
 	}
+end
+
+function ReleaseVote:_getRemainSeconds()
+	return COUNT_DOWN_TIME - (os.time() - self.m_startSeconds);
 end
 
 function ReleaseVote:handleReleaseReq(player , data, msg_id)
 	--发起者
 	self.m_votes[player.seat_index+1] = const.ReleaseVote.AGREE
 	self.m_pTable:sendMsg(player.user_id, msg_id+msg.ResponseBase, {status = 1;})	
-	self.m_pTable:broadcastMsg(msg.NameToId.ReleasePush,{result = const.ReleaseVoteResult.VOTING;votes = self.m_votes;})
+--{result = const.ReleaseVoteResult.VOTING;votes = self.m_votes;}
+	self:_broadcastVoteResult()
 end
 
 function ReleaseVote:handleVoteReq(player, data, msg_id)
@@ -74,7 +79,16 @@ function ReleaseVote:handleVoteReq(player, data, msg_id)
 end
 
 function ReleaseVote:_broadcastVoteResult()
-	self.m_pTable:broadcastMsg(msg.NameToId.ReleasePush,{result = self.m_result;votes=self.m_votes;})
+	local smsg = {
+		release_info = {
+			result     = self.m_result;
+			votes      = self.m_votes;
+			seat_index = self.m_source_seat;
+			time       = self:_getRemainSeconds();
+		};
+	};
+	self.m_pTable:broadcastMsg(msg.NameToId.ReleasePush,smsg)
+	--self.m_pTable:broadcastMsg(msg.NameToId.ReleasePush,{result = self.m_result;votes=self.m_votes;})
 end
 
 function ReleaseVote:_over()
