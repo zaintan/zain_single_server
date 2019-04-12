@@ -96,7 +96,7 @@ function HandlerOutCard:_checkOthersAction( checkWiks, out_card )
 			local playerCards = self.m_pTable:getPlayerCards(seat)
 			local actions = playerCards:checkAddAction(checkWiks, out_card, true, self.seat_index)
 			
-			local player_status = const.PlayerStatus.NULL
+			local player_status = const.PlayerStatus.NONE
 			if actions and #actions > 0 then 
 				player_status = const.PlayerStatus.OPERATE_CARD
 				hasAction  = true
@@ -119,7 +119,7 @@ function HandlerOutCard:onEnter(seat_index, out_card)
 	self.m_pTable:cleanActions()
 
 	
-	--self.m_pState:changePlayerStatus(seat_index, const.PlayerStatus.NULL)
+	--self.m_pState:changePlayerStatus(seat_index, const.PlayerStatus.NONE)
 
 	local checkWiks = {const.Action.PENG, const.Action.PENG_GANG, const.Action.JIE_PAO};
 	local hasOneAction = self:_checkOthersAction(checkWiks, out_card)

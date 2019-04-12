@@ -10,7 +10,7 @@ function HandlerSendCard:ctor(...)
 
 
 	self.seat_index    = -1
-	self.player_status = const.PlayerStatus.NULL
+	self.player_status = const.PlayerStatus.NONE
 end
 
 function HandlerSendCard:onEnter()
