@@ -47,8 +47,11 @@ end
 function GameTableLogic:on_req(uid, msg_id, data)
 	Log.d(LOGTAG, "on_req msg_id=%d,uid=%d",msg_id,uid)
    	return self.m_msgQue(function()
-   		Log.d(LOGTAG, "on_req")
-   		return self.m_table:getCurState():on_req(uid, msg_id, data)
+   		if msg_id == msg.NameToId.ReleaseRequest then
+   			return self.m_table:onReleaseReq(uid, msg_id, data)
+   		else
+   			return self.m_table:getCurState():on_req(uid, msg_id, data)
+   		end 
 	end)
 end
 

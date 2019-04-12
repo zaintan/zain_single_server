@@ -100,23 +100,6 @@ function TableStateFree:_onPlayerExitReq(msg_id, uid, data)
 	return true
 end
 
-function TableStateFree:_onReleaseReq(msg_id,uid, data)
-	--牌局未开始 创建者可以解散 普通人可以离开
-	if data.type == const.ReleaseRequestType.RELEASE then
-		if uid == self.m_pTable.m_createUid then 
-			--解散成功
-			self.m_pTable:sendMsg(uid,msg_id+msg.ResponseBase, {status = 1;status_tip="创建者已解散房间!"})
-			--destroy会推送成功解散的消息
-			self.m_pTable:destroy(const.GameFinishReason.CREATOR_RELEASE)
-			return true
-		else
-			self.m_pTable:sendMsg(uid,msg_id+msg.ResponseBase, {status = -1;status_tip="非创建者无权解散房间!"})
-			return false
-		end 
-	end 
-	--未知解散请求 回复解散失败
-	self.m_pTable:sendMsg(uid,msg_id+msg.ResponseBase, {status = -3;})
-	return false
-end
+
 
 return TableStateFree

@@ -234,6 +234,8 @@ function BaseTable:getBaseInfo()
 	--info.op_info
 	--info.cards_infos
 	info.room_id     = self.m_tableId
+
+	info.release_info = self:_getReleaseInfo()
 	return info
 end
 
@@ -288,4 +290,70 @@ function BaseTable:destroy(releaseReason)
 	skynet.exit()
 end
 
+function BaseTable:_onReleaseReqFree(uid, msg_id, data)
+	--牌局未开始 创建者可以解散 普通人可以离开
+	if data.type == const.ReleaseRequestType.RELEASE then
+		if uid == self.m_createUid then 
+			--解散成功
+			self:sendMsg(uid,msg_id+msg.ResponseBase, {status = 1;status_tip="创建者已解散房间!"})
+			--destroy会推送成功解散的消息
+			self:destroy(const.GameFinishReason.CREATOR_RELEASE)
+			return true
+		else
+			self:sendMsg(uid,msg_id+msg.ResponseBase, {status = -1;status_tip="非创建者无权解散房间!"})
+			return false
+		end 
+	end 
+	--未知解散请求 回复解散失败
+	self:sendMsg(uid,msg_id+msg.ResponseBase, {status = -3;})
+	return false
+end
+
+function BaseTable:onReleaseReq(uid, msg_id, data)
+	if self:getCurState():getStatus() == const.GameStatus.FREE then 
+		return self:_onReleaseReqFree(uid, msg_id, data)
+	end 
+
+	local player = self:getPlayer(uid)
+	if not player then 
+		self:sendMsg(uid,msg_id+msg.ResponseBase, {status = -100;status_tip="找不到该玩家";})
+		return false
+	end 
+	--发起投票解散
+	if data.type == const.ReleaseRequestType.RELEASE then
+		if self.m_releaseVote then --已经有投票在进行中了
+			self:sendMsg(uid,msg_id+msg.ResponseBase, {status = -4;status_tip="已有投票在进行";})
+			return false
+		else 
+			self.m_releaseVote = new(require("game_logic.ReleaseVote"))
+			self.m_releaseVote:init(self,player.seat_index,function (result)
+				self.m_releaseVote = nil
+				if result == const.ReleaseVoteResult.SUCCESS then --gameover 如果是牌局中
+					self:destroy(const.GameFinishReason.PLAYER_VOTE_RELEASE)
+				end 				
+			end)
+			self.m_releaseVote:handleReleaseReq(player, data, msg_id)
+			return true
+		end 
+	elseif data.type == const.ReleaseRequestType.VOTE then
+		if self.m_releaseVote then --已经有投票在进行中了
+			self.m_releaseVote:handleVoteReq(player, data,msg_id)
+			return true
+		else--投票已经结束
+			self:sendMsg(uid,msg_id+msg.ResponseBase, {status = -5;status_tip="投票已结束";})
+			return false
+		end 
+	else
+		--未知解散请求 回复解散失败
+		self:sendMsg(uid,msg_id+msg.ResponseBase, {status = -3;status_tip="未定义请求";})
+		return false		
+	end 		
+end
+
+function  BaseTable:_getReleaseInfo()
+	if self.m_releaseVote then 
+		return self.m_releaseVote:getReconnetInfo()
+	end 
+	return nil
+end
 return BaseTable

@@ -17,6 +17,8 @@ function ReleaseVote:init(pTable,source,callback)
 	self.m_result   = const.ReleaseVoteResult.VOTING
 	self.m_callback = callback
 
+	self.m_startSeconds = os.time()
+
 	self.m_votes   = {}
 	self:__resetVotes()
 
@@ -28,6 +30,19 @@ function ReleaseVote:init(pTable,source,callback)
 		self.m_result = const.ReleaseVoteResult.SUCCESS
 		self:_over()
 	end)
+end
+
+function ReleaseVote:getReconnetInfo()
+	if self.m_bClear then 
+		return nil 
+	end 
+
+	return {
+		result = self.m_result;
+		votes  = self.m_votes;
+		seat_index = self.m_source_seat;
+		time       = COUNT_DOWN_TIME - (os.time() - self.m_startSeconds);
+	}
 end
 
 function ReleaseVote:handleReleaseReq(player , data, msg_id)
