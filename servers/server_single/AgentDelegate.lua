@@ -61,10 +61,12 @@ function class:_kickMe()
 end
 
 function class:quit()
-    Log.d(LOGTAG,"玩家下线!")
+    Log.w(LOGTAG,"玩家下线!%s",tostring(self.FUserID))
     --下线通知 中心服 和 游戏服
-    pcall(skynet.call, ".LoginService","lua","logout",  self.FUserID)
-    pcall(skynet.call, ".GameService", "lua","offline", self.FUserID)
+    if self.FUserID ~= nil then 
+        pcall(skynet.call, ".LoginService","lua","logout",  self.FUserID)
+        pcall(skynet.call, ".GameService", "lua","offline", self.FUserID)
+    end 
 
     if self.client_fd then 
         socket.close(self.client_fd)
@@ -96,6 +98,8 @@ function class:_handlerHeartReq(data)
 end
 
 function class:_handlerLoginReq(data)
+    Log.w(LOGTAG,"recv login req")
+
     local ok,data = pcall(skynet.call, ".LoginService", "lua", "on_login", data)
     Log.d(LOGTAG,"recv ret from LoginService!")
     if not ok then 
