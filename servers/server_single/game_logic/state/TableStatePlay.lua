@@ -158,10 +158,11 @@ function TableStatePlay:_initPlayerStatuses()
 	self.player_statuses = {}
 	local num = self.m_pTable:getMaxPlayerNum()
 	--local players = self.m_pTable:getPlayers()
-	Log.d(LOGTAG,"_initPlayerStatuses num=%d",num);
+	Log.d(LOGTAG,"_initPlayerStatuses num=%d self=%s",num,tostring(self));
 	for i=1,num do
 		self.player_statuses[i] = const.PlayerStatus.NULL
 	end
+	Log.dump(LOGTAG,self.player_statuses)
 end
 
 function TableStatePlay:changePlayerStatus( seat_index, status )
@@ -245,14 +246,15 @@ function TableStatePlay:broadcastRoomCards(hasHand, hasWeave, hasDiscard, except
 	local except = exceptSeats or {}--不包括这些座位号玩家的牌
 	
 	local players = self.m_pTable:getPlayers()
-	Log.d(LOGTAG,"broadcastRoomCards:");
+	Log.d(LOGTAG,"broadcastRoomCards: %s",tostring(self));
 	for id,player in pairs(players) do
 		local msg_data = {cards_infos = {};};
+		Log.dump(LOGTAG,self.player_statuses)
 		for seat,_ in pairs(self.player_statuses) do
 			local cards_seat  = seat - 1
 			Log.d(LOGTAG,"cards_seat:%d,except",cards_seat);
 			Log.dump(LOGTAG,except)
-			
+
 			if not _isInArray(cards_seat,  except) then 
 				local playerCards = self.m_pTable:getPlayerCards(cards_seat)
 				local data = _getPlayerCardsInfo(playerCards,cards_seat,player.seat_index,hasHand, hasWeave, hasDiscard)
