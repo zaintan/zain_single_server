@@ -6,6 +6,10 @@
 local skynet    = require "skynet"
 require "skynet.manager"
 
+local queue  = require "skynet.queue"
+local cs     = queue()
+
+
 ---! 辅助依赖
 local NumSet       = require "NumSet"
 
@@ -127,7 +131,7 @@ end
 ---! lua commands
 local CMD = {}
 
-function CMD.on_login(agent, reqData)
+local function _seq_on_login(agent, reqData)
     Log.d(LOGTAG,"recv cmd on_login")
     if not reqData.login_type or not reqData.token then 
         return _onLoginFalid("缺失必要的登录参数！")
@@ -166,7 +170,7 @@ function CMD.on_login(agent, reqData)
 end
 
 ----注意清缓存
-function CMD.logout(source,uid)
+local function _seq_logout(source,uid)
     Log.d(LOGTAG,"recv cmd logout uid:",uid)
     local user = CacheUserMap:getObject(uid)
     if user then 
@@ -176,7 +180,8 @@ function CMD.logout(source,uid)
     return true
 end
 
-function CMD.query(source,uid )
+--function CMD.query(source,uid )
+local function _seq_query( source,uid )
     --Log.d(LOGTAG,"recv cmd query")
     local obj = CacheUserMap:getObject(uid)
     if not obj then 
@@ -188,6 +193,24 @@ function CMD.query(source,uid )
         FUserName = obj.FUserName;
         FHeadUrl  = obj.FHeadUrl;
     };
+end
+--local cs  = queue()
+function CMD.on_login(agent,reqData)
+    return cs(function()
+        return _seq_on_login(agent,reqData)
+    end)
+end
+
+function CMD.logout(source,uid)
+    return cs(function()
+        return _seq_logout(source,uid)
+    end)
+end
+
+function CMD.query(source,uid)
+    return cs(function()
+        return _seq_query(source,uid)
+    end)
 end
 
 
