@@ -298,6 +298,8 @@ function BaseTable:destroy(releaseReason)
 	for uid,player in pairs(self.m_players) do
 		table.insert(uids, uid)
 	end	
+
+	Log.d(LOGTAG, "table exit! tid=%d, addr=%s",self.m_tableId,tostring(skynet.self()))
 	--通知GameServers
 	pcall(skynet.call, ".GameService", "lua","releaseTable", self.m_tableId, self.m_createUid,uids)
 	skynet.exit()

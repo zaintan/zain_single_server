@@ -98,6 +98,7 @@ function GameServerLogic:handlerCreateReq(uid, data)
 		end 
 		user:addCreatedTable(table_id)
 		self.m_tables:addObject(tableSvr, table_id)
+		Log.d(LOGTAG, "createTable tid=%d, addr=%s",table_id,tostring(tableSvr))
 		return msg.NameToId.CreateRoomResponse,{status = 1;room_id = table_id;}
 	else 
 		skynet.kill(tableSvr)
@@ -183,13 +184,15 @@ function GameServerLogic:_cleanTable(taddr,tableId)
 		if tableAddr ~= tableSvr then 
 			Log.e(LOGTAG,"may be error! table address not equal!")
 		end 
-		self.m_tables:removeObject(nil,tableId)
+		self.m_tables:removeObject(tableId)
 	else
 		Log.e(LOGTAG,"may be error! not found tableId=%d in self.m_tables!",tableId)
 	end 
 end
 
 function GameServerLogic:releaseTable(tableSvr, tableId, create_uid,uids)
+	Log.d(LOGTAG, "releaseTable tid=%d, addr=%s",tableId,tostring(tableSvr))
+
 	--清空加入关联
 	for _,uid in ipairs(uids) do
 		self:_cleanUserJoined(uid)
