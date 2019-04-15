@@ -23,6 +23,7 @@ function BaseTable:ctor(tableId,create_uid, gameId, gameType, gameRules)
 	--
 	self:_initGameRules()
 	self:_initCards()
+	self:_initGameStatistics()
 
 	self:_initPlayers()
 	self:_initStates()
@@ -35,6 +36,10 @@ end
 
 function BaseTable:getOverVal()
 	return self.m_overVal
+end
+function BaseTable:_initGameStatistics()
+	self.m_statistics = new(require("game_logic.GameStatistics"), self)
+	--self.m_statistics:init(self.m_curPlayerNum)
 end
 
 function BaseTable:_initGameRules()
@@ -279,6 +284,14 @@ end
 
 function BaseTable:destroy(releaseReason)
 	--大结算
+	if releaseReason ~= const.GameFinishReason.CREATOR_RELEASE then 
+		--牌局开始以后 都得发大结算
+		local msg_data = {
+			game_finish_reason = releaseReason;
+			player_infos       = self.m_statistics:getInfo()
+		};
+		self:broadcastMsg(msg.NameToId.GameFinishPush, msg_data)
+	end 
 
 	-- body
 	local uids = {}
@@ -296,7 +309,14 @@ function BaseTable:_onReleaseReqFree(uid, msg_id, data)
 		if uid == self.m_createUid then 
 			--解散成功
 			self:sendMsg(uid,msg_id+msg.ResponseBase, {status = 1;status_tip="创建者已解散房间!"})
-			--destroy会推送成功解散的消息
+			--推送成功解散的消息
+			local msg_data = {
+				release_info = {
+					result = const.ReleaseVoteResult.SUCCESS;
+				};
+			}
+			self:broadcastMsg(msg.NameToId.ReleasePush,msg_data)
+			--
 			self:destroy(const.GameFinishReason.CREATOR_RELEASE)
 			return true
 		else
@@ -355,5 +375,16 @@ function  BaseTable:_getReleaseInfo()
 		return self.m_releaseVote:getReconnetInfo()
 	end 
 	return nil
+end
+
+function BaseTable:_getGameOverPlayersInfo()
+	--[[
+			{
+				total_scores   = ;
+				special_counts = ;
+			};
+			]]
+
+	return 
 end
 return BaseTable

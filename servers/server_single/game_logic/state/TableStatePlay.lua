@@ -61,6 +61,7 @@ function TableStatePlay:onEnter()
 	--init Round
 	self:resetPlayerStatuses()
 	self.m_curRound = self.m_curRound + 1
+	--
 	--第一局 随机庄家  
 	if self.m_curRound == 1 then
 		self.m_curBanker = self.m_pTable:getRandBanker()
@@ -291,7 +292,7 @@ end
 function TableStatePlay:gameRoundOver(roundOverType, hu_seat, provider)
 	--确定下把的庄家
 	if roundOverType == const.RoundFinishReason.NORMAL then 
-		self.m_winSeat = hu_seat
+		self.m_winSeat = hu_seat	
 	else
 		local haidiSeat = (self.m_curSeatIndex - 1)%self.m_pTable:getCurPlayerNum()
 		self.m_winSeat  = haidiSeat
@@ -312,11 +313,13 @@ function TableStatePlay:gameRoundOver(roundOverType, hu_seat, provider)
 			data.finish_desc[i]  = seat == hu_seat and "自摸" or ""
 			data.final_scores[i] = seat == hu_seat and player_num*score_beilv or -score_beilv
 			--data.win_types[i]    = 0
+			self.m_pTable.m_statistics:addSpecailCount(hu_seat,const.SpecialCountType.ZI_MO,1)	
 		elseif hu_seat and provider ~= hu_seat then --放炮
 			if seat == hu_seat then 
 				data.finish_desc[i]  = "接炮"
 				data.final_scores[i] = score_beilv
 				--data.win_types[i]    = 0
+				self.m_pTable.m_statistics:addSpecailCount(hu_seat,const.SpecialCountType.JIE_PAO,1)				
 			elseif seat == provider then 
 				data.finish_desc[i]  = "放炮"
 				data.final_scores[i] = -score_beilv
@@ -341,8 +344,11 @@ function TableStatePlay:gameRoundOver(roundOverType, hu_seat, provider)
 	--累积分数
 	local players = self.m_pTable:getPlayers()
 	for k,player in pairs(players) do
-		player.score = player.score + data.final_scores[player.seat_index + 1]
+		local curScore  = data.final_scores[player.seat_index + 1]
+		player.score = player.score + curScore
+		self.m_pTable.m_statistics:addScore(player.seat_index,curScore)
 	end
+	--
 	----大结算
 	if self.m_curRound == self.m_pTable:getOverVal() then 
 		--game over
