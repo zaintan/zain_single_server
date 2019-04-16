@@ -289,6 +289,21 @@ function TableStatePlay:_getCardsInfo(uid)
 	return cards_infos
 end
 
+function TableStatePlay:broadcastShowCards()
+	local data = {	cards_infos = {}; };
+	for i=1,self.m_pTable:getCurPlayerNum() do
+		local info = {
+			has_hands    = true;
+			has_weaves   = false;
+			has_discards = false;
+			seat_index   = i-1;
+		}
+		info.hands = self.m_pTable:getPlayerCards(i-1):getHands()
+		table.insert(data.cards_infos, info)
+	end
+	self.m_pTable:broadcastMsg(msg.NameToId.ShowHandCardsPush, data)
+end
+
 function TableStatePlay:gameRoundOver(roundOverType, hu_seat, provider)
 	--确定下把的庄家
 	if roundOverType == const.RoundFinishReason.NORMAL then 
@@ -297,6 +312,7 @@ function TableStatePlay:gameRoundOver(roundOverType, hu_seat, provider)
 		local haidiSeat = (self.m_curSeatIndex - 1)%self.m_pTable:getCurPlayerNum()
 		self.m_winSeat  = haidiSeat
 	end 
+	self:broadcastShowCards()
 	--推送游戏结束消息
 	local data = {}
 	data.game_status     = const.GameStatus.WAIT

@@ -382,14 +382,4 @@ function  BaseTable:_getReleaseInfo()
 	return nil
 end
 
-function BaseTable:_getGameOverPlayersInfo()
-	--[[
-			{
-				total_scores   = ;
-				special_counts = ;
-			};
-			]]
-
-	return 
-end
 return BaseTable
