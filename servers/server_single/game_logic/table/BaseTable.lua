@@ -302,7 +302,10 @@ function BaseTable:destroy(releaseReason)
 	Log.d(LOGTAG, "table exit! tid=%d, addr=%s",self.m_tableId,tostring(skynet.self()))
 	--通知GameServers
 	pcall(skynet.call, ".GameService", "lua","releaseTable", self.m_tableId, self.m_createUid,uids)
-	skynet.exit()
+	--skynet.exit()
+	skynet.timeout(1,function()
+		skynet.exit()
+	end)
 end
 
 function BaseTable:_onReleaseReqFree(uid, msg_id, data)

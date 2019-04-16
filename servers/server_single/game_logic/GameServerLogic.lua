@@ -145,14 +145,18 @@ end
 
 
 
-function GameServerLogic:handlerClientReq(uid, msgId, data)
+function GameServerLogic:handlerClientReq(source, uid, msgId, data)
 	local user = self.m_users:getObject(uid)
 	if user then 
 		local table_id  = user:getTableId()
 		local tableAddr = self.m_tables:getObject(table_id)
-
-		return skynet.call(tableAddr, "lua", "on_req", uid, msgId, data)
+		if tableAddr then 
+			return skynet.call(tableAddr, "lua", "on_req", uid, msgId, data) 
+		end 
 	end		
+
+	pcall(skynet.call, source , "lua", "sendMsg", msgId + msg.ResponseBase, {status=-1001;})
+	--return false
 	Log.e(LOGTAG,"Not In Table,can not access unkonwn msgId = ",msgId)
 end
 
@@ -180,8 +184,9 @@ function GameServerLogic:_cleanTable(taddr,tableId)
 	self.m_idPool:recoverId(tableId)
 
 	local tableAddr = self.m_tables:getObject(tableId)
+	Log.d(LOGTAG,"cached tableAddr=%s,arg taddr=%s,tableId=%d",tostring(tableAddr),tostring(taddr),tableId)
 	if tableAddr then 
-		if tableAddr ~= tableSvr then 
+		if tableAddr ~= taddr then 
 			Log.e(LOGTAG,"may be error! table address not equal!")
 		end 
 		self.m_tables:removeObject(tableId)
