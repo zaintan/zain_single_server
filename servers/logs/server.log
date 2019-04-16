@@ -1,0 +1,59 @@
+[:00000001] LAUNCH logger logs/server.log
+[:00000002] LAUNCH snlua bootstrap
+[:00000003] LAUNCH snlua launcher
+[:00000004] LAUNCH snlua cdummy
+[:00000005] LAUNCH harbor 0 4
+[:00000006] LAUNCH snlua datacenterd
+[:00000007] LAUNCH snlua service_mgr
+[:00000008] LAUNCH snlua main
+[:00000008] @./server_single/main.lua:start[22] lv3 Main [Tue Apr 16 12:36:47 2019] --> debug port is:8000
+[:00000009] LAUNCH snlua debug_console 8000
+[:00000009] Start debug console at 127.0.0.1:8000
+[:0000000a] LAUNCH snlua NodeStat
+[:0000000b] LAUNCH snlua WatchDog
+[:0000000c] LAUNCH snlua gate
+[:0000000c] Listen on 0.0.0.0:8100
+[:0000000d] LAUNCH snlua LoginService
+[:0000000e] LAUNCH snlua DBService
+[:0000000f] LAUNCH snlua MySQLService
+[:00000010] LAUNCH snlua GameService
+[:00000008] KILL self
+[:00000002] KILL self
+[:0000000b] @./server_single/WatchDog.lua:f[40] lv3 WatchDog [Tue Apr 16 12:37:26 2019] --> tcp agent start fd:3, addr:119.145.0.18:62565
+[:00000012] LAUNCH snlua TcpAgent
+[:00000012] @./server_single/AgentDelegate.lua:create[30] lv3 Agent [Tue Apr 16 12:37:26 2019] --> CMD start called on fd 3
+[:00000012] @./server_single/TcpAgent.lua:f[51] lv3 TcpAgent [Tue Apr 16 12:37:26 2019] --> recv client msg len:29 recvTime:1555389446.14
+[:00000012] @./server_single/AgentDelegate.lua:command_handler[156] lv4 Agent [12:37:26] --> 
+table = {
+    client_version = "1.0.0",
+    platform = 3,
+    token = "tzyBBB",
+    login_type = 1,
+    game_index = 1,
+}
+[:00000012] @./server_single/AgentDelegate.lua:f[101] lv2 Agent [Tue Apr 16 12:37:26 2019] --> recv login req
+[:0000000d] @./services/LoginService.lua:NotFound[135] lv4 LOGIN [Tue Apr 16 12:37:26 2019] --> recv cmd on_login
+[:0000000d] @./services/LoginService.lua:NotFound[146] lv4 LOGIN [Tue Apr 16 12:37:26 2019] --> query db start...
+[:0000000d] @./services/LoginService.lua:NotFound[149] lv4 LOGIN [Tue Apr 16 12:37:26 2019] --> query db over!
+[:0000000d] @./services/LoginService.lua:NotFound[31] lv4 LOGIN [Tue Apr 16 12:37:26 2019] --> success:4596
+[:00000012] @./server_single/AgentDelegate.lua:f[104] lv4 Agent [Tue Apr 16 12:37:26 2019] --> recv ret from LoginService!
+[:00000010] @./services/GameService.lua:f[65] lv4 GS [Tue Apr 16 12:37:26 2019] --> recv cmd:
+[:00000012] @./server_single/AgentDelegate.lua:f[114] lv4 Agent [Tue Apr 16 12:37:26 2019] --> queryTableId return status=true,tableId=-1
+[:00000012] @./server_single/AgentDelegate.lua:sendMsg[85] lv4 Agent [Tue Apr 16 12:37:26 2019] --> sendClientMsg msg_id=10001
+[:00000012] @./server_single/AgentDelegate.lua:sendMsg[86] lv4 Agent [12:37:26] --> 
+table = {
+    status = 0,
+    user_info = {
+        user_name = "tzyBBB",
+        head_img_url = "",
+        sex = 1,
+        gold = 1000,
+        diamond = 10,
+        user_id = 4596,
+    }
+}
+[:0000000b] @./server_single/WatchDog.lua:f[68] lv1 WatchDog [Tue Apr 16 12:37:28 2019] --> socket error fd:3, err:Connection reset by peer
+[:00000012] @./server_single/AgentDelegate.lua:quit[64] lv2 Agent [Tue Apr 16 12:37:28 2019] --> 玩家下线!4596
+[:0000000d] @./services/LoginService.lua:NotFound[174] lv4 LOGIN [Tue Apr 16 12:37:28 2019] --> recv cmd logout uid:
+[:00000010] @./services/GameService.lua:f[65] lv4 GS [Tue Apr 16 12:37:28 2019] --> recv cmd:
+[:00000012] KILL self

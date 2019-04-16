@@ -25,12 +25,12 @@ cpath       = _skynet.."cservice/?.so"
 ---!  港湾ID，用于分布式系统，0表示没有分布
 harbor      = 0
 ---!  后台运行用到的 pid 文件
-daemon      = nil
+daemon      = "skynet.pid"
 ---!  日志文件
 -- logger      = nil
-logger      = nil
+logger      = "logs/server.log"
 --logger      = _root .. "/logs/"..app_name .. ".log"
-logpath     = "."
+--logpath     = "./logs/"
 ---!  初始启动的模块
 bootstrap   = "snlua bootstrap"
 
