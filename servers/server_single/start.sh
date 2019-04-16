@@ -9,5 +9,7 @@
 ### so we can use getenv in skynet
 export NodeName=$1
 
+export StartTime=`date +%Y%m%d_%H%M%S`
+
 ### so we can distinguish different skynet processes
 ../skynet/skynet server_single/config.lua $NodeName

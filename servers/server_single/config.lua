@@ -7,6 +7,7 @@ local _skynet	= _root.."../skynet/"
 
 ---! server_single 用到的参数 从 命令行传的参数
 NodeName    =  "$NodeName"
+StartTime   =  "$StartTime"
 ServerKind  =  "server_single"
 
 ----------------------------------
@@ -25,10 +26,10 @@ cpath       = _skynet.."cservice/?.so"
 ---!  港湾ID，用于分布式系统，0表示没有分布
 harbor      = 0
 ---!  后台运行用到的 pid 文件
-daemon      = "skynet.pid"
+daemon      = "skynet_single.pid"
 ---!  日志文件
 -- logger      = nil
-logger      = "logs/server.log"
+logger      = "logs/server_single_"..StartTime..".log"
 --logger      = _root .. "/logs/"..app_name .. ".log"
 --logpath     = "./logs/"
 ---!  初始启动的模块
