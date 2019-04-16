@@ -310,16 +310,20 @@ function TableStatePlay:gameRoundOver(roundOverType, hu_seat, provider)
 	for i=1,player_num do
 		local seat = i - 1
 		if hu_seat and provider == hu_seat then --自摸
-			data.finish_desc[i]  = seat == hu_seat and "自摸" or ""
-			data.final_scores[i] = seat == hu_seat and player_num*score_beilv or -score_beilv
-			--data.win_types[i]    = 0
-			self.m_pTable.m_statistics:addSpecailCount(hu_seat,const.SpecialCountType.ZI_MO,1)	
+			if seat == hu_seat then 
+				data.finish_desc[i]  = "自摸"
+				data.final_scores[i] = (player_num-1)*score_beilv
+				self.m_pTable.m_statistics:addSpecailCount(seat,const.SpecialCountType.ZI_MO,1)	
+			else 
+				data.finish_desc[i]  = ""
+				data.final_scores[i] = -score_beilv	
+			end 
 		elseif hu_seat and provider ~= hu_seat then --放炮
 			if seat == hu_seat then 
 				data.finish_desc[i]  = "接炮"
 				data.final_scores[i] = score_beilv
 				--data.win_types[i]    = 0
-				self.m_pTable.m_statistics:addSpecailCount(hu_seat,const.SpecialCountType.JIE_PAO,1)				
+				self.m_pTable.m_statistics:addSpecailCount(seat,const.SpecialCountType.JIE_PAO,1)				
 			elseif seat == provider then 
 				data.finish_desc[i]  = "放炮"
 				data.final_scores[i] = -score_beilv
@@ -335,6 +339,8 @@ function TableStatePlay:gameRoundOver(roundOverType, hu_seat, provider)
 			--data.win_types[i]    = 0
 		end 
 
+		self.m_pTable.m_statistics:addScore(seat,data.final_scores[i])
+
 		local playerCards = self.m_pTable:getPlayerCards(seat)
 		local card_data   = _getPlayerCardsInfo(playerCards,seat,seat,true,true)
 		data.cards_infos[i] = card_data
@@ -344,9 +350,7 @@ function TableStatePlay:gameRoundOver(roundOverType, hu_seat, provider)
 	--累积分数
 	local players = self.m_pTable:getPlayers()
 	for k,player in pairs(players) do
-		local curScore  = data.final_scores[player.seat_index + 1]
-		player.score = player.score + curScore
-		self.m_pTable.m_statistics:addScore(player.seat_index,curScore)
+		player.score = player.score + data.final_scores[player.seat_index + 1]
 	end
 	--
 	----大结算

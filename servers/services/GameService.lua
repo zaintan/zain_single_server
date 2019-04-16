@@ -50,7 +50,7 @@ function CMD.on_req(source, uid, msg_id, data)
     end 
     --------------
     --skynet.ignoreret()
-    handler:handlerClientReq(uid,msg_id,data)
+    handler:handlerClientReq(source,uid,msg_id,data)
     return 
 end
 
