@@ -37,7 +37,7 @@ local function _readServer(cfg , server_index)
 			server = v
 		end 
 	end
-	assert(server != nil)
+	assert(server ~= nil)
  
 	local node = cfg.MySite[server.node]
 	local ret     = {}
