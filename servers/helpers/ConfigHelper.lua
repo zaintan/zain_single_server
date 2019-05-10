@@ -33,11 +33,11 @@ local function _readServer(cfg , server_index)
 	local server  = nil
 	local servers = cfg.servers
 	for i,v in ipairs(servers) do
-		if v.index == server_index then 
+		if tonumber(v.index) == tonumber(server_index) then 
 			server = v
 		end 
 	end
-	assert(server ~= nil)
+	assert(server != nil)
  
 	local node = cfg.MySite[server.node]
 	local ret     = {}
@@ -61,7 +61,7 @@ local function _readClusterList(cfg)
 		if server_list[v.kind] == nil then 
 			server_list[v.kind] = {}
 		end 
-		local node = cfg.MySite[server.node]
+		local node = cfg.MySite[v.node]
 		local cluser_name = _getCluserName(v.index)
 		local cluser_addr = _getCluserAddr(node[1], v.nodePort)
 		table.insert( server_list[v.kind], v.index)
