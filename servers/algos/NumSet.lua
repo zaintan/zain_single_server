@@ -70,6 +70,10 @@ class.removeObjects = removeObjects
 --! @param key the key for the object to retrieve
 --! @return return the object
 local function getObject (self, key)
+    if not key then 
+        return nil
+    end 
+
     local obj = self.data[key]
     return obj
 end

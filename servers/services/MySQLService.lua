@@ -146,8 +146,9 @@ skynet.start(function()
     end)
 
     ---! 加载配置
-    local packetHelper  = require "PacketHelper"
-    local config = packetHelper.load_config("./config/db.cfg")
+    local cfgHelper  = require "ConfigHelper"
+    local config = cfgHelper.loadDB()
+    
     conf  = config.DB_Conf
     conf.on_connect = function (db)
         db:query("set charset utf8");

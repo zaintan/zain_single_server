@@ -6,6 +6,10 @@
 local skynet    = require "skynet"
 require "skynet.manager"
 
+local queue  = require "skynet.queue"
+local cs  = queue()
+
+
 local handler = require("game_logic.GameServerLogic")
 
 local LOGTAG = "GS"
@@ -46,7 +50,10 @@ function CMD.on_req(source, uid, msg_id, data)
     
     local func = ComandFuncMap[msg_id]
     if func then 
-        return func(source, uid, data)
+        return cs(function()
+            return func(source, uid, data)
+        end)
+        --return func(source, uid, data)
     end 
     --------------
     --skynet.ignoreret()

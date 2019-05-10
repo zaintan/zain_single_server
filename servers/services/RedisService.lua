@@ -17,7 +17,7 @@ local function get_master_info ()
     local conn = {
         port = conf.port,
     }
-    for _, h in ipairs(conf.Redis_Hosts) do
+    for _, h in ipairs(conf.host) do
         conn.host = h
         local ret, db = pcall(redis.connect, conn)
         if ret and db then
@@ -101,7 +101,7 @@ end
 
 ---! generate redis path
 local function format_path (tableName, keyName, keyValue)
-    return string.format("%s.%s.%s.%s",conf.DB_Conf.database, tableName, keyName, keyValue)
+    return string.format("%s.%s.%s.%s",conf.database, tableName, keyName, keyValue)
 end
 
 ---! lua commands
@@ -155,11 +155,7 @@ skynet.start(function()
     end)
 
     ---! 加载配置
-    local packetHelper  = require "PacketHelper"
-    conf    = packetHelper.load_config("./config/db.cfg")
-
-    ---! 注册自己的地址
-    local srv = skynet.uniqueservice("NodeInfo")
-    skynet.call(srv, "lua", "updateConfig", skynet.self(), "RedisService")
+    local cfgHelper  = require "ConfigHelper"
+    conf   = cfgHelper.loadDB().Redis
 end)
 

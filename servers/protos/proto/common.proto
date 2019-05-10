@@ -127,6 +127,7 @@ message CreateRoomResponse {
 // 进入房间请求
 message JoinRoomRequest {
     required int32 room_id = 1; // 房间号
+    optional bool random_join = 2; // 是否随机加入，暂时用来测试
     repeated int32 reserved = 110; // 消除Warning的预留值
 }
 // 进入房间响应
