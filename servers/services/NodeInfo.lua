@@ -3,6 +3,8 @@
 ---! @brief 调试当前节点，获取运行信息
 --------------------------------------------------------------
 local skynet    = require "skynet"
+require "skynet.manager"
+
 local cluster   = require "skynet.cluster"
 
 local cfgHelper = require "ConfigHelper"
