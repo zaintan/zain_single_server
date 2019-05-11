@@ -8,7 +8,7 @@ local _skynet	= _root.."../skynet/"
 ---! server_single 用到的参数 从 命令行传的参数
 ServerIndex    =  "$ServerIndex"
 StartTime      =  "$StartTime"
-ServerKind     =  "server_alloc"
+ServerKind     =  "server_login"
 
 ----------------------------------
 ---!  自定义参数
