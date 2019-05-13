@@ -132,7 +132,7 @@ function class:_handlerLoginReq(data)
         self.FUserID  = ret.user_info.user_id
         self.userInfo = ret.user_info 
         ----------------------------------------------    
-        local callSucc,tid = ClusterHelper.callIndex(skynet.getenv("server_alloc"), ".AllocService", "lua", "queryTableId", self.FUserID)
+        local callSucc,tid = ClusterHelper.callIndex(skynet.getenv("server_alloc"), ".AllocService", "queryTableId", self.FUserID)
         if not callSucc then 
             Log.e(LOGTAG,"链接分配服失败!无法查询该玩家是否在房间!")
             self:sendMsg(msg.NameToId.LoginResponse, {status = -1005;})
@@ -152,7 +152,7 @@ end
 
 
 function class:_handlerCreateReq(data)
-    local ok,ret = ClusterHelper.callIndex(skynet.getenv("server_alloc") , ".AllocService", "lua", "create",data,self.userInfo)
+    local ok,ret = ClusterHelper.callIndex(skynet.getenv("server_alloc") , ".AllocService", "create",data,self.userInfo)
     if not ok then 
         Log.e(LOGTAG,"链接分配服失败!reason:%s",tostring(ret))
         self:sendMsg(msg.NameToId.CreateRoomResponse, {status = -1202;})
@@ -166,7 +166,6 @@ function class:_handlerJoinReq(data)
     
     local ok,ret = ClusterHelper.callIndex(skynet.getenv("server_alloc"), 
                                                        ".AllocService",
-                                                               "lua",
                                                               "join",
                                                                 data, 
                                        skynet.getenv("ServerIndex"), 
@@ -191,7 +190,7 @@ function class:_handlerRoomReq(msg_id, data)
         return 
     end 
 
-    local ok = ClusterHelper.call(self.gameSvr, self.tableAddr,"lua", "on_req", self.FUserID, msg_id, data)
+    local ok = ClusterHelper.call(self.gameSvr, self.tableAddr, "on_req", self.FUserID, msg_id, data)
     if not ok then 
         Log.e(LOGTAG,"uid:%s转发msgid=%d到逻辑服失败!",tostring(self.FUserID), msg_id)
         self:sendMsg(msg_id + msg.ResponseBase, {status = -1402;})
