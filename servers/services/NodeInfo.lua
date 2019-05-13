@@ -38,11 +38,11 @@ function CMD.initNode()
     --skynet.getenv("ServerIndex")  cfgHelper.getCluserName()
 
     local serverList = Config.serverList
-    assert(serverList.alloc and #serverList.alloc == 1)
-    skynet.setenv("alloc",serverList.alloc[1])
+    assert(serverList.server_alloc and #serverList.server_alloc == 1)
+    skynet.setenv("server_alloc",serverList.server_alloc[1])
     
-    assert(serverList.login and #serverList.login == 1)
-    skynet.setenv("login",serverList.login[1])
+    assert(serverList.server_login and #serverList.server_login == 1)
+    skynet.setenv("server_login",serverList.server_login[1])
     ----
     Log.i(LOGTAG,"init config:")
     Log.dump(LOGTAG,Config)

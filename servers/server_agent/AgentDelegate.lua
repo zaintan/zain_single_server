@@ -68,7 +68,7 @@ function class:quit()
     local selfAddr  = skynet.self()
     if self.FUserID ~= nil then 
         --通知登录服  对应服务器清空的时候 要对地址做校验
-        ClusterHelper.callIndex(skynet.getenv("login"), ".LoginService", "logout",self.FUserID, cur_index, selfAddr)
+        ClusterHelper.callIndex(skynet.getenv("server_login"), ".LoginService", "logout",self.FUserID, cur_index, selfAddr)
         
         if self.gameSvr and self.tableAddr then 
             --通知游戏服
@@ -106,7 +106,7 @@ end
 
 function class:_handlerLoginReq(data)
 
-    local ok,ret = ClusterHelper.callIndex(skynet.getenv("login"), 
+    local ok,ret = ClusterHelper.callIndex(skynet.getenv("server_login"), 
                                                          ".LoginService", 
                                                                  "login", 
                                                                     data, 
@@ -132,7 +132,7 @@ function class:_handlerLoginReq(data)
         self.FUserID  = ret.user_info.user_id
         self.userInfo = ret.user_info 
         ----------------------------------------------    
-        local callSucc,tid = ClusterHelper.callIndex(skynet.getenv("alloc"), ".AllocService", "lua", "queryTableId", self.FUserID)
+        local callSucc,tid = ClusterHelper.callIndex(skynet.getenv("server_alloc"), ".AllocService", "lua", "queryTableId", self.FUserID)
         if not callSucc then 
             Log.e(LOGTAG,"链接分配服失败!无法查询该玩家是否在房间!")
             self:sendMsg(msg.NameToId.LoginResponse, {status = -1005;})
@@ -152,7 +152,7 @@ end
 
 
 function class:_handlerCreateReq(data)
-    local ok,ret = ClusterHelper.callIndex(skynet.getenv("alloc") , ".AllocService", "lua", "create",data,self.userInfo)
+    local ok,ret = ClusterHelper.callIndex(skynet.getenv("server_alloc") , ".AllocService", "lua", "create",data,self.userInfo)
     if not ok then 
         Log.e(LOGTAG,"链接分配服失败!reason:%s",tostring(ret))
         self:sendMsg(msg.NameToId.CreateRoomResponse, {status = -1202;})
@@ -164,7 +164,7 @@ end
 
 function class:_handlerJoinReq(data)
     
-    local ok,ret = ClusterHelper.callIndex(skynet.getenv("alloc"), 
+    local ok,ret = ClusterHelper.callIndex(skynet.getenv("server_alloc"), 
                                                        ".AllocService",
                                                                "lua",
                                                               "join",
