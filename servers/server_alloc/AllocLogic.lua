@@ -75,7 +75,7 @@ function AllocLogic:create(data,userInfo)
 			return {status = -3}
 		end 
 
-        local ok, ret = ClusterHelper.callIndex(server_index, ".GameService","lua","create",table_id,userInfo,data)
+        local ok, ret = ClusterHelper.callIndex(server_index, ".GameService","create",table_id,userInfo,data)
         if not ok then 
             Log.e(LOGTAG,"链接逻辑服%s失败!",tostring(server_index))
             self.m_idPool:recoverId(table_id)
@@ -113,10 +113,10 @@ function AllocLogic:join(data,fromNode,fromAddr,userinfo)
 			local tblInfo   = self.m_tables:getObject(table_id)
 
 			--通知逻辑服重连
-			local ok,ret = ClusterHelper.callIndex(tblInfo.index, tblInfo.addr, "lua", "reconnect",fromNode, fromAddr, uid)
+			local ok,ret = ClusterHelper.callIndex(tblInfo.index, tblInfo.addr,"reconnect",fromNode, fromAddr, uid)
 			if not ok then 
 				Log.i(LOGTAG,"uid=%d重连房间tid=%d逻辑服%d失败!",uid,table_id,tblInfo.index)
-				ClusterHelper.callIndex(fromNode,fromAddr,"lua","sendMsg",msg.NameToId.JoinRoomResponse,{status = -1;})
+				ClusterHelper.callIndex(fromNode,fromAddr,"sendMsg",msg.NameToId.JoinRoomResponse,{status = -1;})
 			end 
 			return false
 		end	
@@ -125,15 +125,15 @@ function AllocLogic:join(data,fromNode,fromAddr,userinfo)
 		local tblInfo = self.m_tables:getObject(data.room_id)
 		if not tblInfo then 
 			Log.e(LOGTAG,"AllocServer查不到该房间号%d!该房间已解散",data.room_id)
-			ClusterHelper.callIndex(fromNode,fromAddr,"lua","sendMsg",msg.NameToId.JoinRoomResponse,{status = -2;})
+			ClusterHelper.callIndex(fromNode,fromAddr,"sendMsg",msg.NameToId.JoinRoomResponse,{status = -2;})
 			return false
 		end 
 
 		--加入房间
-		local callSucc,joinSucc = ClusterHelper.callIndex(tblInfo.index,tblInfo.addr, "lua", "join", fromNode,fromAddr, userinfo)
+		local callSucc,joinSucc = ClusterHelper.callIndex(tblInfo.index,tblInfo.addr, "join", fromNode,fromAddr, userinfo)
 		if not callSucc then
 			Log.d(LOGTAG,"链接逻辑服%d失败%s",tblInfo.index, tostring(joinSucc))
-			ClusterHelper.callIndex(fromNode,fromAddr,"lua","sendMsg",msg.NameToId.JoinRoomResponse,{status = -3;})
+			ClusterHelper.callIndex(fromNode,fromAddr,"sendMsg",msg.NameToId.JoinRoomResponse,{status = -3;})
 			return false
 		end 
 
@@ -183,7 +183,7 @@ function AllocLogic:exit(uid, tid, bNotiGame)
 			end 
 			----------------------------------------------
 			if bNotiGame then 
-				local callSucc,err = ClusterHelper.callIndex(tblInfo.index, tblInfo.addr, "lua", "out_exit", uid)
+				local callSucc,err = ClusterHelper.callIndex(tblInfo.index, tblInfo.addr, "out_exit", uid)
 				if not callSucc then
 					Log.d(LOGTAG,"无法通知逻辑服,链接逻辑服%d失败%s",tblInfo.index, tostring(err))
 					ret = false
@@ -226,7 +226,7 @@ function AllocLogic:release(tid, bNotiGame)
 			self.m_tables:removeObject(tid)
 			----------------------------------------------
 			if bNotiGame then 
-				local callSucc,err = ClusterHelper.callIndex(gameIndex,gameAddr,"lua","out_release")
+				local callSucc,err = ClusterHelper.callIndex(gameIndex,gameAddr,"out_release")
 				if not callSucc then
 					Log.d(LOGTAG,"无法通知逻辑服,链接逻辑服%d失败%s",tblInfo.index, tostring(err))
 					return false
