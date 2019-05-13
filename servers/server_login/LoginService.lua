@@ -82,7 +82,7 @@ local function _updateCacheUser(uid ,agentNode,agentAddr, dbInfo )
         if user.agentNode and user.agentNode ~= agentNode and user.agentAddr ~= agentAddr then 
             -- !!踢错了  提了新的 -_-!!
             Log.i(LOGTAG,"重复登录! t掉之前的登录...")
-            local ok,_ = ClusterHelper.callIndex( user.agentNode, user.agentAddr, "lua", "disconnect", uid)
+            local ok,_ = ClusterHelper.callIndex( user.agentNode, user.agentAddr, "disconnect", uid)
             if not ok then 
                 Log.e(LOGTAG,"maybe err!重复登录!kick失败!")
             end 
