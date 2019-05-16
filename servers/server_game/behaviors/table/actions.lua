@@ -1,5 +1,5 @@
 local Super           = require("behaviors.behavior")
-local actions            = class(Super)
+local actions         = class(Super)
 
 actions.EXPORTED_METHODS = {
     

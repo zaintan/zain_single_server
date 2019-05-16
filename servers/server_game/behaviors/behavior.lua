@@ -16,15 +16,31 @@ function behavior:_clear_()
 	self.target_  = nil
 end
 
+
+local function _setmethods(target, behavior_, methods)
+    for _, name in ipairs(methods) do
+        local method = behavior_[name]
+        target[name] = function(__, ...)
+            return method(behavior_, ...)
+        end
+    end
+end
+
+local function _unsetmethods(target, methods)
+    for _, name in ipairs(methods) do
+        target[name] = nil
+    end
+end
+
 function behavior:bind(target, ...)
     self:_pre_bind_(...)
-    base.setmethods(target, self, self.EXPORTED_METHODS)
+    _setmethods(target, self, self.EXPORTED_METHODS)
     self.target_ = target
     self._on_bind_()
 end
 
 function behavior:unbind(target)
-    base.unsetmethods(target, self.EXPORTED_METHODS)
+    _unsetmethods(target, self.EXPORTED_METHODS)
     self:_clear()
 end
 
