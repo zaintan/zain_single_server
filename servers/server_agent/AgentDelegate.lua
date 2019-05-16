@@ -194,6 +194,9 @@ function class:_handlerRoomReq(msg_id, data)
     if not ok then 
         Log.e(LOGTAG,"uid:%s转发msgid=%d到逻辑服失败!",tostring(self.FUserID), msg_id)
         self:sendMsg(msg_id + msg.ResponseBase, {status = -1402;})
+
+        self.gameSvr   = nil
+        self.tableAddr = nil
         return 
     end 
     --成功转发到逻辑服后  由逻辑服回消息

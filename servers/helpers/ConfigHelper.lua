@@ -105,35 +105,40 @@ return M
 
 --[[
 loadCluser ret = {
-	serverList = {
-		["server_agent"]={
-			[1]=101,
-			[2]=102
-		},
-		["server_alloc"]={
-			[1]=301
-		},
-		["server_game"]={
-			[1]=401
-		},
-	},
-	["clusterList"]={
-		["server_101"]     = "127.0.0.1:8051",
-		["server_102"]     = "127.0.0.1:8250",
-		["server_301"]     = "127.0.0.1:8050",
-		["server_401"]      = "127.0.0.1:8550",
+    cluserList = {
+        server_101 = "127.0.0.1:9051",
+        server_201 = "127.0.0.1:9053",
+        server_402 = "127.0.0.1:9056",
+        server_301 = "127.0.0.1:9054",
+        server_401 = "127.0.0.1:9055",
+        server_102 = "127.0.0.1:9052",
+    }
+    nodeInfo = {
+        debugPort = 9001,
+        tcpPort = 8100,
+        index = 101,
+        publicAddr = "111.230.152.22",
+        nodePort = 9051,
+        kind = "server_agent",
+        clusterName = "server_101",
+        privateAddr = "127.0.0.1",
+    }
+    serverList = {
+        server_game = {
+            1 = 401,
+            2 = 402,
+        }
+        server_agent = {
+            1 = 101,
+            2 = 102,
+        }
+        server_alloc = {
+            1 = 301,
+        }
+        server_login = {
+            1 = 201,
+        }
+    }
+}
 
-	},
-	["nodeInfo"]={
-		["debugPort"]	= 8000,
-		["serverKind"]  = "server_agent",
-		["nodeName"]    = "node1",
-		["tcpPort"]     = 8100,
-		["privateAddr"] = "127.0.0.1",
-		["nodePort"]    = 8050,
-		["publicAddr"]  = "111.230.152.22",
-		["serverIndex"] = 0,
-		["clusterName"] = "server_101"
-	},
-};
 ]]--

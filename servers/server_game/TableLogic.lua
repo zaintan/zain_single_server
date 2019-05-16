@@ -50,7 +50,7 @@ end
 
 -------------------------------------------------------------------------
 function TableLogic:_createTable(...)
-	local BaseTable = require("abstract.AbstractTable")
+	local BaseTable = require("abstract.Table")
 	return new(BaseTable, ...)
 end
 

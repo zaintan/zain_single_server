@@ -66,7 +66,7 @@ function new(classType, ...)
     return obj;
 end
 
-
+--[[
 function split_int( val )
     local ret = {}
     local tmp = val
@@ -77,3 +77,4 @@ function split_int( val )
     table.insert(ret, tmp)
     return ret
 end
+]]--
