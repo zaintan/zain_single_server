@@ -268,7 +268,7 @@ end
 function users:logout(fromNodeIndex, selfAddr, uid)
 	local player = self.m_players[uid]
 	if player then 
-		if player.agentNode = fromNodeIndex and player.agentAddr = selfAddr then
+		if player.agentNode == fromNodeIndex and player.agentAddr == selfAddr then
 			player.agentAddr = nil 
 			player.agentNode = nil 
 			player.online    = false

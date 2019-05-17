@@ -51,7 +51,7 @@ function Table:reconnect(fromNodeIndex, fromAddr, uid)
 	if not succ then 
 		--该玩家不在房间中
 		Log.e(LOGTAG,"uid=%d 逻辑服重连失败!房间内找不到该玩家",uid)
-		ClusterHelper.callIndex(fromNodeIndex,fromAddr,"sendMsg",msg.NameToId.JoinRoomResponse,{status = -401;}
+		ClusterHelper.callIndex(fromNodeIndex,fromAddr,"sendMsg",msg.NameToId.JoinRoomResponse,{status = -401;})
 		return false
 	end 
 	--回复该玩家自己的重连信息

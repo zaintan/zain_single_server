@@ -123,7 +123,7 @@ function release:_initVote(uid)
 	t.votes      = {}
 	local num    = self.target_:getCurPlayerNum()
 	for seat=0,num-1 do
-		t.votes[seat+1] = seat = player.seat and const.ReleaseVote.AGREE or const.ReleaseVote.NONE
+		t.votes[seat+1] = ( (seat == player.seat) and const.ReleaseVote.AGREE or const.ReleaseVote.NONE)
 	end
 
 	t.cancel     = cancelable_timeout(COUNT_DOWN_TIME*100, function ()

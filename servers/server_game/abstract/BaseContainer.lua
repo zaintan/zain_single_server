@@ -40,7 +40,7 @@ _bind_ = function ( target, name, path, ...  )
     return target
 end
 
-function _unbind_(target, ...)
+local function _unbind_(target, ...)
     if not target._behaviors_ then return end
 
     local names = {...}
