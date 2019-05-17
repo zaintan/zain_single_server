@@ -22,7 +22,7 @@ end
 
 
 
-function StateFree:onReadyReq(uid, msg_id, data)
+function StateWait:onReadyReq(uid, msg_id, data)
 	--修改玩家准备状态 广播通知其他玩家
 	self.m_pTable:setReadyState(uid, data.ready)
 	--判断游戏是否开始
@@ -33,4 +33,4 @@ function StateFree:onReadyReq(uid, msg_id, data)
 	return true
 end
 
-return StateFree
+return StateWait

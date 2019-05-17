@@ -7,8 +7,7 @@ local StatePlay = class(Super)
 
 --初始化顺序 从上到下
 StatePlay._behavior_cfgs_ = {
-    { path = "behaviors.state.handles";  bArgs = false; },
-    --{ path = "behaviors.state.round";    bArgs = false; },
+    { path = "behaviors.state.handles"; },
 }
 
 function StatePlay:onInit()
@@ -17,6 +16,16 @@ end
 
 function StatePlay:onEnter()
 	Log.i("","State:%d onEnter",self.m_status)
+	--初始化玩家操作
+	self.m_pTable:resetOperates()	
+	--初始化玩家手牌
+	self.m_pTable:resetCards()
+	--重新洗牌
+	self.m_pTable:resetPool()
+	--round init
+	self.m_pTable:startRound()
+	--change DealCards
+	self:changeHandle(const.GameHandler.DEAL_CARDS)
 end
 
 function StatePlay:onExit()
@@ -24,12 +33,16 @@ function StatePlay:onExit()
 end
 
 
-function StatePlay:onOutCardReq(uid, msg_id, data)
-	--return _retDefaultMsg(uid, msg_id)
+function StatePlay:onOutCardReq(...)
+	return self:getCurHandle():onOutCardReq(...)
 end
 
-function StatePlay:onOperateCardReq(uid, msg_id, data)
-	--return _retDefaultMsg(uid, msg_id)
+function StatePlay:onOperateCardReq(...)
+	return self:getCurHandle():onOperateCardReq(...)
+end
+
+function StatePlay:handleRoundOver()
+	-- body
 end
 
 

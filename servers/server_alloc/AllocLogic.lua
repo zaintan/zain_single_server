@@ -154,7 +154,7 @@ end
 
 --退出房间
 --optional req_uid
-function AllocLogic:exit(uid, tid, bNotiGame)
+function AllocLogic:exit(uid, tid)
 	return cs(function ()
 		local ret = true
 		--
@@ -182,6 +182,7 @@ function AllocLogic:exit(uid, tid, bNotiGame)
 				table.remove(tblInfo.uids, findIndex) 	
 			end 
 			----------------------------------------------
+			--[[不能强制逻辑服退出  会有问题  牌局开始后
 			if bNotiGame then 
 				local callSucc,err = ClusterHelper.callIndex(tblInfo.index, tblInfo.addr, "out_exit", uid)
 				if not callSucc then
@@ -189,6 +190,8 @@ function AllocLogic:exit(uid, tid, bNotiGame)
 					ret = false
 				end	
 			end 
+			]]
+
 		else
 			Log.d(LOGTAG,"maybe err!分配服找不到该房间%d!",tid)
 			ret = false			

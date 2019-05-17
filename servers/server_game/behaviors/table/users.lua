@@ -1,4 +1,5 @@
 --behaviors.users
+--管理玩家个人信息  准备状态
 local Super           = require("behaviors.behavior")
 local users           = class(Super)
 
@@ -371,7 +372,8 @@ function users:_encodePlayer(player)
 	data.head_img_url = player.head_img_url
 	data.seat_index   = player.seat
 	data.ready        = player.ready
-	--data.score        = player.score or 0
+	data.score        = self.target_:getCurScoreBySeat(player.seat)
+	--player.score or 0
 	return data
 end
 

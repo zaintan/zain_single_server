@@ -6,7 +6,9 @@ pool.EXPORTED_METHODS = {
     "dispatchCard",
     "resetPool",
     "getRemainCardNum",
-    "getTotalCardNum",            
+    "getTotalCardNum",
+    "getUsedCardHeadCount",
+    "getUsedCardTailCount",     
 }
 --default
 pool.cards_cfg = {

@@ -1,3 +1,4 @@
+--管理桌子的静态信息
 local Super           = require("behaviors.behavior")
 local info            = class(Super)
 
@@ -5,6 +6,7 @@ info.EXPORTED_METHODS = {
     "getRule",
     "getTableId",
     "getTableInfo",
+    "getTableCreaterInfo",
 }
 --data.game_id,data.game_type,data.game_rules
 --data.over_type, data.over_val
@@ -62,6 +64,10 @@ function info:getTableInfo()
 	info.over_val    = self.m_overVal				
 	info.room_id     = self.m_tid
 	return ret
+end
+
+function info:getTableCreaterInfo()
+	return self.m_creater
 end
 
 return info
