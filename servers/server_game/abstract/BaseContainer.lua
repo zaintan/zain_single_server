@@ -61,12 +61,12 @@ function BaseContainer:_bindBehaviors(...)
 	for _,v in ipairs(self._behavior_cfgs_ or {}) do
 		local arr = string.split(v.path,".")
 		if not arr or #arr < 1 then
-			Log.e("","maybe err! can not split path=%s",path) 
+			Log.e("","maybe err! can not split path=%s",v.path) 
 		else
 			if v.bArgs then 
-				_bind_(self,arr[#arr],path,...)
+				_bind_(self,arr[#arr],v.path,...)
 			else 
-				_bind_(self,arr[#arr],path)
+				_bind_(self,arr[#arr],v.path)
 			end  			
 		end 
 	end

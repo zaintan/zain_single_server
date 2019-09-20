@@ -6,6 +6,8 @@
 local skynet    = require "skynet"
 require "skynet.manager"
 
+local ClusterHelper = require "ClusterHelper"
+
 local handler = require "TableLogic"
 local LOGTAG  = "TableService"
 -------------------------------------------------------------------
