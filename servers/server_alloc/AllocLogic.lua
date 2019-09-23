@@ -53,7 +53,8 @@ function AllocLogic:create(data,userInfo)
 		Log.dump(LOGTAG, data)
 		
 		local user = self.m_users:getObject(uid)
-		if user and not user:canCreateTable() then 
+		local limit = skynet.call(".NodeInfo", "lua", "getConfig", "createLimit")
+		if user and not user:canCreateTable(limit) then 
 			Log.i(LOGTAG,"uid=%d开房数量已达上限!",uid)
 			return {status = -1}
 		end	  

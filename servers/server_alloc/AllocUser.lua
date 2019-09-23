@@ -21,9 +21,9 @@ function AllocUser:canRecover()
 	return false
 end
 
-function AllocUser:canCreateTable()
-	local limit = skynet.getenv("create_limit") or AllocUser.DEFAULT_MAX_LIMIT
-	return #self.m_tCreatedTableIds < tonumber(limit)
+function AllocUser:canCreateTable(limit)
+	--local limit = skynet.getenv("create_limit") or AllocUser.DEFAULT_MAX_LIMIT
+	return #self.m_tCreatedTableIds < limit
 end
 
 function AllocUser:canJoinTable()

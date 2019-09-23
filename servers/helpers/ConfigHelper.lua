@@ -85,6 +85,7 @@ local function loadCluser(server_index, filename)
 	if nodeInfo.kind == "server_alloc" then 
 		local cfg = _load_file("./config/alloc.cfg")
 		ret.games = cfg.games
+		ret.createLimit = cfg.createLimit
 	end 
 	return ret
 end
