@@ -36,7 +36,7 @@ function behavior:bind(target, ...)
     self:_pre_bind_(...)
     _setmethods(target, self, self.EXPORTED_METHODS)
     self.target_ = target
-    self._on_bind_()
+    self:_on_bind_()
 end
 
 function behavior:unbind(target)

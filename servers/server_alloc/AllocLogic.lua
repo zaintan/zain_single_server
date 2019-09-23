@@ -145,7 +145,7 @@ function AllocLogic:join(data,fromNode,fromAddr,userinfo)
 			user:joinTable(data.room_id)
 			table.insert(tblInfo.uids, uid)
 			--成功加入房间  由逻辑服去回复消息给client
-			return true
+			return { gameSvr = tblInfo.index; tableAddr = tblInfo.addr;}
 		end 
 		return false
 	end)

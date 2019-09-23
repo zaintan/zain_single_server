@@ -22,25 +22,12 @@ function Table:ctor(...)
 	self:changeState(const.GameStatus.FREE)
 end
 
-function Table:getJoinInfo()
-	local info = {}
-	info.game_status = self:getCurState():getStatus()
-	--info
-	local tblInfo     = self:getTableInfo()
-	--players
-	local playersInfo = self:getPlayersInfo()
-	--release_info
-	local releaseInfo = self:getReleaseInfo()
-	--round_info
-	local roundInfo   = self:getRoundInfo()
-	--op_info
-	local opInfo      = self:getOperateInfo()
-	--cars_info
-	local cardsInfo   = self:getCardsInfo()
-	--合并
-	local data = table.union(info,tblInfo,playersInfo,releaseInfo,roundInfo,opInfo,cardsInfo)
-
-	return data
+function Table:pushRoomInfo(uid)
+	local game_status = self:getCurState():getStatus()
+	self:_getBehavior("info"):reconnectPush(uid,game_status)
+	self:_getBehavior("cards"):reconnectPush(uid)	
+	self:_getBehavior("operates"):reconnectPush(uid)
+	self:_getBehavior("release"):reconnectPush(uid)
 end
 
 --房间内重连
@@ -55,17 +42,15 @@ function Table:reconnect(fromNodeIndex, fromAddr, uid)
 		return false
 	end 
 	--回复该玩家自己的重连信息
-	local rsp         = self:getJoinInfo()
-	rsp.status        = 1
-	self:sendMsg(msg.NameToId.JoinRoomResponse,rsp,uid)
+	self:sendMsg(msg.NameToId.JoinRoomResponse,{status = 1;},uid)
+	self:pushRoomInfo(uid)
 	return true
 end
 
 --加入房间
 function Table:join(...)
-	return state:onJoin(...)
+	return self:getCurState():onJoin(...)
 end
-
 
 --下线
 --users实现该行为logout

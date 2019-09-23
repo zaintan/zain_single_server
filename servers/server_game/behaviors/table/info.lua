@@ -5,7 +5,6 @@ local info            = class(Super)
 info.EXPORTED_METHODS = {
     "getRule",
     "getTableId",
-    "getTableInfo",
     "getTableCreaterInfo",
 }
 --data.game_id,data.game_type,data.game_rules
@@ -17,8 +16,6 @@ function info:_pre_bind_(tid,userInfo,data)
 	self.m_appId     = data.game_id--子游戏
 	self.m_gameType  = data.game_type--子玩法
 	--结束条件
-	self.m_overType  = data.over_type
-	self.m_overVal   = data.over_val
 end
 
 function info:getTableId()
@@ -51,19 +48,23 @@ function info:_clear_()
 	self.m_gameRules = nil 
 	self.m_appId     = nil 
 	self.m_gameType  = nil 
-	self.m_overType  = nil 
-	self.m_overVal   = nil 
 end
 
-function info:getTableInfo()
-	local ret = {}
-	info.game_id     = self.m_appId
-	info.game_type   = self.m_gameType
-	info.game_rules  = self.m_gameRules
-	info.over_type   = self.m_overType	
-	info.over_val    = self.m_overVal				
-	info.room_id     = self.m_tid
-	return ret
+function info:reconnectPush(uid, game_status)
+	local data = {}
+	data.info  = {
+	    game_id     = self.m_appId;
+	    game_type   = self.m_gameType;
+	    game_rules  = self.m_gameRules;
+	    room_id     = self.m_tid;
+	    game_status = game_status;
+	};--GameRoomInfo
+	--behaviors.round
+	data.round_info = self.target_:getRoundInfo()
+	--behaviors.users
+	data.players    = self.target_:getPlayersInfo()
+	--push
+	self.target_:sendMsg(msg.NameToId.RoomInfoPush,data,uid)
 end
 
 function info:getTableCreaterInfo()

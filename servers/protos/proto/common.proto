@@ -2,24 +2,8 @@ package Base;
 option java_package = "protobuf.cher";
 // 服务端客户端通信消息体
 message ProtoInfo {
-    enum ProtoMainType {
-        REQUEST = 1; // 请求类型
-        RESPONSE = 2; // 响应类型
-        UPLOAD = 3; // 客户端上报
-        PUSH = 4; // 服务端到客户端的主动推送
-    }
-
-    enum ProtoSubType {
-        GATE = 1; // 网关消息
-        HALL = 2; // 大厅消息
-        ALLOC = 3; // 创建房间
-        ROOM = 4; // 房间消息
-    }
-
-    required int32 main_type = 1; // 消息主类型
-    required int32 sub_type = 2; // 消息副类型
-    optional int32 msg_id = 3; // 消息ID
-    optional bytes msg_body = 4; // 消息内容
+    optional int32 msg_id = 1; // 消息ID
+    optional bytes msg_body = 2; // 消息内容
     repeated int32 reserved = 110; // 消除Warning的预留值
 }
 // 玩家信息
@@ -77,6 +61,16 @@ message OperateInfo {
     repeated WeaveItemInfo weaves = 1; // 可操作的组合牌信息
     optional int32 reserved = 110; // 消除Warning的预留值
 }
+
+message GameRoomInfo {
+    optional int32 game_id = 1; // 子游戏ID
+    optional int32 game_type = 2; // 子玩法ID
+    repeated GameRuleInfo game_rules = 3; // 玩法规则
+    optional int32 game_status = 4; // 游戏状态
+    optional int32 room_id = 5; // 房间号   
+    optional int32 reserved = 110; // 消除Warning的预留值     
+}
+
 // 小局房间信息
 message RoundRoomInfo {
     optional int32 cur_val = 1; // 当前局数或当前圈数或当前分数
@@ -113,8 +107,6 @@ message CreateRoomRequest {
     required int32 game_id = 2; // 子游戏ID
     required int32 game_type = 3; // 子玩法ID
     repeated GameRuleInfo game_rules = 4; // 玩法规则
-    required int32 over_type = 5; // 结束类型，1：局数，2：圈数，3：分数
-    optional int32 over_val = 6; // 结束类型的值，8局或1圈或100分
     repeated int32 reserved = 110; // 消除Warning的预留值
 }
 // 创建房间响应
@@ -134,18 +126,11 @@ message JoinRoomRequest {
 message JoinRoomResponse {
     optional int32 status = 1; // 状态
     optional string status_tip = 2; // 状态提示信息
-    optional int32 game_id = 3; // 子游戏ID
-    optional int32 game_type = 4; // 子玩法ID
-    repeated GameRuleInfo game_rules = 5; // 玩法规则
-    repeated RoomUserInfo players = 6; // 房间内的玩家
-    optional int32 game_status = 7; // 游戏状态
-    optional int32 over_type = 9; // 结束类型，1：局数，2：圈数，3：分数
-    optional int32 over_val = 10; // 结束类型的值，8局或1圈或100分
-    optional RoundRoomInfo round_room_info = 11; // 小局房间信息
-    optional OperateInfo op_info = 12; // 当前进入房间的玩家的操作条消息
-    repeated PlayerCardsInfo cards_infos = 13; // 房间内所有玩家的牌数据
-    optional int32 room_id = 14; // 房间号
-    optional ReleaseInfo release_info = 15;//解散信息    
+    //optional GameRoomInfo game_room_info   = 3;
+    //optional RoundRoomInfo round_room_info = 4; // 小局房间信息
+    //optional OperateInfo op_info           = 5; // 当前进入房间的玩家的操作条消息
+    //repeated PlayerCardsInfo cards_infos   = 6; // 房间内所有玩家的牌数据
+    //optional ReleaseInfo release_info      = 7;//解散信息    
     repeated int32 reserved = 110; // 消除Warning的预留值
 }
 // 玩法规则
@@ -343,4 +328,12 @@ message PlayerExitPush {
 message ShowHandCardsPush {
     repeated PlayerCardsInfo cards_infos = 1; // 房间内所有玩家的牌数据
     optional int32 reserved = 110; // 消除Warning的预留值
+}
+
+// 
+message RoomInfoPush {
+    optional GameRoomInfo info       = 1; // 
+    optional RoundRoomInfo round_info = 2; // 
+    repeated RoomUserInfo players = 4; // 房间内的玩家
+    repeated int32 reserved = 110; // 消除Warning的预留值
 }

@@ -22,5 +22,10 @@ function operates:resetOperates()
 	-- body
 end
 
+function operates:reconnectPush(uid)
+
+	--push
+	--self.target_:sendMsg(msg.NameToId.RoomInfoPush,data,uid)
+end
 
 return operates

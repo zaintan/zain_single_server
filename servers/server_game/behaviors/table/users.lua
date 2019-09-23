@@ -294,7 +294,11 @@ function users:playerReconnect(fromNodeIndex, fromAddr, uid)
 end
 
 function users:getPlayersInfo()
-	-- body
+	local data = {}
+	for _, player in pairs(self.m_players) do 
+		table.insert(data, self:_encodePlayer(player))
+	end 
+	return data
 end
 
 --[[

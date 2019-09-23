@@ -7,7 +7,6 @@ local skynet          = require "skynet"
 local COUNT_DOWN_TIME = 150
 
 release.EXPORTED_METHODS = {
-    "getReleaseInfo",
     "onCreatorRelease",
     "onReleaseStartVote",
     "onReleaseDoVote",
@@ -194,6 +193,10 @@ function release:getReleaseInfo()
 	return data
 end
 
+function release:reconnectPush(uid)
 
+	--push
+	--self.target_:sendMsg(msg.NameToId.RoomInfoPush,data,uid)
+end
 
 return release

@@ -15,9 +15,8 @@ function StateFree:onJoin(node, addr, userinfo)
 	end 
 
 	--回复该玩家加入房间的信息
-	local rsp         = self.m_pTable:getJoinInfo()
-	rsp.status        = 1
-	self:sendMsg(msg.NameToId.JoinRoomResponse,rsp,uid)
+	self.m_pTable:sendMsg(msg.NameToId.JoinRoomResponse,{status = 1;},uid)
+	self.m_pTable:pushRoomInfo(uid)
 	return true
 end
 ----

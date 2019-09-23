@@ -51,6 +51,7 @@ function handles:changeHandle( handle )
 		Log.e(LOGTAG,"maybe err!切换状态失败tohandle=%s",tostring(tohandle))
 		return false
 	end 
+	assert(self.m_curHandle ~= tohandle)
 	if self.m_curHandle then 
 		self.m_curHandle:onExit()
 	end 

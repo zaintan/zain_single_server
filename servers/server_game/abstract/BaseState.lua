@@ -61,11 +61,9 @@ function BaseState:onReleaseReq(uid, msg_id, data)
 		return false
 	end 
 
-	if data.type == const.ReleaseRequestType.RELEASE then
-		--发起投票
+	if data.type == const.ReleaseRequestType.RELEASE then--发起投票
 		return self.m_pTable:onReleaseStartVote(uid, data)
-	elseif data.type == const.ReleaseRequestType.VOTE then
-		--投票
+	elseif data.type == const.ReleaseRequestType.VOTE then--投票
 		return self.m_pTable:onReleaseDoVote(uid, data)
 	else --未知请求
 		Log.e("","maybe err!未知解散请求 uid=%d data.type=%d",uid, data.type)

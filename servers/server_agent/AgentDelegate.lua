@@ -177,7 +177,7 @@ function class:_handlerJoinReq(data)
         return
     end
     --成功转发到分配服后  由分配服回消息
-    if ret.gameSvr and ret.tableAddr then 
+    if ret and ret.gameSvr and ret.tableAddr then 
         self.gameSvr   = ret.gameSvr
         self.tableAddr = ret.tableAddr
     end 

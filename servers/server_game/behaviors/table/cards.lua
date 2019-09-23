@@ -3,7 +3,6 @@ local Super           = require("behaviors.behavior")
 local cards            = class(Super)
 
 cards.EXPORTED_METHODS = {
-    "getCardsInfo",
     "resetCards",
 
     "updateHandCards"
@@ -21,8 +20,19 @@ function cards:_clear_()
 	self.target_  = nil
 end
 
-function cards:getCardsInfo()
-	-- body
+function cards:reconnectPush()
+	--local data = {}
+	--[[
+	data.cards_infos = {
+		has_hands = true;
+		has_weaves = true;
+		has_discards = true;
+		hands = {};
+		weaves = {};
+		discards = {};
+	}
+	]]
+	--self.target_:sendMsg(msg.NameToId.PlayerCardsPush,data,uid)
 end
 
 function cards:resetCards()

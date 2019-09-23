@@ -13,6 +13,7 @@ function StateWait:onEnter()
 	--取消所有玩家的准备状态
 	local bReady     = false
 	local bBroadcast = true
+	
 	self.m_pTable:resetAllReadyState(bReady, bBroadcast)
 	
 	--清理掉所有玩家的手牌
@@ -30,6 +31,7 @@ function StateWait:onReadyReq(uid, msg_id, data)
 		--切换到play状态
 		self.m_pTable:changeState(const.GameStatus.PLAY)
 	end 
+	
 	return true
 end
 
