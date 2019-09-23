@@ -54,10 +54,8 @@ class.registerProtoName  = registerProtoName
 
 
 ---! @brief make a general proto data for client - server.
-local function makeProtoData (self, main, sub, id,body)
+local function makeProtoData (self,id,body)
     local msg = {
-        main_type = main,
-        sub_type  = sub,
         msg_id    = id,
         msg_body  = body
     }

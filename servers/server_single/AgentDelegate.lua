@@ -88,7 +88,7 @@ function class:sendMsg(msg_id, data)
 
     local protoName = msg.IdToName[msg_id] 
     local body      = packetHelper:encodeMsg("Base."..protoName, data)
-    local packet    = packetHelper:makeProtoData(0, 0,msg_id , body)
+    local packet    = packetHelper:makeProtoData(msg_id , body)
     self:_sendPacket(packet)
     return true
 end
