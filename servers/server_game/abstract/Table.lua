@@ -45,8 +45,11 @@ function Table:reconnect(fromNodeIndex, fromAddr, uid)
 		ClusterHelper.callIndex(fromNodeIndex,fromAddr,"sendMsg",msg.NameToId.JoinRoomResponse,{status = -401;})
 		return false
 	end 
+
+	local data  = self:getAppInfo()
+	data.status = 1;	
 	--回复该玩家自己的重连信息
-	self:sendMsg(msg.NameToId.JoinRoomResponse,{status = 1;},uid)
+	self:sendMsg(msg.NameToId.JoinRoomResponse,data,uid)
 	self:pushRoomInfo(uid)
 	return true
 end

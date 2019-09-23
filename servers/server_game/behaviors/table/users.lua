@@ -66,9 +66,9 @@ end
 
 function users:parseUserInfo( userInfo )
 	local ret = {}
-	ret.user_id      = userInfo.FUserID
-	ret.user_name    = userInfo.FUserName
-	ret.head_img_url = userInfo.FHeadUrl
+	ret.user_id      = userInfo.user_id
+	ret.user_name    = userInfo.user_name
+	ret.head_img_url = userInfo.head_img_url
 
 	ret.ready        = false
 	return ret
@@ -126,20 +126,22 @@ end
 function users:addPlayer(agentNode, agentAddr, uid , data)
 	local player = self.m_players[uid]
 	if player then 
-		Log.i("LOGTAG","重复添加玩家uid = %d",uid)
+		Log.i(LOGTAG,"重复添加玩家uid = %d",uid)
 		return -1
 	end 
 
 	if self.m_curPlayerNum >= self.m_maxPlayerNum then 
-		Log.i("LOGTAG","桌子已满! %d/%d",self.m_curPlayerNum,self.m_maxPlayerNum)
+		Log.i(LOGTAG,"桌子已满! %d/%d",self.m_curPlayerNum,self.m_maxPlayerNum)
 		return -2
 	end 
 
 	local seat = self:_getEmptySeat()
 	if not seat then 
-		Log.i("LOGTAG","获取不到空的座位号!")
+		Log.i(LOGTAG,"获取不到空的座位号!")
 		return -3
 	end 
+
+	Log.i(LOGTAG,"users addPlayer uid = %s",tostring(uid))
 
 	local p     = self:parseUserInfo(data)
 	p.agentNode = agentNode
@@ -147,7 +149,7 @@ function users:addPlayer(agentNode, agentAddr, uid , data)
 	p.seat      = seat
 	p.online    = true
 	self.m_players[uid] = p
-
+	Log.dump(LOGTAG,p)
 	--广播通知其他人 玩家加入房间
 	self:_notifyPlayerEnter(p)
 	--
@@ -159,7 +161,7 @@ end
 function users:delPlayer(uid)
 	local player = self.m_players[uid]
 	if not player then 
-		Log.i("LOGTAG","无法移除,找不到该玩家uid = %d",uid)
+		Log.i(LOGTAG,"无法移除,找不到该玩家uid = %d",uid)
 		return -1
 	end 
 	--回复该玩家离开成功
@@ -190,7 +192,7 @@ function users:_send(player, msg_id, msg_data)
 	if player.agentNode and player.agentAddr then 
 		local ok = ClusterHelper.callIndex(player.agentNode, player.agentAddr, "sendMsg", msg_id, msg_data)
 		if not ok then 
-			Log.e(LOGTAG,"maybe err!发送消息失败!uid=%d,agentNode=%s,agentAddr=%s",player.user_id,tostring(player.agentNode),tostring(player.agentAddr)) 
+			Log.e(LOGTAG,"maybe err!发送消息失败!uid=%s,agentNode=%s,agentAddr=%s",tostring(player.user_id),tostring(player.agentNode),tostring(player.agentAddr)) 
 			player.agentAddr = nil
 			player.agentNode = nil
 			player.online    = false
@@ -266,6 +268,7 @@ function users:isAllReady()
 end
 
 function users:logout(fromNodeIndex, selfAddr, uid)
+	Log.i(LOGTAG,"users logout uid = %s %s,%s",tostring(uid), tostring(fromNodeIndex), tostring(selfAddr))
 	local player = self.m_players[uid]
 	if player then 
 		if player.agentNode == fromNodeIndex and player.agentAddr == selfAddr then
@@ -281,13 +284,15 @@ function users:logout(fromNodeIndex, selfAddr, uid)
 end
 
 function users:playerReconnect(fromNodeIndex, fromAddr, uid)
+	Log.i(LOGTAG,"users playerReconnect uid = %s  fromAddr:%s,%s",tostring(uid),tostring(fromNodeIndex),tostring(fromAddr))
 	local player = self.m_players[uid]
 	if player then 
-		player.agentAddr = fromNodeIndex 
-		player.agentNode = fromAddr
+		player.agentAddr = fromAddr
+		player.agentNode = fromNodeIndex
 		player.online    = true
 		--广播其他玩家
 		self:_notifyOnOffLine(player)
+		Log.dump(LOGTAG,self.m_players)
 		return true
 	end
 	return false
