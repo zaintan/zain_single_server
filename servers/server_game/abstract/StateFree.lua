@@ -8,15 +8,17 @@ local StateFree = class(Super)
 ----
 function StateFree:onJoin(node, addr, userinfo)
 	--users.addPlayer(agentNode, agentAddr, uid , data)
-	local ret = self.m_pTable:addPlayer(node, addr, userinfo.FUserID ,userinfo) 
+	local ret = self.m_pTable:addPlayer(node, addr, userinfo.user_id ,userinfo) 
 	if ret < 0 then --failed
 		ClusterHelper.callIndex(node,addr,"sendMsg",msg.NameToId.JoinRoomResponse,{status = ret-410;})
 		return false
 	end 
-
+	
+	local data  = self.m_pTable:getAppInfo()
+	data.status = 1;
 	--回复该玩家加入房间的信息
-	self.m_pTable:sendMsg(msg.NameToId.JoinRoomResponse,{status = 1;},uid)
-	self.m_pTable:pushRoomInfo(uid)
+	self.m_pTable:sendMsg(msg.NameToId.JoinRoomResponse, data, userinfo.user_id)
+	self.m_pTable:pushRoomInfo(userinfo.user_id)
 	return true
 end
 ----

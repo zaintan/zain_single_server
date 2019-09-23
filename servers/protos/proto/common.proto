@@ -126,11 +126,8 @@ message JoinRoomRequest {
 message JoinRoomResponse {
     optional int32 status = 1; // 状态
     optional string status_tip = 2; // 状态提示信息
-    //optional GameRoomInfo game_room_info   = 3;
-    //optional RoundRoomInfo round_room_info = 4; // 小局房间信息
-    //optional OperateInfo op_info           = 5; // 当前进入房间的玩家的操作条消息
-    //repeated PlayerCardsInfo cards_infos   = 6; // 房间内所有玩家的牌数据
-    //optional ReleaseInfo release_info      = 7;//解散信息    
+    optional int32 game_id = 3; // 子游戏ID
+    optional int32 game_type = 4; // 子玩法ID  
     repeated int32 reserved = 110; // 消除Warning的预留值
 }
 // 玩法规则

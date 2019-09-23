@@ -15,7 +15,11 @@ Table._behavior_cfgs_ = {
     { path = "behaviors.table.info";   bArgs = true;},
     { path = "behaviors.table.states";},
     { path = "behaviors.table.pool"; },
-    { path = "behaviors.table.cards";},
+    { path = "behaviors.table.cards";},--statistics
+    { path = "behaviors.table.statistics";},
+    { path = "behaviors.table.round";},
+    { path = "behaviors.table.operates";},
+    { path = "behaviors.table.release";},
 }
 
 function Table:ctor(...)

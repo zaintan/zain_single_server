@@ -220,7 +220,7 @@ function users:sendMsg(msg_id, msg_data, uid)
 	if player then 
  	    self:_send(player, msg_id, msg_data)
 	else
-		Log.e(LOGTAG,"maybe err!发送消息失败!uid=%d不存在玩家",uid) 
+		Log.e(LOGTAG,"maybe err!发送消息失败!uid=%s不存在玩家",tostring(uid)) 
 	end 
 end
 

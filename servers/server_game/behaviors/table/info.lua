@@ -5,6 +5,7 @@ local info            = class(Super)
 info.EXPORTED_METHODS = {
     "getRule",
     "getTableId",
+    "getAppInfo",
     "getTableCreaterInfo",
 }
 --data.game_id,data.game_type,data.game_rules
@@ -69,6 +70,13 @@ end
 
 function info:getTableCreaterInfo()
 	return self.m_creater
+end
+
+function info:getAppInfo()
+	return {
+		game_id = self.m_appId;
+		game_type = self.m_gameType;
+	}
 end
 
 return info
