@@ -50,6 +50,7 @@ function users:playerNumCanStart()
 end
 
 function users:setMaxPlayerNum(num)
+	Log.i(LOGTAG,"users:setMaxPlayerNum = %d",num)
 	self.m_maxPlayerNum = num
 end
 
@@ -76,7 +77,7 @@ end
 
 
 function users:_getEmptySeat()
-	for i=self.m_curPlayerNum,self.m_maxPlayerNum-1 do
+	for i=0,self.m_maxPlayerNum-1 do
 		local bUsed = false
 		for _,v in pairs(self.m_players) do
 			if v.seat == i then

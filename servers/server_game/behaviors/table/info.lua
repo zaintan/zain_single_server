@@ -8,6 +8,8 @@ info.EXPORTED_METHODS = {
     "getAppInfo",
     "getTableCreaterInfo",
 }
+
+local LOGTAG = "info"
 --data.game_id,data.game_type,data.game_rules
 --data.over_type, data.over_val
 function info:_pre_bind_(tid,userInfo,data)
@@ -35,11 +37,20 @@ end
 function info:_on_bind_()
 	local ret      = self.target_:parseUserInfo(self.m_creater)
 	self.m_creater = ret
-
+	Log.i(LOGTAG,"info:_on_bind_")
+	Log.dump(LOGTAG, self.m_gameRules)
 	--固定人数玩法
-	local rule = self:getRule(const.GameRule.RULE_PLAYER_COUNT)
+	local rule = nil 
+	for i = const.GameRule.RULE_PLAYER_FIXED_COUNT_BASE,const.GameRule.RULE_PLAYER_FIXED_COUNT_MAX do
+		rule = self:getRule(i)
+		if rule then 
+			break
+		end 
+	end
+	--
 	if rule then 
-		self.target_:setMaxPlayerNum(rule.value)
+		Log.i(LOGTAG,"rule id:%d  value:%d", rule.id, rule.value)
+		self.target_:setMaxPlayerNum(rule.id - const.GameRule.RULE_PLAYER_FIXED_COUNT_BASE)
 	end
 end
 

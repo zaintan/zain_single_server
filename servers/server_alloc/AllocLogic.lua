@@ -119,7 +119,8 @@ function AllocLogic:join(data,fromNode,fromAddr,userinfo)
 				Log.i(LOGTAG,"uid=%d重连房间tid=%d逻辑服%d失败!",uid,table_id,tblInfo.index)
 				ClusterHelper.callIndex(fromNode,fromAddr,"sendMsg",msg.NameToId.JoinRoomResponse,{status = -1;})
 			end 
-			return false
+			return { gameSvr = fromNode; tableAddr = fromAddr;}
+			--return false
 		end	
 
 		--判断房间号存不存在

@@ -5,6 +5,8 @@
 ------------------------------------------------------
 local Super     = require("abstract.BaseState")
 local StateFree = class(Super)
+
+local ClusterHelper = require "ClusterHelper"
 ----
 function StateFree:onJoin(node, addr, userinfo)
 	--users.addPlayer(agentNode, agentAddr, uid , data)
