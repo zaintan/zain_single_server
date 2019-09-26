@@ -3,8 +3,6 @@ import os
 import sys
 import string
 
-path = os.path.join(os.getcwd(), "proto")
-
 def excuteCMD(cmd):
 	print("excute: " + cmd)
 	os.system(cmd)
@@ -30,8 +28,15 @@ for name in pid_file_list:
         file.close()
 
 ##run new
-excuteCMD("sh server_alloc/start.sh 301")
-excuteCMD("sh server_login/start.sh 201")
-excuteCMD("sh server_game/start.sh 401")
-excuteCMD("sh server_agent/start.sh 101")
+print("start clean!")
+
+for name in pid_file_list:
+    excuteCMD("rm -f " + name)
+
+log_file_list = []
+listdir(os.path.join(os.getcwd(), "logs"), log_file_list, '.log')
+
+for name in log_file_list:
+    excuteCMD("rm -f logs/" + name)
+
 print("excute over! ")

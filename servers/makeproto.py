@@ -3,7 +3,7 @@ import os
 import sys
 import string
 
-path = os.path.join(os.getcwd(), "proto")
+path = os.path.join(os.getcwd(), "protos", "proto")
 
 def excuteCMD(cmd):
 	print("excute: " + cmd)
@@ -21,5 +21,5 @@ listdir(path, l)
 
 for name in l:
     input_name = name.replace(".proto",".pb")
-    cmd = "protoc -o ./" + input_name + " ./proto/" + name
+    cmd = "protoc -o ./protos/" + input_name + " ./protos/proto/" + name
     excuteCMD(cmd)
