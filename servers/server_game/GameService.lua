@@ -15,8 +15,10 @@ local CMD = {}
 function CMD.create(tid,userInfo,data)--
     return cs(function()
         local tableSvr = skynet.newservice("TableService")
+
         local ok,ret = pcall(skynet.call, tableSvr, "lua", "init", tid, userInfo, data)
         if ok and ret then 
+            Log.i(LOGTAG, "alloc new Table addr:%d tid:%d",tableSvr, tid)
             return {tableAddr = tableSvr;}
         else 
             skynet.kill(tableSvr)

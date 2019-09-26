@@ -6,6 +6,8 @@
 local Super     = require("abstract.BaseState")
 local StateFree = class(Super)
 
+local LOGTAG = "StateFree"
+
 local ClusterHelper = require "ClusterHelper"
 ----
 function StateFree:onJoin(node, addr, userinfo)
@@ -25,6 +27,7 @@ function StateFree:onJoin(node, addr, userinfo)
 end
 ----
 function StateFree:onReadyReq(uid, msg_id, data)
+	Log.i(LOGTAG,"onReadyReq uid = %d",uid)
 	--修改玩家准备状态 广播通知其他玩家
 	self.m_pTable:setReadyState(uid, data.ready)
 	--判断游戏是否开始

@@ -21,7 +21,9 @@ function M.call(...)
 end
 
 function M.callIndex(server_index, ... )
-    return M.call(cfgHelper.getCluserName(server_index),...)
+	local addr = cfgHelper.getCluserName(server_index)
+	Log.i("","call server:%s",addr)
+    return M.call(addr,...)
 end
 
 return M

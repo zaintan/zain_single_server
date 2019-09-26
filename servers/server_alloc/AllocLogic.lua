@@ -119,7 +119,9 @@ function AllocLogic:join(data,fromNode,fromAddr,userinfo)
 				Log.i(LOGTAG,"uid=%d重连房间tid=%d逻辑服%d失败!",uid,table_id,tblInfo.index)
 				ClusterHelper.callIndex(fromNode,fromAddr,"sendMsg",msg.NameToId.JoinRoomResponse,{status = -1;})
 			end 
-			return { gameSvr = fromNode; tableAddr = fromAddr;}
+
+			Log.i(LOGTAG,"AllocServer join reconnect ret: {gameSvr=%s,tableAddr=%s}",tostring(tblInfo.index),tostring(tblInfo.addr))
+			return { gameSvr = tblInfo.index; tableAddr = tblInfo.addr;}
 			--return false
 		end	
 
@@ -147,6 +149,7 @@ function AllocLogic:join(data,fromNode,fromAddr,userinfo)
 			user:joinTable(data.room_id)
 			table.insert(tblInfo.uids, uid)
 			--成功加入房间  由逻辑服去回复消息给client
+			Log.i(LOGTAG,"AllocServer join ret: {gameSvr=%s,tableAddr=%s}",tostring(tblInfo.index),tostring(tblInfo.addr))
 			return { gameSvr = tblInfo.index; tableAddr = tblInfo.addr;}
 		end 
 		return false

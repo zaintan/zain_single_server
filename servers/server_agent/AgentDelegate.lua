@@ -70,9 +70,9 @@ function class:quit()
         --通知登录服  对应服务器清空的时候 要对地址做校验
         ClusterHelper.callIndex(skynet.getenv("server_login"), ".LoginService", "logout",self.FUserID, cur_index, selfAddr)
         
+        --通知游戏服
         if self.gameSvr and self.tableAddr then 
-            --通知游戏服
-            ClusterHelper.call(self.gameSvr, self.tableAddr, "logout",cur_index, selfAddr,self.FUserID)       
+            ClusterHelper.callIndex(self.gameSvr, self.tableAddr, "logout",cur_index, selfAddr,self.FUserID)       
         end 
     end 
 
@@ -176,6 +176,9 @@ function class:_handlerJoinReq(data)
         self:sendMsg(msg.NameToId.JoinRoomResponse, {status = -1204;})
         return
     end
+
+    Log.i(LOGTAG,"AllocServer ret:")
+    Log.dump(LOGTAG,ret)
     --成功转发到分配服后  由分配服回消息
     if ret and ret.gameSvr and ret.tableAddr then 
         self.gameSvr   = ret.gameSvr
@@ -190,9 +193,9 @@ function class:_handlerRoomReq(msg_id, data)
         return 
     end 
 
-    local ok = ClusterHelper.call(self.gameSvr, self.tableAddr, "on_req", self.FUserID, msg_id, data)
+    local ok = ClusterHelper.callIndex(self.gameSvr, self.tableAddr, "on_req", self.FUserID, msg_id, data)
     if not ok then 
-        Log.e(LOGTAG,"uid:%s转发msgid=%d到逻辑服失败!",tostring(self.FUserID), msg_id)
+        Log.e(LOGTAG,"uid:%s转发msgid=%d到逻辑服失败!toindex=%d, toAddr=%d",tostring(self.FUserID), msg_id,self.gameSvr, self.tableAddr)
         self:sendMsg(msg_id + msg.ResponseBase, {status = -1402;})
 
         self.gameSvr   = nil
