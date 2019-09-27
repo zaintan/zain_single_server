@@ -29,7 +29,7 @@ function HandleSendCard:onEnter()
 end
 
 
-function HandlerSendCard:_onOutCardReq(msg_id, uid, data)
+function HandleSendCard:_onOutCardReq(msg_id, uid, data)
 	local ret_msg_id = msg_id + msg.ResponseBase
 	local seat_index = self.m_pTable:getPlayerSeat(uid)
 	--不是该玩家
@@ -56,7 +56,7 @@ function HandlerSendCard:_onOutCardReq(msg_id, uid, data)
 	return false
 end
 
-function HandlerSendCard:_onOperateCardReq(msg_id, uid, data)
+function HandleSendCard:_onOperateCardReq(msg_id, uid, data)
 	Log.d(LOGTAG, "_onOperateCardReq msg_id=%d,uid=%d",msg_id,uid)
 	Log.dump(LOGTAG, data)
 
