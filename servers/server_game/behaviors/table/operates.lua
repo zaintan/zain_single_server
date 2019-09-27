@@ -2,7 +2,7 @@
 local Super           = require("behaviors.behavior")
 local operates        = class(Super)
 
-local HuLib  = require("game_logic.hulib.mj.base_split")
+local HuLib            = require("thirdlib.mj.base_split")
  local tblHelper       = require "TableHelper"
 
 operates.EXPORTED_METHODS = {
