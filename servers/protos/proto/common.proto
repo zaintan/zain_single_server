@@ -59,6 +59,7 @@ message PlayerCardsInfo {
 // 操作条信息
 message OperateInfo {
     repeated WeaveItemInfo weaves = 1; // 可操作的组合牌信息
+    optional int32 operate_id     = 2;
     optional int32 reserved = 110; // 消除Warning的预留值
 }
 
@@ -227,6 +228,7 @@ message PlayerCardsPush {
 message OperateCardRequest {
     optional int32 weave_kind = 1; // 点了什么操作
     optional int32 center_card = 2; // 操作的牌
+    optional int32 operate_id  = 3;
     repeated int32 reserved = 110; // 消除Warning的预留值
 }
 // 操作牌响应

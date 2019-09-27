@@ -17,16 +17,10 @@ function HandleDealCards:onEnter()
 		self.m_pTable:updateHandCards(seat, cards)
 	end
 	--广播发牌消息
-	self:_broadcastPlayerCards()
+	local hasHand,hasWeave,hasDiscard = true,true,true
+	self.m_pTable:broadcastPlayerCards(hasHand,hasWeave,hasDiscard)
 	--切到 发牌状态
 	self.m_pState:changeHandler(const.GameHandler.SEND_CARD)
 end
-
-
-function HandleDealCards:_broadcastPlayerCards()
-	-- body
-end
-
-
 
 return HandleDealCards

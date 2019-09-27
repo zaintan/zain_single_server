@@ -3,7 +3,7 @@ local Super           = require("behaviors.behavior")
 local pool            = class(Super)
 
 pool.EXPORTED_METHODS = {
-    "dispatchCard",
+    "getCard",
     "resetPool",
     "getRemainCardNum",
     "getTotalCardNum",
@@ -28,9 +28,6 @@ pool.cards_cfg = {
 	0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29,		
 }
 
-function pool:_pre_bind_(...)
-
-end
 
 function pool:_on_bind_()
 	self.m_cards  = self.cards_cfg
@@ -39,7 +36,7 @@ function pool:_on_bind_()
 end
 
 function pool:_clear_()
-	self.target_  = nil
+	Super._clear_(self)
 	self.m_cards  = nil
 
 	self.m_pFirst = 0
@@ -47,7 +44,7 @@ function pool:_clear_()
 end
 
 --num:card_num
-function pool:dispatchCard(num, bBack)
+function pool:getCard(num, bBack)
 	local n = num or 1
 
 	if self:getRemainCardNum() < num then 

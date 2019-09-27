@@ -22,9 +22,9 @@ users.EXPORTED_METHODS = {
     "delPlayer",
     "getPlayerBySeat",
     "getPlayerByUid",
-    --"sendMsgBySeat",
+    "sendMsgBySeat",
     "sendMsg",
-    --"broadcastMsgBySeat",
+    "broadcastMsgBySeat",
     "broadcastMsg",
 
     "getPlayersInfo",
@@ -200,7 +200,7 @@ function users:_send(player, msg_id, msg_data)
 		end 
 	end
 end
---[[
+--
 function users:sendMsgBySeat(msg_id, msg_data, seat)
 	local player = self:getPlayerBySeat(seat)
 	if player then 
@@ -217,7 +217,7 @@ function users:broadcastMsgBySeat(msg_id, msg_data, except_seat)
 		end   
 	end
 end
-]]
+
 function users:sendMsg(msg_id, msg_data, uid)
 	local player = self:getPlayerByUid(uid)
 	if player then 
