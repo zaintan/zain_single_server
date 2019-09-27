@@ -181,7 +181,7 @@ end
 function operates:_pushPlayerStatus( seat )
 	
 	local msg_data = {}
-	msg_data.player_status      = self.player_status[seat + 1]
+	msg_data.player_status      = self:getPlayerStatus(seat)
 	msg_data.pointed_seat_index = self.target_:getCurSeat()
 	msg_data.op_info = {} 
 	msg_data.op_info.weaves     = self.m_operateActions[seat + 1]
