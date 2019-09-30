@@ -314,7 +314,7 @@ function users:_notifyPlayerReady(player)
 	local data = {
 		ready_infos = {
 			{
-				seat_index = player.seat_index;
+				seat_index = player.seat;
 				ready      = player.ready;
 			};
 		};
