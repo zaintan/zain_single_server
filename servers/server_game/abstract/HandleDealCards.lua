@@ -20,7 +20,8 @@ function HandleDealCards:onEnter()
 	local hasHand,hasWeave,hasDiscard = true,true,true
 	self.m_pTable:broadcastPlayerCards(hasHand,hasWeave,hasDiscard)
 	--切到 发牌状态
-	self.m_pState:changeHandler(const.GameHandler.SEND_CARD)
+	local seat_index = self.m_pTable:getCurSeat()
+	self.m_pState:changeHandle(const.GameHandler.SEND_CARD, seat_index)
 end
 
 return HandleDealCards

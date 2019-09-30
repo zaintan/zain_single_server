@@ -33,7 +33,10 @@ end
 function round:startRound()
 	self.m_bStart = true
 	--
-	self.m_round  = self.m_round + 1
+	self.m_round     = self.m_round + 1
+	if not self.m_playerNum then
+		self.m_playerNum = self.m_pTable:getCurPlayerNum()
+	end 
 	--
 	--
 	--定庄家 --第一把随机庄家
@@ -61,7 +64,7 @@ function round:_broadcastGameStart()
 end
 
 function round:_getRandomBanker()
-	local num = #self.m_statuses
+	local num = self.m_playerNum
 	local r   = math.random(num) - 1
 	if r < 0 then 
 		r = 0
@@ -105,8 +108,9 @@ function round:turnSeat(nextSeat)
 	if nextSeat then 
 		self.m_seat = nextSeat
 	else 
-		self.m_seat = (self.m_seat + 1)%(#self.m_statuses)
-	end 
+		self.m_seat = (self.m_seat + 1)%self.m_playerNum
+	end
+	return self.m_seat 
 end
 
 return round

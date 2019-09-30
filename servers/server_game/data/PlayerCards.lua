@@ -13,6 +13,8 @@ function PlayerCards:reset()
 	self.m_hands    = {}
 	self.m_discards = {}
 	self.m_weaves   = {}
+
+	self.hu_info    = {}
 	self:cleanActions()
 end
 
@@ -59,11 +61,12 @@ function PlayerCards:outCard(card)
 end
 
 function PlayerCards:removeDiscard()
-	if #self.m_discards > 0 then 
-		table.remove(self.m_discards)
-		return true
+	local ret = self.m_discards[#self.m_discards]
+	if not ret then 
+		Log.e("","删除牌错误，弃牌区已经没有牌了!")
 	end 
-	return false
+	table.remove(self.m_discards)
+	return ret
 end
 
 function PlayerCards:removeHandCard(cards)
@@ -135,5 +138,10 @@ function PlayerCards:getWeave( data  )
 	return nil
 end
 
+function PlayerCards:addHu( weave_kind, card, provide )
+	self.hu_info.weave_kind  = weave_kind
+	self.hu_info.center_card = card
+	self.hu_info.provide     = provide
+end
 
 return PlayerCards

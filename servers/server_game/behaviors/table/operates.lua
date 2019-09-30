@@ -6,34 +6,320 @@ local HuLib            = require("thirdlib.mj.base_split")
  local tblHelper       = require "TableHelper"
 
 operates.EXPORTED_METHODS = {
-    "resetOperates",
-    "checkPlayerOperates",
+    "resetOperates",--重置操作
+    "checkPlayerOperates",--检查玩家是否有操作 并广播
+    "getPlayerOperateStatus",--获取玩法 当前操作的状态 0无操作 1有操作,等待中 2有操作,已操作
+    "recordPlayerOperate",--记录玩家当前做的操作
+    "hasMorePriorityUndoOp",--有无 高优先级的操作 处于未操作状态
+    "executeHighestPriorityOp",--执行当前最高优先级的生效操作
 
 
-    "changePlayerStatus",
-    "getPlayerStatus",
-    "getAllStatuses",
+    "changePlayerStatus",--改变玩家状态
+    "getPlayerStatus",--获取玩家状态
+    "getAllStatuses",--获取所有玩家状态
+    "broadcastPlayersStatus",
+    "pushPlayerStatus",
 }
 
 function operates:_on_bind_()
+	--玩家状态 k:seat+1  v:const.PlayerStatus.NONE,const.PlayerStatus.OPERATE_CARD,const.PlayerStatus.OUT_CARD
 	self.m_statuses = {}
-
+	--玩家操作 k:seat+1  v:{{ weave_kind=,center_card=,provide_player=,public_card=};...}
 	self.m_operateActions = {}
+	--玩家操作结果 k:seat+1  v:{weave_kind=,center_card=}//client operate_req
+	self.m_operateResults = {}
+
 	local num = self.target_:getCurPlayerNum()
 	for seat = 0,num-1 do
 		self.m_operateActions[seat + 1] = {}
 		self.m_statuses[seat + 1]       = const.PlayerStatus.NONE
 	end
 
-	self.m_curId = 0
+	self.m_operateId = 0
 end
+
+local kGameActionPriMap = {
+	[const.Action.NULL]       = 0;
+	[const.Action.LEFT_EAT]   = 1;
+	[const.Action.RIGHT_EAT]  = 1;
+	[const.Action.CENTER_EAT] = 1;
+	[const.Action.PENG]       = 2;
+	[const.Action.AN_GANG]    = 2;
+	[const.Action.JIE_PAO]    = 3;
+	[const.Action.ZI_MO]      = 3;
+	[const.Action.PENG_GANG]  = 2;
+	[const.Action.ZHI_GANG]    = 2;		
+}
+
+
 
 function operates:resetOperates()
 	for i=1,#self.m_operateActions do
 		self.m_operateActions[i] = {}
 		self.m_statuses[i] = const.PlayerStatus.NONE
+		self.m_operateResults[i] = nil
 	end
 end
+
+function operates:getPlayerOperateStatus( seat, weave )
+	for _,v in pairs(self.m_operateActions) do
+		--
+		if v.weave_kind == weave.weave_kind and 
+			v.center_card == weave.center_card and 
+			v.provide_player == weave.provide_player then 
+			--有操作
+			if self.m_operateResults[seat+1] then 
+				--已经操作过了
+				return 2
+			end	
+			return 1
+		end 		
+	end
+	--无此操作
+	return 0
+end
+
+function operates:recordPlayerOperate(seat_index, data)
+	local item = {}
+	--item.
+	self.m_operateResults[seat_index + 1] = data
+end
+
+function operates:_getHighestUndoOp()
+	local op = 0
+	for i,actions in pairs(self.m_operateActions) do
+		if actions ~= nil and #actions > 0 then 
+			if not self.m_operateResults[i] then 
+				for _,v in ipairs(actions) do
+					local cur_op = kGameActionPriMap[v.weave_kind]
+					op = math.max(op, cur_op)
+				end
+			end 
+		end 	
+	end	
+	return op
+end
+
+function operates:_getHighestDoneOp()
+	local op = -1
+	for _,result in pairs(self.m_operateResults) do
+		op = math.max(op, kGameActionPriMap[result.weave_kind])
+	end
+	return op
+end
+
+
+function operates:hasMorePriorityUndoOp(seat_index, data)
+
+	local maxUndo = self:_getHighestUndoOp()
+	local maxDone = self:_getHighestDoneOp()
+
+	if maxUndo > maxDone then 
+		return true
+	end 
+
+	if maxUndo == maxDone and maxUndo ~= 0 then 
+		return true
+	end 
+
+	return false
+end
+--广播生效操作
+function operates:executeHighestPriorityOp()
+	local maxDone = self:_getHighestDoneOp()
+	if maxDone == 0 then --过的  不需要广播通知
+		return 
+	end 
+	--已经删除的牌，防止一炮多响的时候 多次删除弃牌 
+	local deledCards = {}
+
+	--provide_player
+	for i,result in pairs(self.m_operateResults) do
+		local seat = i - 1
+		--同级操作 都生效;--麻将除了一炮多响  其他不可能会有同优先级的操作
+		if kGameActionPriMap[result.weave_kind] == maxDone then 
+			self:_executeAction(seat, result, deledCards)
+		end  
+	end
+	self:resetOperates()
+end
+
+local function _isInArray( arr, v )
+	for _,c in ipairs(arr) do
+		if c == v then 
+			return true
+		end 
+	end
+	return false
+end
+
+function operates:_broadcastExecuteAction(seat, action)
+	--广播玩家执行了操作
+	local msg_data = {
+		seat_index     = seat;
+		weave_kind     = action.weave_kind;
+		provide_player = action.provide_player;
+		center_card    = action.center_card;
+	}
+	self.target_:broadcastMsg(msg.NameToId.OperateCardPush, msg_data)
+end 
+
+function operates:_checkRemoveDiscard( deledCards,  card,  providerPlayerCards )
+	if not _isInArray(deledCards, action.center_card) then 
+		providerPlayerCards:removeDiscard()
+		table.insert(deledCards, waitRemoveCard)
+	end 
+end
+
+function operates:_executeGuo(  )
+	-- body
+end
+
+function operates:_executeChi( seat, action, deledCards )
+	local providerPlayerCards = self.target_:getPlayerCards(action.provide_player)
+	local operaterPlayerCards = self.target_:getPlayerCards(seat)
+
+	self:_checkRemoveDiscard(deledCards, action.center_card, providerPlayerCards)
+
+	if action.weave_kind == const.Action.LEFT_EAT then
+		operaterPlayerCards:removeHandCard({action.center_card + 1 , action.center_card + 2})
+		operaterPlayerCards:addWeave(action.weave_kind,action.center_card, 1, action.provide_player)
+	elseif action.weave_kind == const.Action.CENTER_EAT then 
+		operaterPlayerCards:removeHandCard({action.center_card - 1 , action.center_card + 1})
+		operaterPlayerCards:addWeave(action.weave_kind,action.center_card, 1, action.provide_player)
+	else
+		operaterPlayerCards:removeHandCard({action.center_card - 1 , action.center_card - 2})
+		operaterPlayerCards:addWeave(action.weave_kind,action.center_card, 1, action.provide_player)
+	end
+	--广播执行操作
+	self:_broadcastExecuteAction(seat, action)
+	--刷新提供者的弃牌
+	self.target_:broadcastPlayerCards(false,false,true,{action.provide_player})
+	--刷新操作者的手牌
+	self.target_:broadcastPlayerCards(true,true,false,{seat})
+end
+
+function operates:_executePeng( seat, action, deledCards )
+	local providerPlayerCards = self.target_:getPlayerCards(action.provide_player)
+	local operaterPlayerCards = self.target_:getPlayerCards(seat)
+
+	self:_checkRemoveDiscard(deledCards, action.center_card, providerPlayerCards)	
+	
+	operaterPlayerCards:removeHandCard({action.center_card, action.center_card})
+	operaterPlayerCards:addWeave(action.weave_kind,action.center_card, 1, action.provide_player)
+
+	--广播执行操作
+	self:_broadcastExecuteAction(seat, action)
+	--刷新提供者的弃牌
+	self.target_:broadcastPlayerCards(false,false,true,{action.provide_player})
+	--刷新操作者的手牌
+	self.target_:broadcastPlayerCards(true,true,false,{seat})
+end
+
+function operates:_executeAnGang( seat, action, deledCards )
+	
+	local providerPlayerCards = self.target_:getPlayerCards(action.provide_player)
+	local operaterPlayerCards = self.target_:getPlayerCards(seat)
+
+	operaterPlayerCards:removeHandCard({action.center_card, action.center_card, action.center_card, action.center_card})
+	operaterPlayerCards:addWeave(action.weave_kind,action.center_card, 1, action.provide_player)
+
+	--广播执行操作
+	self:_broadcastExecuteAction(seat, action)
+	--刷新操作者的手牌
+	self.target_:broadcastPlayerCards(true,true,false,{seat})
+end
+
+function operates:_executeHu( seat, action, deledCards )
+	local providerPlayerCards = self.target_:getPlayerCards(action.provide_player)
+	local operaterPlayerCards = self.target_:getPlayerCards(seat)
+
+	self:_checkRemoveDiscard(deledCards, action.center_card, providerPlayerCards)	
+	
+	operaterPlayerCards:addHu(action.weave_kind, action.center_card, action.provide_player)
+
+	--广播执行操作
+	self:_broadcastExecuteAction(seat, action)
+	--刷新提供者的弃牌
+	self.target_:broadcastPlayerCards(false,false,true,{action.provide_player})
+	--刷新操作者的手牌 
+	--self.target_:broadcastPlayerCards(true,true,false,{seat})
+end
+
+function operates:_executeZimo( seat, action, deledCards )
+	local providerPlayerCards = self.target_:getPlayerCards(action.provide_player)
+	local operaterPlayerCards = self.target_:getPlayerCards(seat)
+
+	self:_checkRemoveDiscard(deledCards, action.center_card, providerPlayerCards)	
+
+	operaterPlayerCards:addHu(action.weave_kind, action.center_card, action.provide_player)
+	--广播执行操作
+	self:_broadcastExecuteAction(seat, action)
+	--刷新操作者的手牌 
+	--self.target_:broadcastPlayerCards(true,true,false,{seat})	
+end
+
+function operates:_executePengGang( seat, action, deledCards )
+	local providerPlayerCards = self.target_:getPlayerCards(action.provide_player)
+	local operaterPlayerCards = self.target_:getPlayerCards(seat)
+
+	self:_checkRemoveDiscard(deledCards, action.center_card, providerPlayerCards)	
+	
+	operaterPlayerCards:removeHandCard({action.center_card, action.center_card, action.center_card})
+	operaterPlayerCards:addWeave(action.weave_kind,action.center_card, 1, action.provide_player)
+
+	--广播执行操作
+	self:_broadcastExecuteAction(seat, action)
+	--刷新提供者的弃牌
+	self.target_:broadcastPlayerCards(false,false,true,{action.provide_player})
+	--刷新操作者的手牌
+	self.target_:broadcastPlayerCards(true,true,false,{seat})
+end
+
+function operates:_executeBuGang( seat, action, deledCards )
+	local providerPlayerCards = self.target_:getPlayerCards(action.provide_player)
+	local operaterPlayerCards = self.target_:getPlayerCards(seat)
+
+	operaterPlayerCards:removeHandCard({action.center_card})
+	--changeWeave
+	local weave = operaterPlayerCards:getWeave({weave_kind=const.Action.PENG,center_card=action.center_card})
+	if not weave then 
+		Log.e(LOGTAG,"补杠失败!找不到碰center_card=%d",action.center_card)
+	end 
+	weave.weave_kind = const.Action.ZHI_GANG	
+	--
+	--广播执行操作
+	self:_broadcastExecuteAction(seat, action)
+	--刷新操作者的手牌
+	self.target_:broadcastPlayerCards(true,true,false,{seat})
+end
+
+local kExecuteActionMap = {
+	[const.Action.NULL]       = operates._executeGuo;
+	[const.Action.LEFT_EAT]   = operates._executeChi;
+	[const.Action.RIGHT_EAT]  = operates._executeChi;
+	[const.Action.CENTER_EAT] = operates._executeChi;
+	[const.Action.PENG]       = operates._executePeng;
+	[const.Action.AN_GANG]    = operates._executeAnGang;
+	[const.Action.JIE_PAO]    = operates._executeHu;
+	[const.Action.ZI_MO]      = operates._executeZimo;
+	[const.Action.PENG_GANG]  = operates._executePengGang;
+	[const.Action.ZHI_GANG]   = operates._executeBuGang;		
+}
+
+function operates:_executeAction(seat, action, deledCards)
+	--1.删除提供者的弃牌
+	--2.删除操作者的手牌
+	--3.添加组合牌
+	--4.广播
+	local func = kExecuteActionMap[action.weave_kind]
+	if func then 
+		func(self, seat, action, deledCards )
+	else
+		Log.e("","未定义的weave_kind=%d",action.weave_kind)
+	end 
+end
+
 
 function operates:_addAction( seat, weave_kind, center_card, provider, public)
 	local action = {}
@@ -45,7 +331,7 @@ function operates:_addAction( seat, weave_kind, center_card, provider, public)
 	table.insert(self.m_operateActions[seat+1],  action)
 end
 
-function operates:_checkChi(...)
+function operates:_checkChi(seat, playerCards ,card, provider)
 	return
 end
 
@@ -61,6 +347,9 @@ function operates:_checkPeng(seat, playerCards ,card, provider)
 end
 
 function operates:_checkAnGang(seat, playerCards ,card, provider)
+	if self.target_:getRemainCardNum() <= 0 then 
+		return
+	end 
 	--
 	local cards = playerCards:getMoreThanNumCardsInHand(4)
 	for _,card in ipairs(cards) do
@@ -72,6 +361,9 @@ function operates:_checkPengGang(seat, playerCards ,card, provider)
 	if seat == provider then 
 		return
 	end 
+	if self.target_:getRemainCardNum() <= 0 then 
+		return
+	end 	
 	--
 	local num = playerCards:getCardNumInHands(card)
 	if num >= 3 then 
@@ -80,7 +372,10 @@ function operates:_checkPengGang(seat, playerCards ,card, provider)
 end
 
 function operates:_checkBuGang(seat, playerCards ,card, provider)
-	--
+	if self.target_:getRemainCardNum() <= 0 then 
+		return
+	end 
+	
 	local num = playerCards:getCardNumInHands(card)
 	if num >= 4 then 
 		self:_addAction(seat, const.Action.ZHI_GANG, card, provider, 1)
@@ -162,23 +457,25 @@ function operates:checkPlayerOperates(seat, playerCards, wiks, card, provider, a
 		self:_addAction(seat, const.Action.NULL)
 	end 
 	-- 改变玩家操作状态
+	local hasOp = false
 	if #self.m_operateActions[seat + 1] > 0 then 
 		self:changePlayerStatus(seat, const.PlayerStatus.OPERATE_CARD)
+		hasOp = true
 	else 
 		self:changePlayerStatus(seat, const.PlayerStatus.OUT_CARD)
 	end 	
-	-- 广播通知客户端刷新
-	self:_broadcastPlayerStatus()
+	--
+	return hasOp
 end
 
-function operates:_broadcastPlayerStatus()
+function operates:broadcastPlayersStatus()
 	for i,_ in ipairs(self.m_statuses) do
 		local seat = i - 1
-		self:_pushPlayerStatus(seat)
+		self:pushPlayerStatus(seat)
 	end
 end
 
-function operates:_pushPlayerStatus( seat )
+function operates:pushPlayerStatus( seat )
 	
 	local msg_data = {}
 	msg_data.player_status      = self:getPlayerStatus(seat)
@@ -205,7 +502,12 @@ end
 
 function operates:reconnectPush(uid)
 	local seat     = self.target_:getPlayerByUid(uid).seat
-	self:_pushPlayerStatus(seat)
+	--有操作 且没有已经操作过
+	if self:getPlayerStatus(seat) == const.PlayerStatus.OPERATE_CARD
+		and self.m_operateResults[seat+1] == nil then 
+
+		self:pushPlayerStatus(seat)
+	end 
 end
 
 return operates

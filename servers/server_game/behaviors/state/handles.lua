@@ -10,11 +10,10 @@ handles.EXPORTED_METHODS = {
 }
 
 handles.handles_cfg = {
-	[const.GameHandler.DEAL_CARDS] = "abstract.HandleDealCards",
-	[const.GameHandler.SEND_CARD]  = "abstract.HandleSendCard",
-	[const.GameHandler.CHI_PENG]   = "abstract.HandleChiPeng",	
-	[const.GameHandler.GANG]       = "abstract.HandleGang",	
-	[const.GameHandler.OUT_CARD]   = "abstract.HandleOutCard",			
+	[const.GameHandler.DEAL_CARDS]  = "abstract.HandleDealCards",
+	[const.GameHandler.SEND_CARD]   = "abstract.HandleSendCard",
+	[const.GameHandler.WAI_OPERATE] = "abstract.HandleWaitOperate",	
+	[const.GameHandler.OUT_CARD]    = "abstract.HandleOutCard",			
 }
 
 function handles:_pre_bind_(...)
@@ -39,7 +38,7 @@ function handles:_clear_()
     self.m_handles   = nil
 end
 
-function handles:changeHandle( handle )
+function handles:changeHandle( handle, ... )
 	local tohandle= nil
 	if type(handle) == "number" then 
 		tohandle = self.m_handles[handle]
@@ -56,7 +55,7 @@ function handles:changeHandle( handle )
 		self.m_curHandle:onExit()
 	end 
 	self.m_curHandle = tohandle
-	self.m_curHandle:onEnter()
+	self.m_curHandle:onEnter(...)
 	return true
 end
 

@@ -11,6 +11,7 @@ cards.EXPORTED_METHODS = {
     "broadcastPlayerCards",
     "dispatchCard",
     "getPlayerCards",
+    "outCard",
 }
 
 
@@ -140,6 +141,23 @@ end
 
 function cards:getPlayerCards(seat)
 	return self.m_cards[seat+1]
+end
+
+function cards:outCard( seat, card )
+	local ret = self:getPlayerCards(seat):outCard(card)
+	if not ret then 
+		Log.e("","may be error!从玩家seat=%d手牌中找不到该牌card=%d",seat,card)
+	end 
+	--成功的rsp可以省略
+	self:_broadcastOutCard(seat, card)
+end
+
+function cards:_broadcastOutCard(seat, card)
+	local msg_data = {
+		seat_index = seat_index;
+		out_card   = card;		
+	}
+	self.target_:broadcastMsg(msg.NameToId.OutCardPush, msg_data)
 end
 
 return cards

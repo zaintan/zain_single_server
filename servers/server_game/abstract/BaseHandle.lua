@@ -43,5 +43,4 @@ function BaseHandle:onOperateCardReq(uid, msg_id, data)
 	return _retDefaultMsg(uid, msg_id)
 end
 
-
 return BaseHandle

@@ -228,7 +228,8 @@ message PlayerCardsPush {
 message OperateCardRequest {
     optional int32 weave_kind = 1; // 点了什么操作
     optional int32 center_card = 2; // 操作的牌
-    optional int32 operate_id  = 3;
+    optional int32 provide_player = 3; // 供应用户
+    optional int32 operate_id  = 4;
     repeated int32 reserved = 110; // 消除Warning的预留值
 }
 // 操作牌响应
@@ -241,6 +242,8 @@ message OperateCardResponse {
 message OperateCardPush {
     optional int32 seat_index = 1; // 操作人
     optional int32 weave_kind = 2; // 操作值
+    optional int32 provide_player = 3; // 供应用户 
+    optional int32 center_card = 4; // 供应用户    
     repeated int32 reserved = 110; // 消除Warning的预留值
 }
 // 出牌请求
