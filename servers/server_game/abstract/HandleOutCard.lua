@@ -6,6 +6,8 @@ local Super            = require("abstract.BaseHandle")
 local HandleOutCard    = class(Super)
 
 function HandleOutCard:onEnter(seat_index)
+	Super.onEnter(self)
+	
 	self.seat_index = seat_index
 	--广播玩家状态
 	self.m_pTable:broadcastPlayersStatus()

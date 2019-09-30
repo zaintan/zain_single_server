@@ -6,6 +6,7 @@ local Super            = require("abstract.BaseHandle")
 local HandleSendCard  = class(Super)
 
 function HandleSendCard:onEnter(seat_index, isGangDraw)
+	Super.onEnter(self)
 	--重置玩家状态 所有操作
 	self.m_pTable:resetOperates()
 	--当前操作者

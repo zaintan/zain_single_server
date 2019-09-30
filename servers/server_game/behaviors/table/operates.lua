@@ -29,7 +29,8 @@ function operates:_on_bind_()
 	--玩家操作结果 k:seat+1  v:{weave_kind=,center_card=}//client operate_req
 	self.m_operateResults = {}
 
-	local num = self.target_:getCurPlayerNum()
+	--local num = self.target_:getCurPlayerNum()
+	local num = self.target_:getMaxPlayerNum()
 	for seat = 0,num-1 do
 		self.m_operateActions[seat + 1] = {}
 		self.m_statuses[seat + 1]       = const.PlayerStatus.NONE

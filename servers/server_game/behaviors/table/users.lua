@@ -143,6 +143,7 @@ function users:addPlayer(agentNode, agentAddr, uid , data)
 	end 
 
 	Log.i(LOGTAG,"users addPlayer uid = %s",tostring(uid))
+	self.m_curPlayerNum = self.m_curPlayerNum + 1
 
 	local p     = self:parseUserInfo(data)
 	p.agentNode = agentNode
@@ -157,14 +158,13 @@ function users:addPlayer(agentNode, agentAddr, uid , data)
 	return 0
 end
 
---	self.m_pTable:sendMsg(uid,msg_id+msg.ResponseBase, {status = 1;})
-
 function users:delPlayer(uid)
 	local player = self.m_players[uid]
 	if not player then 
 		Log.i(LOGTAG,"无法移除,找不到该玩家uid = %d",uid)
 		return -1
 	end 
+	self.m_curPlayerNum = self.m_curPlayerNum - 1
 	--回复该玩家离开成功
 	self:sendMsg(msg.NameToId.PlayerExitResponse,{status = 1;}, uid)
 	--广播通知其他人 玩家离开房间
@@ -260,7 +260,7 @@ function users:resetAllReadyState(bValue, bBroadcast)
 end
 
 function users:isAllReady()
-	for v in pairs(self.m_players) do
+	for _,v in pairs(self.m_players) do
 		if not v.ready then 
 			return false
 		end 
@@ -307,17 +307,7 @@ function users:getPlayersInfo()
 	return data
 end
 
---[[
-	player.ready = data.ready
-	self.m_pTable:sendMsg(uid, msg.NameToId.ReadyResponse, {status = 0;ready = data.ready;})
-	
-	local push_data = {
-		ready_infos = {{seat_index = player.seat_index;ready = data.ready;}}
-	}
-	self.m_pTable:broadcastMsg(msg.NameToId.ReadyPush, push_data, uid)
-	
 
-]]
 --广播其他玩家  玩家准备
 function users:_notifyPlayerReady(player)
 	-- body

@@ -17,7 +17,8 @@ cards.EXPORTED_METHODS = {
 
 function cards:_on_bind_()
 	self.m_cards = {}
-	local num = self.target_:getCurPlayerNum()
+	--local num = self.target_:getCurPlayerNum()
+	local num = self.target_:getMaxPlayerNum()
 	for seat = 0,num-1 do
 		self.m_cards[seat + 1] = new(PlayerCards)
 	end
@@ -30,17 +31,19 @@ function cards:resetCards()
 end
 
 function cards:updateHandCards(seat, values)
+	Log.i("","updateHandCards seat = %d",seat)
+	Log.dump("",values)
 	self.m_cards[seat+1]:dealCards(values)
 end
 
 
 function cards:_getPlayerHandsInfo(seat, showSeat)
 	if seat == showSeat then 
-		return self.m_cards[seat]:getHands()
+		return self.m_cards[seat + 1]:getHands()
 	end
 	--
 	local ret = {}
-	for i,v in ipairs(self.m_cards[seat]:getHands()) do
+	for i,v in ipairs(self.m_cards[seat + 1]:getHands()) do
 		table.insert(ret, -1)
 	end
 	return ret
@@ -48,11 +51,11 @@ end
 
 --这里 不同麻将的 暗杠 要视情况处理下
 function cards:_getPlayerWeavesInfo(seat, showSeat)
-	return self.m_cards[seat]:getWeaves()
+	return self.m_cards[seat + 1]:getWeaves()
 end
 
 function cards:_getPlayerDiscardsInfo(seat)
-	return self.m_cards[seat]:getDiscards()
+	return self.m_cards[seat + 1]:getDiscards()
 end
 
 function cards:_getAllPlayersCardsInfo(hasHand, hasWeave, hasDiscard,toSeat, containSeats)
@@ -116,7 +119,7 @@ end
 
 function cards:dispatchCard(seat, card )
 	if type(card) == "number" then 
-		self.m_cards[seat]:drawCard(card)
+		self.m_cards[seat+1]:drawCard(card)
 	--elseif type(card) == "table" then
 	--	for _,v in ipairs(card) do
 	--		table.insert(self.m_cards[seat].hands,  v)

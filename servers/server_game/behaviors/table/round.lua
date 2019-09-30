@@ -35,7 +35,7 @@ function round:startRound()
 	--
 	self.m_round     = self.m_round + 1
 	if not self.m_playerNum then
-		self.m_playerNum = self.m_pTable:getCurPlayerNum()
+		self.m_playerNum = self.target_:getCurPlayerNum()
 	end 
 	--
 	--
@@ -60,7 +60,7 @@ function round:_broadcastGameStart()
 		game_status     = self.target_:getCurState():getStatus();
 		round_room_info = self:getRoundInfo();
 	}
-	self.m_pTable:broadcastMsg(msg.NameToId.GameStartPush, data)
+	self.target_:broadcastMsg(msg.NameToId.GameStartPush, data)
 end
 
 function round:_getRandomBanker()
@@ -86,12 +86,12 @@ function round:getRoundInfo()
 	info.pointed_seat_index = self.m_seat;
 	info.dice_values        = self.m_dices;
 
-	info.player_statuses    = self.m_pTable:getAllStatuses()
+	info.player_statuses    = self.target_:getAllStatuses()
 	
-	info.remain_num         = self.m_pTable:getRemainCardNum();
-	info.total_num          = self.m_pTable:getTotalCardNum();
-	info.head_send_count    = self.m_pTable:getUsedCardHeadCount();
-	info.tail_send_count    = self.m_pTable:getUsedCardTailCount();
+	info.remain_num         = self.target_:getRemainCardNum();
+	info.total_num          = self.target_:getTotalCardNum();
+	info.head_send_count    = self.target_:getUsedCardHeadCount();
+	info.tail_send_count    = self.target_:getUsedCardTailCount();
 
 	return info 
 end

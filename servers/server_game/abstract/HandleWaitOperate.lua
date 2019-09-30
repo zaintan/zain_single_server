@@ -9,6 +9,7 @@ local LOGTAG = "WaitOpHandle"
 
 
 function HandleWaitOperate:onEnter(card, provider, wait_seat)
+	Super.onEnter(self)
 	--广播玩家状态
 	self.m_pTable:broadcastPlayersStatus()
 	--

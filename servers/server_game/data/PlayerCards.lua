@@ -15,7 +15,6 @@ function PlayerCards:reset()
 	self.m_weaves   = {}
 
 	self.hu_info    = {}
-	self:cleanActions()
 end
 
 function PlayerCards:getHands()

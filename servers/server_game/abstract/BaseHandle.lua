@@ -8,8 +8,6 @@ function BaseHandle:ctor(pState,status)
 	self.m_pState = pState
 	self.m_status = status
 	--
-	self.m_pTable = pState.m_pTable
-	--
 	self:onInit()
 end
 
@@ -23,6 +21,7 @@ end
 
 function BaseHandle:onEnter()
 	Log.i("","Handle:%d onEnter",self.m_status)
+	self.m_pTable = self.m_pState.m_pTable
 end
 
 function BaseHandle:onExit()

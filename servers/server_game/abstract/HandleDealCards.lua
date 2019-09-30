@@ -8,11 +8,13 @@ local HandleDealCards  = class(Super)
 
 
 function HandleDealCards:onEnter()
+	Super.onEnter(self)
 	-- body
 	--每人抓13张牌
 	local num = self.m_pTable:getCurPlayerNum()
 	for seat=0,num-1 do
-		local cards = self.m_pTable:dispatchCard(13)
+		local cards = self.m_pTable:getCard(13)
+		Log.dump("",cards)
 		--更新玩家手牌
 		self.m_pTable:updateHandCards(seat, cards)
 	end
