@@ -104,16 +104,19 @@ values('tzy','zaintan','','1','10','1000','3','0',NOW(),NOW());
 ]]
 local function _registerGuestUser(reqData)
     local info = _createNewUser(reqData)
+
+    local curDate = os.date("%Y-%m-%d %H:%M:%S")
     --插入数据库
     local sqlStr = string.format("insert into TUser(FPlatformID,FUserName,FHeadUrl,FSex,FDiamond,FGold,FPlatformType,FGameIndex,FRegDate,FLastLoginTime) values('%s','%s','%s','%d','%d','%d','%d','%d','%s','%s');", 
-            info.FPlatformID,info.FUserName,info.FHeadUrl,info.FSex,info.FDiamond,info.FGold,info.FPlatformType,info.FGameIndex,"NOW()","NOW()");
-    
+            info.FPlatformID,info.FUserName,info.FHeadUrl,info.FSex,info.FDiamond,info.FGold,info.FPlatformType,info.FGameIndex,curDate,curDate);
+    Log.i(LOGTAG,sqlStr)
     local pRet   = skynet.call(".DBService", "lua", "execDB", sqlStr)
     if not pRet then 
         return nil
     end    
 
     local sqlStr = string.format("select * from TUser where FPlatformID=\"%s\";",info.FPlatformID)
+    Log.i(LOGTAG,sqlStr)
     local pRet   = skynet.call(".DBService", "lua", "execDB", sqlStr)
     if pRet and type(pRet) == "table" and #pRet > 0 then 
         info.FUserID        = tonumber(pRet[1].FUserID)

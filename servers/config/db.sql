@@ -6,8 +6,10 @@
 net start mysql
 
 --连接数据库
-mysql -u root -p "edrtwjo*@#3983"
-
+--mysql -u root -p "edrtwjo*@#3983"
+mysql -u root -p "Tzy0930!"
+--mysql -u root -p "Tzy0930!"
+-- Tzy0930!
 --创建数据库
 CREATE DATABASE `DB_ZYGame`;
 --选择数据库
