@@ -4,10 +4,10 @@
 大端2个字节表示消息大小(1~65536 Byte)(2^16 - 1 = 65535)
 消息体内容采用protobuf编解码, 构成:
 
-message ProtoInfo {
-    optional int32 msg_id = 1;// 消息ID
-    optional bytes msg_body = 2; // 消息内容
-};
+	message ProtoInfo {
+	    optional int32 msg_id = 1;// 消息ID
+	    optional bytes msg_body = 2; // 消息内容
+	};
 
 每一个msg_id对应一条消息，这个映射关系位于文件servers/config/cfg/msg.cfg
 为了方便,下面提到的交互协议省略了外层,只提到msg_body这一层
