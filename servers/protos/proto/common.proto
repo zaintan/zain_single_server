@@ -215,8 +215,7 @@ message RoundFinishPush {
 message DispatchCardPush {
     optional int32 dispatch_card = 1; // 抓的牌
     optional int32 seat_index = 2; // 抓牌人
-    optional int32 remain_num = 3; // 剩余牌张数
-    optional int32 dispatch_type = 4; // 发牌类型：1：顺序发牌，2：尾部补牌
+    optional int32 dispatch_type = 3; // 发牌类型：1：顺序发牌，2：尾部补牌
     repeated int32 reserved = 110; // 消除Warning的预留值 
 }
 // 玩家手牌推送
