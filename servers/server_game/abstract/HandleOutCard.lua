@@ -33,7 +33,7 @@ function HandleOutCard:onOutCardReq( uid, msg_id, data )
 
 	--不存在的牌
 	local playerCards = self.m_pTable:getPlayerCards(self.seat_index)
-	if playerCards:getCardNumInHands(data.out_card) > 0 then 
+	if playerCards:getCardNumInHands(data.out_card) <= 0 then 
 		self.m_pTable:sendMsg(ret_msg_id, {status = -4;}, uid)
 		return false
 	end 

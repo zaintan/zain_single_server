@@ -136,7 +136,7 @@ function cards:_broadcastDispatchCard(send_seat, card)
 		local seat     = i - 1
 		local msg_data = {
 			dispatch_card = seat == send_seat and card or -1;
-			seat_index    = seat;			
+			seat_index    = send_seat;			
 		}
 		self.target_:sendMsgBySeat(msg.NameToId.DispatchCardPush, msg_data, seat)
 	end 
@@ -157,7 +157,7 @@ end
 
 function cards:_broadcastOutCard(seat, card)
 	local msg_data = {
-		seat_index = seat_index;
+		seat_index = seat;
 		out_card   = card;		
 	}
 	self.target_:broadcastMsg(msg.NameToId.OutCardPush, msg_data)
