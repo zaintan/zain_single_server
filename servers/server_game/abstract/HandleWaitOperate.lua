@@ -21,7 +21,7 @@ function HandleWaitOperate:onOperateCardReq( uid, msg_id, data )
 
 
 	local ret_msg_id    = msg_id + msg.ResponseBase
-	local seat_index    = self.m_pTable:getPlayerBySeat(uid)
+	local seat_index    = self.m_pTable:getPlayerByUid(uid)
 	local player_status = self.m_pTable:getPlayerStatus(seat_index)
 
 	--不在操作状态
