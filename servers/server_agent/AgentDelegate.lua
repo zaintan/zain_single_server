@@ -186,14 +186,14 @@ function class:_handlerJoinReq(data)
     end 
 end
 
-function class:_handlerRoomReq(msg_id, data)
+function class:_handlerRoomReq(msg_id, msg_body)
     if not self.gameSvr or not self.tableAddr then 
         Log.e(LOGTAG,"无逻辑服地址!无法转发到逻辑服!")
         self:sendMsg(msg_id + msg.ResponseBase, {status = -1401;})
         return 
     end 
 
-    local ok = ClusterHelper.callIndex(self.gameSvr, self.tableAddr, "on_req", self.FUserID, msg_id, data)
+    local ok = ClusterHelper.callIndex(self.gameSvr, self.tableAddr, "on_req", self.FUserID, msg_id, msg_body)
     if not ok then 
         Log.e(LOGTAG,"uid:%s转发msgid=%d到逻辑服失败!toindex=%d, toAddr=%d",tostring(self.FUserID), msg_id,self.gameSvr, self.tableAddr)
         self:sendMsg(msg_id + msg.ResponseBase, {status = -1402;})
@@ -223,14 +223,8 @@ function class:command_handler(cmsg, recvTime)
         return 
     end 
 
-    local data,err = packetHelper:decodeMsg("Base."..msgName, args.msg_body)
-    if not data or err ~= nil then 
-        Log.e(LOGTAG,"proto decode error: msgid=%d name=%s !", args.msg_id, msgName )
-        return
-    end 
-
     if args.msg_id ~= msg.NameToId.HeartRequest then
-        Log.dump(LOGTAG,data)
+        --Log.dump(LOGTAG,data)
 
         if args.msg_id ~= msg.NameToId.LoginRequest and not self:_hadLogin() then 
             Log.e(LOGTAG,"非法用户请求msgid=%d,请先登录!",args.msg_id)
@@ -241,9 +235,17 @@ function class:command_handler(cmsg, recvTime)
 
     local f = ComandFuncMap[args.msg_id]
     if f then 
+        --
+        local data,err = packetHelper:decodeMsg("Base."..msgName, args.msg_body)
+        if not data or err ~= nil then 
+            Log.e(LOGTAG,"proto decode error: msgid=%d name=%s !", args.msg_id, msgName )
+            return
+        end 
+        Log.dump(LOGTAG,data)
         f(self, data)
     else--房间请求
-        self:_handlerRoomReq(args.msg_id, data)
+        self:_handlerRoomReq(args.msg_id,args.msg_body)
+        --self:_handlerRoomReq(args.msg_id, data)
     end 
 end
 

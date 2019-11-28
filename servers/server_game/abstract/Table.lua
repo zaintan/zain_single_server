@@ -7,6 +7,8 @@ local ClusterHelper = require "ClusterHelper"
 local Super     = require("abstract.BaseContainer")
 local Table     = class(Super)
 
+---! 帮助库
+local packetHelper  = nil
 local LOGTAG = "Table"
 
 --初始化顺序 从上到下
@@ -71,11 +73,23 @@ Table._COMMAND_MAP_ = {
 }
 
 --收到客户端消息
-function Table:on_req(uid, msg_id, data)
+function Table:on_req(uid, msg_id, msg_body)
 	if self._bWaitDestroy then 
 		log.e(LOGTAG,"maybe err!销毁状态 接收到msg_id:%d",msg_id)
 		return false
 	end 
+
+	local msgName  = msg.IdToName[msg_id]
+
+	if not packetHelper then 
+		packetHelper = (require "PacketHelper").create("protos/common.pb")
+	end 
+    local data,err = packetHelper:decodeMsg("Base."..msgName, msg_body)
+    if not data or err ~= nil then 
+        Log.e(LOGTAG,"proto decode error: msgid=%d name=%s !", msg_id, msgName )
+        return
+    end 
+    Log.dump(LOGTAG,data)
 
 	local func_name = self._COMMAND_MAP_[msg_id]
 	if func_name then 

@@ -396,11 +396,19 @@ function operates:_checkBuGang(seat, playerCards ,card, provider)
 	if self.target_:getRemainCardNum() <= 0 then 
 		return
 	end 
-	
-	local num = playerCards:getCardNumInHands(card)
-	if num >= 4 then 
-		self:_addAction(seat, const.Action.ZHI_GANG, card, provider, 1)
-	end 
+
+	local cards = playerCards:getMoreThanNumCardsInHand(1)
+	--
+	for _,card in ipairs(cards) do
+		local findWeave = {
+			weave_kind  = const.Action.PENG;
+			center_card = card ;
+		}
+		if playerCards:getWeave(findWeave) then 
+			self:_addAction(seat, const.Action.ZHI_GANG, card, seat, 1)
+		end 		
+		--
+	end
 end
 
 

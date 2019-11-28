@@ -61,11 +61,13 @@ function HandleWaitOperate:onOperateCardReq( uid, msg_id, data )
 	local effect_seat,effect_data = self.m_pTable:executeHighestPriorityOp()
 	--胡牌
 	if self:_isHu(effect_data.weave_kind) then
-		
+
+		self.m_pTable:turnSeat(effect_seat)
 		self.m_pState:handleRoundOver()
 
 	elseif self:_isChiPeng(effect_data.weave_kind) then 
-		
+
+		self.m_pTable:turnSeat(effect_seat)
 		--这里也要判断是否可以操作 暗杠
 		local playerCards = self.m_pTable:getPlayerCards(effect_seat) 
 		local hasAction = self.m_pTable:checkPlayerOperates(effect_seat, playerCards, {const.Action.AN_GANG}, nil, effect_seat, true)
@@ -77,6 +79,7 @@ function HandleWaitOperate:onOperateCardReq( uid, msg_id, data )
 
 	elseif self:_isGang(effect_data.weave_kind) then 
 
+		self.m_pTable:turnSeat(effect_seat)
 		self.m_pState:changeHandle(const.GameHandler.SEND_CARD, effect_seat , true)
 
 	elseif effect_data.weave_kind == const.Action.NULL then 
