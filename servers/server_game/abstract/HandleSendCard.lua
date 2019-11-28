@@ -12,7 +12,7 @@ function HandleSendCard:onEnter(seat_index, isGangDraw)
 	--当前操作者
 	self.seat_index = seat_index
 	--发牌
-	local card = self.m_pTable:getCard(1)
+	local card = self.m_pTable:getCard(1, isGangDraw)
 	if not card then 
 		Log.i("","发牌失败！牌池没有牌了, 流局")
 		self.m_pState:handleRoundOver()
@@ -20,7 +20,7 @@ function HandleSendCard:onEnter(seat_index, isGangDraw)
 	end 
 	self.send_card = card
 	--广播发牌
-	self.m_pTable:dispatchCard(self.seat_index, card)
+	self.m_pTable:dispatchCard(self.seat_index, card, isGangDraw)
 	--判断当前操作者是否可以操作
 	local checkWiks   = {const.Action.AN_GANG, const.Action.ZHI_GANG, const.Action.ZI_MO };
 	local playerCards = self.m_pTable:getPlayerCards(self.seat_index) 

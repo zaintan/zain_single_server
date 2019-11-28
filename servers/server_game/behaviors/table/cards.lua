@@ -117,7 +117,7 @@ function cards:reconnectPush(uid)
 	self.target_:sendMsg(msg.NameToId.RoomCardsPush, msg_data, uid)
 end
 
-function cards:dispatchCard(seat, card )
+function cards:dispatchCard(seat, card, isGangDraw )
 	if type(card) == "number" then 
 		self.m_cards[seat+1]:drawCard(card)
 	--elseif type(card) == "table" then
@@ -128,15 +128,16 @@ function cards:dispatchCard(seat, card )
 		Log.e("","maybe error! dispatchCard card type=%s", type(card)) 
 	end 
 	--广播抓牌消息
-	self:_broadcastDispatchCard(seat, card)
+	self:_broadcastDispatchCard(seat, card, isGangDraw)
 end
 
-function cards:_broadcastDispatchCard(send_seat, card)
+function cards:_broadcastDispatchCard(send_seat, card, isGangDraw)
 	for i=1,#self.m_cards do 
 		local seat     = i - 1
 		local msg_data = {
 			dispatch_card = seat == send_seat and card or -1;
-			seat_index    = send_seat;			
+			seat_index    = send_seat;	
+			dispatch_type = isGangDraw and 2 or 1	--发牌类型：1：顺序发牌，2：尾部补牌	
 		}
 		self.target_:sendMsgBySeat(msg.NameToId.DispatchCardPush, msg_data, seat)
 	end 
