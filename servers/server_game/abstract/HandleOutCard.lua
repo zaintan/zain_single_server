@@ -60,7 +60,7 @@ function HandleOutCard:_checkOthersCanOperate(card, provider)
 	for seat = 0,num-1 do
 		--自己的不用检查
 		if seat ~= self.seat_index then 
-			local playerCards = self.m_pTable:getPlayerCards(self.seat_index) 
+			local playerCards = self.m_pTable:getPlayerCards(seat) 
 			local ret = self.m_pTable:checkPlayerOperates(seat, playerCards, checkWiks, card, provider, true)
 			hasAction = hasAction or ret
 		end 
