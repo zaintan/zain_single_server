@@ -62,12 +62,20 @@ function operates:resetOperates()
 	end
 end
 
+
+--这里检测条件要变更 操作吗
 function operates:getPlayerOperateStatus( seat, weave )
-	for _,v in pairs(self.m_operateActions) do
-		--
-		if v.weave_kind == weave.weave_kind and 
-			v.center_card == weave.center_card and 
-			v.provide_player == weave.provide_player then 
+	--Log.dump("self.m_operateActions", self.m_operateActions)
+	--Log.dump("weave", weave)
+	--Log.dump("self.m_operateResults", self.m_operateResults)
+
+	for _,v in pairs(self.m_operateActions[seat+1] or {}) do
+		--Log.d("cmp","v.weave_kind = %s, weave.weave_kind=%s",tostring(v.weave_kind),tostring(weave.weave_kind))
+		--Log.d("cmp","v.center_card = %s, weave.center_card=%s",tostring(v.center_card),tostring(weave.center_card))
+		--Log.d("cmp","v.provide_player = %s, weave.provide_player=%s",tostring(v.provide_player),tostring(weave.provide_player))
+		
+		if (v.weave_kind == const.Action.NULL and v.weave_kind == weave.weave_kind) or
+			(v.weave_kind == weave.weave_kind and v.center_card == weave.center_card) then 
 			--有操作
 			if self.m_operateResults[seat+1] then 
 				--已经操作过了
@@ -81,9 +89,15 @@ function operates:getPlayerOperateStatus( seat, weave )
 end
 
 function operates:recordPlayerOperate(seat_index, data)
+	--Log.d("recordPlayerOperate","seat_index = %d, data.provide_player=%s",seat_index,tostring(data.provide_player))
+	--Log.dump("recordPlayerOperate", data)
+	--provide_player
 	local item = {}
-	--item.
-	self.m_operateResults[seat_index + 1] = data
+	item.weave_kind = data.weave_kind
+	item.provide_player = data.provide_player
+	item.center_card = data.center_card
+	Log.dump("item",item)
+	self.m_operateResults[seat_index + 1] = item
 end
 
 function operates:_getHighestUndoOp()
@@ -134,15 +148,21 @@ function operates:executeHighestPriorityOp()
 	--已经删除的牌，防止一炮多响的时候 多次删除弃牌 
 	local deledCards = {}
 
+	local effect_seat,effect_data
 	--provide_player
 	for i,result in pairs(self.m_operateResults) do
 		local seat = i - 1
 		--同级操作 都生效;--麻将除了一炮多响  其他不可能会有同优先级的操作
 		if kGameActionPriMap[result.weave_kind] == maxDone then 
 			self:_executeAction(seat, result, deledCards)
+			--
+			effect_seat = seat
+			effect_data = result
 		end  
 	end
 	self:resetOperates()
+
+	return effect_seat, effect_data
 end
 
 local function _isInArray( arr, v )
@@ -166,7 +186,7 @@ function operates:_broadcastExecuteAction(seat, action)
 end 
 
 function operates:_checkRemoveDiscard( deledCards,  card,  providerPlayerCards )
-	if not _isInArray(deledCards, action.center_card) then 
+	if not _isInArray(deledCards, card) then 
 		providerPlayerCards:removeDiscard()
 		table.insert(deledCards, waitRemoveCard)
 	end 
@@ -441,9 +461,9 @@ local kCheckFuncsMap = {
 };
 
 function operates:checkPlayerOperates(seat, playerCards, wiks, card, provider, addNull)
-	Log.i("","checkPlayerOperates seat=%d,card=%d,provider=%d,addNull=%s",seat,card,provider,tostring(addNull))
-	Log.dump("playerCards", playerCards)
-	Log.dump("wiks",wiks)
+	--Log.i("","checkPlayerOperates seat=%d,card=%d,provider=%d,addNull=%s",seat,card,provider,tostring(addNull))
+	--Log.dump("playerCards", playerCards)
+	--Log.dump("wiks",wiks)
 	-- 检查是否有操作
 	for _,wik in ipairs(wiks) do
 		local func = kCheckFuncsMap[wik]	

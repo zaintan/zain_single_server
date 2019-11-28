@@ -1,23 +1,10 @@
 
-ˇ&
-proto/common.protoBase"ﬂ
-	ProtoInfo
-	main_type (
-sub_type (
-msg_id (
-msg_body (
-reservedn ("@
-ProtoMainType
-REQUEST
-RESPONSE
-
-UPLOAD
-PUSH"7
-ProtoSubType
-GATE
-HALL	
-ALLOC
-ROOM"ò
+≥&
+protos/proto/common.protoBase"?
+	ProtoInfo
+msg_id (
+msg_body (
+reservedn ("ò
 AccountInfo
 user_id (
 	user_name (	
@@ -61,9 +48,19 @@ has_weaves (
 weaves (2.Base.WeaveItemInfo
 
 seat_index (
-reservedn ("D
+reservedn ("X
 OperateInfo#
-weaves (2.Base.WeaveItemInfo
+weaves (2.Base.WeaveItemInfo
+
+operate_id (
+reservedn ("í
+GameRoomInfo
+game_id (
+	game_type (&
+
+game_rules (2.Base.GameRuleInfo
+game_status (
+room_id (
 reservedn ("È
 RoundRoomInfo
 cur_val (
@@ -93,43 +90,30 @@ game_index (
 status_tip (	$
 	user_info (2.Base.AccountInfo
 room_id (
-reservedn ("´
+reservedn ("Ü
 CreateRoomRequest
 create_type (
 game_id (
 	game_type (&
 
-game_rules (2.Base.GameRuleInfo
-	over_type (
-over_val (
+game_rules (2.Base.GameRuleInfo
 reservedn ("[
 CreateRoomResponse
 status (
 
 status_tip (	
 room_id (
-reservedn ("4
+reservedn ("I
 JoinRoomRequest
-room_id (
-reservedn ("´
+room_id (
+random_join (
+reservedn ("l
 JoinRoomResponse
 status (
 
 status_tip (	
 game_id (
-	game_type (&
-
-game_rules (2.Base.GameRuleInfo#
-players (2.Base.RoomUserInfo
-game_status (
-	over_type	 (
-over_val
- (,
-round_room_info (2.Base.RoundRoomInfo"
-op_info (2.Base.OperateInfo*
-cards_infos (2.Base.PlayerCardsInfo
-room_id ('
-release_info (2.Base.ReleaseInfo
+	game_type (
 reservedn (";
 GameRuleInfo
 
@@ -179,40 +163,44 @@ card_types (
 reservedn ("M
 RoomCardsPush*
 cards_infos (2.Base.PlayerCardsInfo
-reservedn ("¢
+reservedn ("ø
 RoundFinishPush*
 cards_infos (2.Base.PlayerCardsInfo
 finish_desc (	
 game_status (
 	win_types (
-final_scores (
-reservedn ("z
+final_scores (
+round_finish_reason (
+reservedn ("f
 DispatchCardPush
 dispatch_card (
 
-seat_index (
-
-remain_num (
-dispatch_type (
+seat_index (
+dispatch_type (
 reservedn ("O
 PlayerCardsPush*
 cards_infos (2.Base.PlayerCardsInfo
-reservedn ("O
+reservedn ("{
 OperateCardRequest
 
 weave_kind (
-center_card (
+center_card (
+provide_player (
+
+operate_id (
 reservedn ("K
 OperateCardResponse
 status (
 
 status_tip (	
-reservedn ("K
+reservedn ("x
 OperateCardPush
 
 seat_index (
 
-weave_kind (
+weave_kind (
+provide_player (
+center_card (
 reservedn ("4
 OutCardRequest
 out_card (
@@ -277,5 +265,11 @@ seat_index (
 reservedn ("Q
 ShowHandCardsPush*
 cards_infos (2.Base.PlayerCardsInfo
-reservedn (B
+reservedn ("ê
+RoomInfoPush 
+info (2.Base.GameRoomInfo'
+
+round_info (2.Base.RoundRoomInfo#
+players (2.Base.RoomUserInfo
+reservedn (B
 protobuf.cher
