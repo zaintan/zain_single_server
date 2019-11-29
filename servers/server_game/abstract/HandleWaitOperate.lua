@@ -10,6 +10,7 @@ local LOGTAG = "WaitOpHandle"
 
 function HandleWaitOperate:onEnter(card, provider, wait_seat)
 	Super.onEnter(self)
+	self.m_waitSeat = wait_seat
 	--广播玩家状态
 	self.m_pTable:broadcastPlayersStatus()
 	--
@@ -72,7 +73,7 @@ function HandleWaitOperate:onOperateCardReq( uid, msg_id, data )
 		local playerCards = self.m_pTable:getPlayerCards(effect_seat) 
 		local hasAction = self.m_pTable:checkPlayerOperates(effect_seat, playerCards, {const.Action.AN_GANG}, nil, effect_seat, true)
 		if hasAction then 
-			self:onEnter(nil, effect_seat, effect_seat)
+			self:onEnter(nil, effect_seat, nil)
 		else
 			self.m_pState:changeHandle(const.GameHandler.OUT_CARD, effect_seat)
 		end 
@@ -84,8 +85,11 @@ function HandleWaitOperate:onOperateCardReq( uid, msg_id, data )
 
 	elseif effect_data.weave_kind == const.Action.NULL then 
 		
-		self.m_pState:changeHandle(const.GameHandler.SEND_CARD, self.m_pTable:turnSeat())
-
+		if self.m_waitSeat then --send
+			self.m_pState:changeHandle(const.GameHandler.OUT_CARD, effect_seat)
+		else 
+			self.m_pState:changeHandle(const.GameHandler.SEND_CARD, self.m_pTable:turnSeat())
+		end 
 	else 
 		Log.e(LOGTAG, "不识别的操作:weave_kind=%d",effect_data.weave_kind) 
 	end 

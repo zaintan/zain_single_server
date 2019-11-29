@@ -9,6 +9,8 @@ function HandleOutCard:onEnter(seat_index)
 	Super.onEnter(self)
 	
 	self.seat_index = seat_index
+	self.m_pTable:resetOperates()
+	self.m_pTable:changePlayerStatus(seat_index, const.PlayerStatus.OUT_CARD)
 	--广播玩家状态
 	self.m_pTable:broadcastPlayersStatus()
 end

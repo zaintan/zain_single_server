@@ -142,9 +142,9 @@ end
 --广播生效操作
 function operates:executeHighestPriorityOp()
 	local maxDone = self:_getHighestDoneOp()
-	if maxDone == 0 then --过的  不需要广播通知
-		return 
-	end 
+	--if maxDone == 0 then --过的  不需要广播通知
+	--	return 
+	--end 
 	--已经删除的牌，防止一炮多响的时候 多次删除弃牌 
 	local deledCards = {}
 
