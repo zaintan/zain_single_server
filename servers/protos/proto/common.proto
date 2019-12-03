@@ -39,10 +39,6 @@ message WeaveItemInfo {
     optional int32 center_card = 2; // 中心牌
     optional int32 public_card = 3; // 公开标志
     optional int32 provide_player = 4; // 供应用户
-    optional int32 hu_xi = 5; // 组合胡息
-    repeated ChiGroupCard chi_group_cards = 6; // 吃牌对应的落组合
-    repeated int32 weave_cards = 7; // 实际组合牌
-    repeated int32 client_special_cards = 8; // 客户端需要特殊处理的牌值
     repeated int32 reserved = 110; // 消除Warning的预留值
 }
 // 玩家手牌信息
@@ -54,6 +50,7 @@ message PlayerCardsInfo {
     repeated int32 discards = 5; // 弃牌数据
     repeated WeaveItemInfo weaves = 6; // 组合牌数据
     optional int32 seat_index = 7; // 谁的手牌
+    optional WeaveItemInfo hu_info = 8; // 可操作的组合牌信息
     optional int32 reserved = 110; // 消除Warning的预留值
 }
 // 操作条信息

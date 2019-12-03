@@ -31,7 +31,7 @@ end
 function Table:pushRoomInfo(uid)
 	local game_status = self:getCurState():getStatus()
 	self:_getBehavior("info"):reconnectPush(uid,game_status)
-	self:_getBehavior("cards"):reconnectPush(uid)	
+	self:_getBehavior("cards"):reconnectPush(uid,game_status)	
 	self:_getBehavior("operates"):reconnectPush(uid)
 	self:_getBehavior("release"):reconnectPush(uid)
 end

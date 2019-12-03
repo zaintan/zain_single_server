@@ -140,7 +140,11 @@ end
 function PlayerCards:addHu( weave_kind, card, provide )
 	self.hu_info.weave_kind  = weave_kind
 	self.hu_info.center_card = card
-	self.hu_info.provide     = provide
+	self.hu_info.provide_player = provide
+end
+
+function PlayerCards:getHuInfo()
+	return self.hu_info
 end
 
 return PlayerCards

@@ -58,6 +58,10 @@ function cards:_getPlayerDiscardsInfo(seat)
 	return self.m_cards[seat + 1]:getDiscards()
 end
 
+function cards:_getPlayerHuInfo( seat )
+	return self.m_cards[seat + 1]:getHuInfo()
+end
+
 function cards:_getAllPlayersCardsInfo(hasHand, hasWeave, hasDiscard,toSeat, containSeats)
 	local data = { cards_infos = {};};
 
@@ -69,14 +73,17 @@ function cards:_getAllPlayersCardsInfo(hasHand, hasWeave, hasDiscard,toSeat, con
 			seat_index   = seat;		
 		}
 		if hasHand then 
-			item.hands = self:_getPlayerHandsInfo(seat,  toSeat)
+			item.hands = self:_getPlayerHandsInfo(seat,  toSeat == -1 and seat or toSeat)
 		end 
 		if hasWeave then 
-			item.weaves = self:_getPlayerWeavesInfo(seat,  toSeat)
+			item.weaves = self:_getPlayerWeavesInfo(seat,  toSeat == -1 and seat or toSeat)
 		end 
 		if hasDiscard then 
 			item.discards = self:_getPlayerDiscardsInfo(seat)
-		end 		
+		end 	
+
+		item.hu_info = self:_getPlayerHuInfo(seat)
+		--
 		table.insert(data.cards_infos,  item)
 	end
 	return data
@@ -110,9 +117,12 @@ function cards:broadcastPlayerCards(hasHand, hasWeave, hasDiscard, containSeats)
 end
 
 
-function cards:reconnectPush(uid)
+function cards:reconnectPush(uid, game_status)
 	--self:broadcastPlayerCards(true, true, true)
 	local seat     = self.target_:getPlayerByUid(uid).seat
+	if game_status == const.GameStatus.WAIT then --牌局结束了 可以展示所有牌
+		seat = -1
+	end 
 	local msg_data = self:_getAllPlayersCardsInfo(true, true, true, seat, self:_getAllSeats())
 	self.target_:sendMsg(msg.NameToId.RoomCardsPush, msg_data, uid)
 end
@@ -165,4 +175,3 @@ function cards:_broadcastOutCard(seat, card)
 end
 
 return cards
-
