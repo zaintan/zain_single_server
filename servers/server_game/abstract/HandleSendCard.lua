@@ -15,7 +15,7 @@ function HandleSendCard:onEnter(seat_index, isGangDraw)
 	local card = self.m_pTable:getCard(1, isGangDraw)
 	if not card then 
 		Log.i("","发牌失败！牌池没有牌了, 流局")
-		self.m_pState:handleRoundOver()
+		self.m_pState:handleRoundOver(const.RoundFinishReason.DRAW)
 		return
 	end 
 	self.send_card = card

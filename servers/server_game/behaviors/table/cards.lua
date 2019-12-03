@@ -12,6 +12,7 @@ cards.EXPORTED_METHODS = {
     "dispatchCard",
     "getPlayerCards",
     "outCard",
+    "getShowAllCardsInfo",
 }
 
 
@@ -116,6 +117,9 @@ function cards:broadcastPlayerCards(hasHand, hasWeave, hasDiscard, containSeats)
 	end 
 end
 
+function cards:getShowAllCardsInfo()
+	return self:_getAllPlayersCardsInfo(true, true, false, -1, self:_getAllSeats())
+end
 
 function cards:reconnectPush(uid, game_status)
 	--self:broadcastPlayerCards(true, true, true)

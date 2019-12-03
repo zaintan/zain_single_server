@@ -41,8 +41,38 @@ function StatePlay:onOperateCardReq(...)
 	return self:getCurHandle():onOperateCardReq(...)
 end
 
-function StatePlay:handleRoundOver()
-	-- body
+function StatePlay:handleRoundOver(reason, huPlayerSeat, effectOp)
+
+	local msg_data        = self.m_pTable:getShowAllCardsInfo()
+	msg_data.game_status  = const.GameStatus.WAIT --self:getStatus()
+	msg_data.final_scores = self.m_pTable:getAllScores()
+	msg_data.round_finish_reason = reason
+	
+	msg_data.finish_desc  = {}
+	msg_data.win_types    = {}
+	--
+
+	--胡牌了的
+	if reason == const.RoundFinishReason.NORMAL then 
+
+		table.insert(msg_data.win_types, effectOp.weave_kind)
+		--
+		local num = self.m_pTable:getCurPlayerNum()
+		for seat=0,num-1 do
+			msg_data.finish_desc[seat+1] = ""
+		end
+		--
+		if effectOp.weave_kind == const.Action.ZI_MO then 
+			msg_data.finish_desc[huPlayerSeat+1] = "自摸"
+		else
+			msg_data.finish_desc[huPlayerSeat+1] = "接炮"
+			msg_data.finish_desc[effectOp.provide_player + 1] = "放炮"
+		end 
+	end
+	--
+	self.m_pTable:broadcastMsg(msg.NameToId.RoundFinishPush, msg_data)
+	--
+	self.m_pTable:changeState(const.GameStatus.WAIT)
 end
 
 

@@ -64,7 +64,7 @@ function HandleWaitOperate:onOperateCardReq( uid, msg_id, data )
 	if self:_isHu(effect_data.weave_kind) then
 
 		self.m_pTable:turnSeat(effect_seat)
-		self.m_pState:handleRoundOver()
+		self.m_pState:handleRoundOver(const.RoundFinishReason.NORMAL,  effect_seat,  effect_data)
 
 	elseif self:_isChiPeng(effect_data.weave_kind) then 
 
