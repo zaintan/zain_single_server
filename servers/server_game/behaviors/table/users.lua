@@ -255,7 +255,7 @@ function users:resetAllReadyState(bValue, bBroadcast)
 	end
 
 	if bBroadcast then 
-		self:_notifyAllPlayersReady()
+		self:_notifyAllPlayersSeat()
 	end 
 end
 
@@ -345,10 +345,10 @@ function users:_notifyAllPlayersSeat()
 	self:broadcastMsg(msg.NameToId.ReadyPush, data)
 end
 
---刷新所有玩家准备状态
-function users:_notifyAllPlayersReady()
-	-- body
-end
+----刷新所有玩家准备状态
+--function users:_notifyAllPlayersReady()
+--	-- body
+--end
 
 --广播通知其他玩家  玩家进入
 function users:_notifyPlayerEnter(player)
