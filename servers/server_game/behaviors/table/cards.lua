@@ -13,6 +13,7 @@ cards.EXPORTED_METHODS = {
     "getPlayerCards",
     "outCard",
     "getShowAllCardsInfo",
+    "getStartCardsInfo",
 }
 
 
@@ -119,6 +120,10 @@ end
 
 function cards:getShowAllCardsInfo()
 	return self:_getAllPlayersCardsInfo(true, true, false, -1, self:_getAllSeats())
+end
+
+function cards:getStartCardsInfo(seat)
+	return self:_getAllPlayersCardsInfo(true, true, true, seat, self:_getAllSeats())
 end
 
 function cards:reconnectPush(uid, game_status)

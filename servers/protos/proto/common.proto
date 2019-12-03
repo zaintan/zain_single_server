@@ -198,6 +198,7 @@ message RoomCardsPush {
     repeated PlayerCardsInfo cards_infos = 1; // 房间内所有玩家的牌数据
     optional int32 reserved = 110; // 消除Warning的预留值
 }
+
 // 小局结算推送
 message RoundFinishPush {
     repeated PlayerCardsInfo cards_infos = 1; // 房间内所有玩家的牌数据
@@ -334,4 +335,11 @@ message RoomInfoPush {
     optional RoundRoomInfo round_info = 2; // 
     repeated RoomUserInfo players = 3; // 房间内的玩家
     repeated int32 reserved = 110; // 消除Warning的预留值
+}
+
+message DealCardsPush {
+    repeated PlayerCardsInfo cards_infos = 1; // 房间内所有玩家的牌数据
+    optional int32 head_send_count = 2; // 牌墩顺序发牌张数
+    optional int32 tail_send_count = 3; // 牌墩尾部发牌张数    
+    optional int32 reserved = 110; // 消除Warning的预留值    
 }
