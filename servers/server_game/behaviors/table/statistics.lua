@@ -44,7 +44,7 @@ end
 
 function statistics:getAllScores()
 	local ret = {}
-	local num = self.m_pTable:getCurPlayerNum()
+	local num = self.target_:getCurPlayerNum()
 	for seat = 0,num-1 do
 		ret[seat+1] = self.m_scores[seat+1] or 0
 	end

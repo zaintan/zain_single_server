@@ -271,7 +271,7 @@ function operates:_executeZimo( seat, action, deledCards )
 	local providerPlayerCards = self.target_:getPlayerCards(action.provide_player)
 	local operaterPlayerCards = self.target_:getPlayerCards(seat)
 
-	self:_checkRemoveDiscard(deledCards, action.center_card, providerPlayerCards)	
+	--self:_checkRemoveDiscard(deledCards, action.center_card, providerPlayerCards)	
 
 	operaterPlayerCards:addHu(action.weave_kind, action.center_card, action.provide_player)
 	--广播执行操作
