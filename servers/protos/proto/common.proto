@@ -66,6 +66,7 @@ message GameRoomInfo {
     repeated GameRuleInfo game_rules = 3; // 玩法规则
     optional int32 game_status = 4; // 游戏状态
     optional int32 room_id = 5; // 房间号   
+    optional int32 round = 6;
     optional int32 reserved = 110; // 消除Warning的预留值     
 }
 
@@ -207,6 +208,7 @@ message RoundFinishPush {
     repeated int32 win_types = 4; // 胡类型
     repeated int32 final_scores = 5; // 小局分数统计
     optional int32 round_finish_reason = 6; // 小局结束原因
+    optional int64 over_time = 7;
     repeated int32 reserved = 110; // 消除Warning的预留值
 }
 // 抓牌推送
