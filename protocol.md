@@ -281,9 +281,11 @@ GameStartPush:
 	};
 
 牌局开始后推送所有玩家手牌信息
-RoomCardsPush:
+DealCardsPush:
 
 	msg_body = {
+		head_send_count = 26；
+		tail_send_count = 0；
 		cards_infos = {//repeated message PlayerCardsInfo
 			{
 				has_hands = true;
@@ -452,9 +454,9 @@ RoundFinishPush:
 	msg_body = {
 		game_status = 1;//Free:0 Wait:1 Play:2
 		round_finish_reason = 0; //int 小局结束原因
-		win_types    = {};//repeated int32  胡类型
-		finish_desc  = {};//repeated string 小结算文字描述信息
-		final_scores = {};//repeated int32 小局分数统计
+		win_types    = {"接炮"};//repeated int32  胡类型
+		finish_desc  = {"接炮","","放炮",""};//repeated string 小结算文字描述信息
+		final_scores = {10,0,-10,0};//repeated int32 小局分数统计
 		cards_infos  = { //repeated  message PlayerCardsInfo
 			{
 				has_hands = true;
@@ -471,6 +473,11 @@ RoundFinishPush:
 						provide_player = 0;
 					};
 					...
+				};
+				hu_info = {//message WeaveItemInfo
+					weave_kind = 1;//接炮
+					center_card = 1;//胡的牌
+					provide_player = 2;//放炮者
 				};
 			};
 			{
