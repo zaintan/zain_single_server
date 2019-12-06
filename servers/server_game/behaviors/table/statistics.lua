@@ -3,7 +3,7 @@ local Super           = require("behaviors.behavior")
 local statistics      = class(Super)
 
 statistics.EXPORTED_METHODS = {
-    --"setGameFinishReason",
+    "setGameFinishReason",
     "getCurScoreBySeat",
     "getAllScores",
     "addScore",
@@ -26,9 +26,9 @@ function statistics:_clear_()
 	self.target_  = nil
 end
 
---function statistics:setGameFinishReason(reason)
---	self.m_gameFinishReason = reason
---end
+function statistics:setGameFinishReason(reason)
+	self.m_gameFinishReason = reason
+end
 
 function statistics:getCurScoreBySeat(seat)
 	return self.m_scores[seat+1] or 0
@@ -72,18 +72,34 @@ function statistics:addRoundCount( seat_index, id, add_num )
 end
 
 function statistics:getGameOverInfo()
---	local player_num = self.target_:getCurPlayerNum()
---	local ret = {}
---	for i=1,player_num do
---		local seat_index = i - 1
---		ret[i] = {}
---		ret[i].total_scores   = self._scores[seat_index] or 0
---		ret[i].special_counts = {}
---		for k,v in pairs(self._info[seat_index] or {}) do
---		 	table.insert(ret[i].special_counts, {id = k; count = v;})
---		end 
---	end
---	return ret
+	--
+	local msg_data = {}
+	msg_data.game_finish_reason = self.m_gameFinishReason
+	--
+	local countIds = {
+		const.SpecialCountType.ZI_MO, 
+		const.SpecialCountType.JIE_PAO,
+		const.SpecialCountType.FANG_PAO,
+		const.SpecialCountType.AN_GANG,
+		const.SpecialCountType.PENG_GANG,
+		const.SpecialCountType.ZHI_GANG
+	}
+
+	local player_num = self.target_:getCurPlayerNum()
+	local player_infos = {}
+	for i=1,player_num do
+		local item = {}
+		item.total_scores = self.m_scores[i] or 0
+		item.special_counts = {}
+		for _,id in ipairs(countIds) do
+			table.insert(item.special_counts, { id = id; count = self.m_gameInfo[i][id] or 0 })
+		end
+		player_infos[i] = item
+	end
+	--
+	msg_data.player_infos = player_infos
+
+	return msg_data
 end
 
 return statistics

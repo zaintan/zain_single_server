@@ -78,7 +78,7 @@ function BaseState:onJoin(node, addr, userinfo)
 end
 
 function BaseState:broadcastGameOver()
-	-- body
+	self.m_pTable:broadcastMsg(msg.NameToId.GameFinishPush, self.m_pTable:getGameOverInfo())
 end
 
 return BaseState

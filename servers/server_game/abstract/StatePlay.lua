@@ -42,12 +42,13 @@ function StatePlay:onOperateCardReq(...)
 end
 
 function StatePlay:handleRoundOver(reason, huPlayerSeat, effectOp)
-
+	--
 	local msg_data        = self.m_pTable:getShowAllCardsInfo()
 	msg_data.game_status  = const.GameStatus.WAIT --self:getStatus()
 	msg_data.final_scores = self.m_pTable:getAllScores()
 	msg_data.round_finish_reason = reason
-	
+	msg_data.over_time    = os.time()
+
 	msg_data.finish_desc  = {}
 	msg_data.win_types    = {}
 	--
@@ -72,8 +73,14 @@ function StatePlay:handleRoundOver(reason, huPlayerSeat, effectOp)
 	--
 	self.m_pTable:broadcastMsg(msg.NameToId.RoundFinishPush, msg_data)
 	--
-	self.m_pTable:changeState(const.GameStatus.WAIT)
+	if self.m_pTable:isLastRound() then 
+		--game over
+		self.m_pTable:destroy(const.GameFinishReason.NORMAL)
+	else 
+		self.m_pTable:changeState(const.GameStatus.WAIT)
+	end 
 end
+
 
 
 return StatePlay

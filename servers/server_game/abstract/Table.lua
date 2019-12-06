@@ -107,7 +107,9 @@ function Table:on_req(uid, msg_id, msg_body)
 end
 
 --销毁
-function Table:destroy()
+function Table:destroy(reason)
+	--
+	self:setGameFinishReason(reason);
 	--通知AllocServer
 	local tid    = self.m_pTable:getTableId()
 	local index  = skynet.getenv("server_alloc")
@@ -119,6 +121,8 @@ end
 
 --alloc server 透传 强制解散
 function Table:out_release()
+	self:setGameFinishReason(const.GameFinishReason.SYSTEM_BACK);
+	--
 	self:_onGameEnd()
 end
 

@@ -7,6 +7,7 @@ info.EXPORTED_METHODS = {
     "getTableId",
     "getAppInfo",
     "getTableCreaterInfo",
+    "getTotalRound",
 }
 
 local LOGTAG = "info"
@@ -49,8 +50,20 @@ function info:_on_bind_()
 	end
 	--
 	if rule then 
-		Log.i(LOGTAG,"rule id:%d  value:%d", rule.id, rule.value)
+		Log.i(LOGTAG,"player num rule id:%d  value:%d", rule.id, rule.value)
 		self.target_:setMaxPlayerNum(rule.id - const.GameRule.RULE_PLAYER_FIXED_COUNT_BASE)
+	end
+	--
+	self.m_totalRound = 1
+	local rule = nil 
+	for i = const.GameRule.RULE_ROUND_ID_BASE,const.GameRule.RULE_ROUND_ID_MAX do
+		rule = self:getRule(i)
+		if rule then break end 
+	end
+	--
+	if rule then 
+		Log.i(LOGTAG,"round rule id:%d  value:%d", rule.id, rule.value)
+		self.m_totalRound = rule.value
 	end
 end
 
@@ -70,6 +83,7 @@ function info:reconnectPush(uid, game_status)
 	    game_rules  = self.m_gameRules;
 	    room_id     = self.m_tid;
 	    game_status = game_status;
+	    round       = self.m_totalRound;
 	};--GameRoomInfo
 	--behaviors.round
 	data.round_info = self.target_:getRoundInfo()
@@ -88,6 +102,10 @@ function info:getAppInfo()
 		game_id = self.m_appId;
 		game_type = self.m_gameType;
 	}
+end
+
+function info:getTotalRound()
+	return self.m_totalRound
 end
 
 return info

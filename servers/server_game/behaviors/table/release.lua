@@ -42,11 +42,8 @@ function release:onCreatorRelease(uid, errCode)
 	}
 	self.target_:broadcastMsg(msg.NameToId.ReleasePush, data)
 
-
-	--标记GameOver原因 const.GameFinishReason.CREATOR_RELEASE
-	self.target_:setGameFinishReason(const.GameFinishReason.CREATOR_RELEASE);
 	--大结算 销毁table
-	self.target_:destroy()
+	self.target_:destroy(const.GameFinishReason.CREATOR_RELEASE)
 
 	return true
 end
@@ -129,10 +126,8 @@ function release:_initVote(uid)
 		--倒计时结束
 		self.m_vote.result = const.ReleaseVoteResult.SUCCESS
 		--over
-		--标记GameOver原因 
-		self.target_:setGameFinishReason(const.GameFinishReason.PLAYER_VOTE_RELEASE);
 		--大结算 销毁table
-		self.target_:destroy()		
+		self.target_:destroy(const.GameFinishReason.PLAYER_VOTE_TIME_OUT)		
 	end)
 
 	self.m_vote = t
@@ -158,10 +153,8 @@ function release:_onAgree(seat, value)
 		self.m_vote.result = const.ReleaseVoteResult.SUCCESS
 		--广播投票结果
 		self:_broacastVote()
-		--标记GameOver原因 
-		self.target_:setGameFinishReason(const.GameFinishReason.PLAYER_VOTE_RELEASE);
 		--大结算 销毁table
-		self.target_:destroy()	
+		self.target_:destroy(const.GameFinishReason.PLAYER_VOTE_AGREE)	
 	else
 		self:_broacastVote() 
 	end 

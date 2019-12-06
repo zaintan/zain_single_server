@@ -5,7 +5,7 @@ local round           = class(Super)
 round.EXPORTED_METHODS = {
     "getRoundInfo",
     "startRound",
-    
+    "isLastRound",
 
     "changePlayerStatus",
     "getPlayerStatus",
@@ -111,6 +111,10 @@ function round:turnSeat(nextSeat)
 		self.m_seat = (self.m_seat + 1)%self.m_playerNum
 	end
 	return self.m_seat 
+end
+
+function round:isLastRound()
+	return self.target_:getTotalRound() == self.m_round
 end
 
 return round

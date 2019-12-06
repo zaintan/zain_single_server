@@ -118,6 +118,7 @@ JoinRoomRequest:
 				...			
 			};
 			room_id = 123456;
+			round   = 8;
 			game_status = 0;//Free:0 Wait:1 Play:2
 		};
 		round_info = { //message RoundRoomInfo
@@ -457,6 +458,7 @@ RoundFinishPush:
 		win_types    = {"接炮"};//repeated int32  胡类型
 		finish_desc  = {"接炮","","放炮",""};//repeated string 小结算文字描述信息
 		final_scores = {10,0,-10,0};//repeated int32 小局分数统计
+		over_time    = 0;//结束时间戳
 		cards_infos  = { //repeated  message PlayerCardsInfo
 			{
 				has_hands = true;
