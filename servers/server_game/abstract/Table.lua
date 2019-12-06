@@ -111,7 +111,7 @@ function Table:destroy(reason)
 	--
 	self:setGameFinishReason(reason);
 	--通知AllocServer
-	local tid    = self.m_pTable:getTableId()
+	local tid    = self:getTableId()
 	local index  = skynet.getenv("server_alloc")
 	local bNotifiGame = false
     ClusterHelper.callIndex(index,".AllocService","release",tid, bNotifiGame)
