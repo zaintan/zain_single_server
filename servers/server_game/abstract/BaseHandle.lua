@@ -29,17 +29,17 @@ function BaseHandle:onExit()
 end
 
 
-local function _retDefaultMsg(uid, msg_id)
+local function _retDefaultMsg(self, uid, msg_id)
 	self.m_pTable:sendMsg(msg_id + msg.ResponseBase , {status = -450;}, uid)
 	return false
 end
 
 function BaseHandle:onOutCardReq(uid, msg_id, data)
-	return _retDefaultMsg(uid, msg_id)
+	return _retDefaultMsg(self, uid, msg_id)
 end
 
 function BaseHandle:onOperateCardReq(uid, msg_id, data)
-	return _retDefaultMsg(uid, msg_id)
+	return _retDefaultMsg(self, uid, msg_id)
 end
 
 return BaseHandle

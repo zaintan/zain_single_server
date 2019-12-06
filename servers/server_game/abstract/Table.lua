@@ -7,6 +7,8 @@ local ClusterHelper = require "ClusterHelper"
 local Super     = require("abstract.BaseContainer")
 local Table     = class(Super)
 
+local skynet    = require "skynet"
+
 ---! 帮助库
 local packetHelper  = nil
 local LOGTAG = "Table"

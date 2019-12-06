@@ -32,26 +32,26 @@ function BaseState:onExit()
 end
 
 
-local function _retDefaultMsg(uid, msg_id)
+local function _retDefaultMsg(self, uid, msg_id)
 	self.m_pTable:sendMsg(msg_id + msg.ResponseBase , {status = -401;}, uid)
 	return false
 end
 
 
 function BaseState:onReadyReq(uid, msg_id, data)
-	return _retDefaultMsg(uid, msg_id)
+	return _retDefaultMsg(self, uid, msg_id)
 end
 
 function BaseState:onOutCardReq(uid, msg_id, data)
-	return _retDefaultMsg(uid, msg_id)
+	return _retDefaultMsg(self, uid, msg_id)
 end
 
 function BaseState:onOperateCardReq(uid, msg_id, data)
-	return _retDefaultMsg(uid, msg_id)
+	return _retDefaultMsg(self, uid, msg_id)
 end
 
 function BaseState:onPlayerExitReq(uid, msg_id, data)
-	return _retDefaultMsg(uid, msg_id)
+	return _retDefaultMsg(self, uid, msg_id)
 end
 
 function BaseState:onReleaseReq(uid, msg_id, data)
@@ -67,7 +67,7 @@ function BaseState:onReleaseReq(uid, msg_id, data)
 		return self.m_pTable:onReleaseDoVote(uid, data)
 	else --未知请求
 		Log.e("","maybe err!未知解散请求 uid=%d data.type=%d",uid, data.type)
-		return _retDefaultMsg(uid, msg_id)
+		return _retDefaultMsg(self, uid, msg_id)
 	end 
 end
 
