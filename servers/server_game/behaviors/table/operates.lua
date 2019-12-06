@@ -249,6 +249,8 @@ function operates:_executeAnGang( seat, action, deledCards )
 	self:_broadcastExecuteAction(seat, action)
 	--刷新操作者的手牌
 	self.target_:broadcastPlayerCards(true,true,false,{seat})
+	--
+	self.target_:addGameCount(seat,const.SpecialCountType.AN_GANG,1)	
 end
 
 function operates:_executeHu( seat, action, deledCards )
@@ -265,6 +267,8 @@ function operates:_executeHu( seat, action, deledCards )
 	self.target_:broadcastPlayerCards(false,false,true,{action.provide_player})
 	--刷新操作者的手牌 
 	--self.target_:broadcastPlayerCards(true,true,false,{seat})
+	self.target_:addGameCount(seat,const.SpecialCountType.JIE_PAO,1)
+	self.target_:addGameCount(action.provide_player,const.SpecialCountType.FANG_PAO,1)
 end
 
 function operates:_executeZimo( seat, action, deledCards )
@@ -278,6 +282,7 @@ function operates:_executeZimo( seat, action, deledCards )
 	self:_broadcastExecuteAction(seat, action)
 	--刷新操作者的手牌 
 	--self.target_:broadcastPlayerCards(true,true,false,{seat})	
+	self.target_:addGameCount(seat,const.SpecialCountType.ZI_MO,1)	
 end
 
 function operates:_executePengGang( seat, action, deledCards )
@@ -295,6 +300,8 @@ function operates:_executePengGang( seat, action, deledCards )
 	self.target_:broadcastPlayerCards(false,false,true,{action.provide_player})
 	--刷新操作者的手牌
 	self.target_:broadcastPlayerCards(true,true,false,{seat})
+
+	self.target_:addGameCount(seat,const.SpecialCountType.PENG_GANG,1)	
 end
 
 function operates:_executeBuGang( seat, action, deledCards )
@@ -313,6 +320,8 @@ function operates:_executeBuGang( seat, action, deledCards )
 	self:_broadcastExecuteAction(seat, action)
 	--刷新操作者的手牌
 	self.target_:broadcastPlayerCards(true,true,false,{seat})
+
+	self.target_:addGameCount(seat,const.SpecialCountType.ZHI_GANG,1)	
 end
 
 local kExecuteActionMap = {

@@ -92,6 +92,10 @@ function statistics:getGameOverInfo()
 		item.total_scores = self.m_scores[i] or 0
 		item.special_counts = {}
 		for _,id in ipairs(countIds) do
+			local count = 0
+			if self.m_gameInfo[i] and self.m_gameInfo[i][id] then 
+				count = self.m_gameInfo[i][id]
+			end 
 			table.insert(item.special_counts, { id = id; count = self.m_gameInfo[i][id] or 0 })
 		end
 		player_infos[i] = item
