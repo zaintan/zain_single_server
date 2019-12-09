@@ -90,7 +90,8 @@ function statistics:getGameOverInfo()
 	local player_infos = {}
 	for i=1,player_num do
 		local item = {}
-		item.total_scores = self.m_scores[i] or 0
+		item.total_scores = self:getCurScoreBySeat(i-1)
+		--self.m_scores[i] or 0
 		item.special_counts = {}
 		for _,id in ipairs(countIds) do
 			local count = 0

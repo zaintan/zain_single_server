@@ -45,7 +45,7 @@ function StatePlay:handleRoundOver(reason, huPlayerSeat, effectOp)
 	--
 	local msg_data        = self.m_pTable:getShowAllCardsInfo()
 	msg_data.game_status  = const.GameStatus.WAIT --self:getStatus()
-	msg_data.final_scores = self.m_pTable:getAllScores()
+	
 	msg_data.round_finish_reason = reason
 	msg_data.over_time    = os.time()
 
@@ -83,6 +83,8 @@ function StatePlay:handleRoundOver(reason, huPlayerSeat, effectOp)
 			self.m_pTable:addScore(effectOp.provide_player, -baseScore)
 		end 
 	end
+	--
+	msg_data.final_scores = self.m_pTable:getAllScores()
 	--
 	self.m_pTable:broadcastMsg(msg.NameToId.RoundFinishPush, msg_data)
 	--
