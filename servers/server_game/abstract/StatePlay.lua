@@ -70,9 +70,9 @@ function StatePlay:handleRoundOver(reason, huPlayerSeat, effectOp)
 			--add score
 			for seat=0,num-1 do
 				if seat ~= huPlayerSeat then 
-					self.m_pTable:addScore(huPlayerSeat, -baseScore*2)
+					self.m_pTable:addScore(seat, -baseScore*2)
 				else 
-					self.m_pTable:addScore(huPlayerSeat, baseScore*num*2)
+					self.m_pTable:addScore(seat, baseScore*(num-1)*2)
 				end 
 			end
 		else
