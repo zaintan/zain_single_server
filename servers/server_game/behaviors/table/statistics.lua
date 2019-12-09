@@ -75,6 +75,7 @@ function statistics:getGameOverInfo()
 	--
 	local msg_data = {}
 	msg_data.game_finish_reason = self.m_gameFinishReason
+	msg_data.over_time          = os.time()
 	--
 	local countIds = {
 		const.SpecialCountType.ZI_MO, 

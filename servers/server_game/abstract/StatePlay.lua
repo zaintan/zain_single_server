@@ -62,12 +62,25 @@ function StatePlay:handleRoundOver(reason, huPlayerSeat, effectOp)
 		for seat=0,num-1 do
 			msg_data.finish_desc[seat+1] = ""
 		end
+		------------
+		local baseScore = 1
 		--
 		if effectOp.weave_kind == const.Action.ZI_MO then 
 			msg_data.finish_desc[huPlayerSeat+1] = "自摸"
+			--add score
+			for seat=0,num-1 do
+				if seat ~= huPlayerSeat then 
+					self.m_pTable:addScore(huPlayerSeat, -baseScore*2)
+				else 
+					self.m_pTable:addScore(huPlayerSeat, baseScore*num*2)
+				end 
+			end
 		else
 			msg_data.finish_desc[huPlayerSeat+1] = "接炮"
 			msg_data.finish_desc[effectOp.provide_player + 1] = "放炮"
+
+			self.m_pTable:addScore(huPlayerSeat, baseScore)
+			self.m_pTable:addScore(effectOp.provide_player, -baseScore)
 		end 
 	end
 	--

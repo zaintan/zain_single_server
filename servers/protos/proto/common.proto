@@ -271,6 +271,7 @@ message RemoveDiscardPush {
 message GameFinishPush {
     repeated PlayerResultInfo player_infos = 1; // 大局统计信息
     optional int32 game_finish_reason = 2; // 大局结束原因
+    optional int64 over_time = 3;
     optional int32 reserved = 110; // 消除Warning的预留值
 }
 // 大局统计信息 
