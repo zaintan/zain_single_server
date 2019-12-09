@@ -40,6 +40,9 @@ function statistics:addScore(seat_index, add_score)
 		self.m_scores[seat_index + 1] = 0
 	end 
 	self.m_scores[seat_index + 1] = self.m_scores[seat_index + 1] + add_score
+
+	Log.d("statistics", "addScore: seat_index=%d,add_score=%d",seat_index,add_score)
+	Log.dump("statistics", self.m_scores)	
 end
 
 function statistics:getAllScores()
