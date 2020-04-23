@@ -66,6 +66,20 @@ function new(classType, ...)
     return obj;
 end
 
+function g_createMsg( msgCode )
+    return {
+        status     = msgCode[1];
+        status_tip = msgCode[2];
+    }
+end
+
+function g_msgid_req2rsp( msg_id )
+    return msg_id + 1
+end
+
+function g_msgid_rsp2req( msg_id )
+    return msg_id - 1
+end
 --[[
 function split_int( val )
     local ret = {}

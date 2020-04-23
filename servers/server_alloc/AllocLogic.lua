@@ -56,14 +56,14 @@ function AllocLogic:create(data,userInfo)
 		local limit = skynet.call(".NodeInfo", "lua", "getConfig", "createLimit")
 		if user and not user:canCreateTable(limit) then 
 			Log.i(LOGTAG,"uid=%d开房数量已达上限!",uid)
-			return {status = -1}
+			return g_createMsg(MsgCode.CreateFailedLimit)
 		end	  
 
 		local table_id = self.m_idPool:allocId()
 		--没使用 要记得回收房间号
 		if not table_id then 
 			Log.e(LOGTAG,"分配房间号失败!",uid)
-			return {status = -2}
+			return g_createMsg(MsgCode.CreateFailedNoID)
 		end 
 
 		--call game_server
@@ -73,14 +73,14 @@ function AllocLogic:create(data,userInfo)
 		if not server_index then 
 			Log.e(LOGTAG,"appid=%d,找不到配置的逻辑服!",appid)
 			self.m_idPool:recoverId(table_id)
-			return {status = -3}
+			return g_createMsg(MsgCode.AllocFailedLinkGame)
 		end 
 
         local ok, ret = ClusterHelper.callIndex(server_index, ".GameService","create",table_id,userInfo,data)
         if not ok then 
             Log.e(LOGTAG,"链接逻辑服%s失败!",tostring(server_index))
             self.m_idPool:recoverId(table_id)
-            return {status = -4}
+            return g_createMsg(MsgCode.AllocFailedLinkGame)
         end  		
 		---
 		--创建成功
@@ -93,11 +93,14 @@ function AllocLogic:create(data,userInfo)
 			self.m_tables:addObject({addr = ret.tableAddr;index = server_index; creater = uid; uids = {};}, table_id)
 
 			Log.i(LOGTAG, "用户uid=%d在服务器index=%d成功创建房间,tid=%d,gameid=%d",uid,server_index,table_id,appid)
-			return {status = 1;room_id = table_id;}
+			
+			local ret   = g_createMsg(MsgCode.CreateSuccess)
+			ret.room_id = table_id
+			return ret  --{status = 1;room_id = table_id;}
 		else 
 			Log.e(LOGTAG,"创建房间失败!原因:%s",tostring(ret.err))
             self.m_idPool:recoverId(table_id)
-            return {status = -5}			
+            return g_createMsg(MsgCode.CreateFailedGameRet)		
 		end
 	end)
 end
@@ -117,7 +120,7 @@ function AllocLogic:join(data,fromNode,fromAddr,userinfo)
 			local ok,ret = ClusterHelper.callIndex(tblInfo.index, tblInfo.addr,"reconnect",fromNode, fromAddr, uid)
 			if not ok then 
 				Log.i(LOGTAG,"uid=%d重连房间tid=%d逻辑服%d失败!",uid,table_id,tblInfo.index)
-				ClusterHelper.callIndex(fromNode,fromAddr,"sendMsg",msg.NameToId.JoinRoomResponse,{status = -1;})
+				ClusterHelper.callIndex(fromNode,fromAddr,"sendMsg",msg.NameToId.JoinRoomResponse,g_createMsg(MsgCode.AllocFailedLinkGame))
 			end 
 
 			Log.i(LOGTAG,"AllocServer join reconnect ret: {gameSvr=%s,tableAddr=%s}",tostring(tblInfo.index),tostring(tblInfo.addr))
@@ -129,7 +132,7 @@ function AllocLogic:join(data,fromNode,fromAddr,userinfo)
 		local tblInfo = self.m_tables:getObject(data.room_id)
 		if not tblInfo then 
 			Log.e(LOGTAG,"AllocServer查不到该房间号%d!该房间已解散",data.room_id)
-			ClusterHelper.callIndex(fromNode,fromAddr,"sendMsg",msg.NameToId.JoinRoomResponse,{status = -2;})
+			ClusterHelper.callIndex(fromNode,fromAddr,"sendMsg",msg.NameToId.JoinRoomResponse,g_createMsg(MsgCode.JoinFailedReleased))
 			return false
 		end 
 
@@ -137,7 +140,7 @@ function AllocLogic:join(data,fromNode,fromAddr,userinfo)
 		local callSucc,joinSucc = ClusterHelper.callIndex(tblInfo.index,tblInfo.addr, "join", fromNode,fromAddr, userinfo)
 		if not callSucc then
 			Log.d(LOGTAG,"链接逻辑服%d失败%s",tblInfo.index, tostring(joinSucc))
-			ClusterHelper.callIndex(fromNode,fromAddr,"sendMsg",msg.NameToId.JoinRoomResponse,{status = -3;})
+			ClusterHelper.callIndex(fromNode,fromAddr,"sendMsg",msg.NameToId.JoinRoomResponse,g_createMsg(MsgCode.AllocFailedLinkGame))
 			return false
 		end 
 
@@ -234,7 +237,7 @@ function AllocLogic:release(tid, bNotiGame)
 			self.m_tables:removeObject(tid)
 			----------------------------------------------
 			if bNotiGame then 
-				local callSucc,err = ClusterHelper.callIndex(gameIndex,gameAddr,"out_release")
+				local callSucc,err = ClusterHelper.callIndex(gameIndex,gameAddr,"recvSysRelease")
 				if not callSucc then
 					Log.d(LOGTAG,"无法通知逻辑服,链接逻辑服%d失败%s",tblInfo.index, tostring(err))
 					return false

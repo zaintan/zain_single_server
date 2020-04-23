@@ -1,9 +1,15 @@
 log_level = 4
 Log       = Log or (require "LogHelper")
 ----------------------------------------------
-local cp = require "config_parse"
-const    = cp.parseConsts()
-msg      = cp.parseMsg()
+MsgCode     = require "gaCodeDef"
+const       = require "gaConstDef"
+msg         = {
+	NameToId = require "gaMsgDef";
+	IdToName = {};
+}
+for k,v in pairs(m.NameToId) do
+	msg.IdToName[v] = k;
+end
 ----------------------------------------------
 require "expand"
 require "functions"

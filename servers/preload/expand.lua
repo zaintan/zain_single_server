@@ -29,3 +29,29 @@ function table.union(...)
     end    
     return ret
 end
+
+function table.clone( tbl )
+    
+    local lookup_table = {}  
+
+    local function _copy(target)  
+        if type(target) ~= "table" then  
+            return target   
+        end  
+
+        if lookup_table[target] then 
+            return lookup_table[target]
+        end 
+
+        local new_table = {}  
+        lookup_table[target] = new_table  
+
+        for index, value in pairs(target) do  
+            new_table[_copy(index)] = _copy(value)  
+        end   
+        
+        return setmetatable(new_table, getmetatable(target))      
+    end     
+
+    return _copy(tbl) 
+end

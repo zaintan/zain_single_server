@@ -22,13 +22,12 @@ local CacheLimitCount   = 10240
 
 local LOGTAG = "LOGIN"
 -----------------------------------------------------------------------------------------
-local function _onLoginFalid(tip)
-    Log.d(LOGTAG,"login failed:",tip)
-    return {status = -1;status_tip = tip;}
-end
 
 local function _onLoginSuccess(uid)
     Log.d(LOGTAG,"login success:%d",uid)
+
+    local ret = g_createMsg(MsgCode.LoginSuccess)
+
     local user = CacheUserMap:getObject(uid)
     local info = {}
     info.user_id      = user.FUserID
@@ -37,8 +36,9 @@ local function _onLoginSuccess(uid)
     info.sex          = user.FSex
     info.diamond      = user.FDiamond
     info.gold         = user.FGold
-    --info.vip_level    = user.F
-    return {status = 0;user_info = info;}
+
+    ret.user_info = info
+    return ret--{status = 0;user_info = info;}
 end
 
 --创建新用户
@@ -139,7 +139,7 @@ local function _seq_on_login(reqData,agentNode,agentAddr)
     Log.dump(LOGTAG,reqData)
 
     if not reqData.login_type or not reqData.token then 
-        return _onLoginFalid("缺失必要的登录参数！")
+        return g_createMsg(MsgCode.LoginFailedArgs)
     end 
 
     if reqData.login_type == const.LoginType.USER then --游客登录
@@ -159,18 +159,18 @@ local function _seq_on_login(reqData,agentNode,agentAddr)
                         _updateCacheUser(registerRet.FUserID ,agentNode,agentAddr, registerRet)
                         return _onLoginSuccess(registerRet.FUserID)
                     else
-                        return _onLoginFalid("注册失败!")
+                        return g_createMsg(MsgCode.LoginFailedRegister)
                     end  
                 else--数据库查询到了
                     _updateCacheUser(pRet[1].FUserID, agentNode,agentAddr, pRet[1])
                     return _onLoginSuccess(pRet[1].FUserID)
                 end
             else--找不到
-                return _onLoginFalid("数据库链接失败!")
+                return g_createMsg(MsgCode.LoginFailedLinkDB)
             end 
         end 
     end 
-    return _onLoginFalid("暂不支持的登录方式！")
+    return g_createMsg(MsgCode.LoginFailedType)
 end
 
 ----注意清缓存

@@ -23,35 +23,40 @@ end
 --需推送客户端
 function TableLogic:reconnect(fromNodeIndex, fromAddr, uid)
 	return cs(function ()
-		return self.m_table:reconnect(fromNodeIndex, fromAddr, uid)
+		return self.m_table:recvReconnectReq(fromNodeIndex, fromAddr, uid)
 	end)
 end
 
 --需推送客户端
 function TableLogic:join(fromNodeIndex, fromAddr, userinfo)
 	return cs(function ()
-		return self.m_table:join(fromNodeIndex, fromAddr, userinfo)
+		return self.m_table:recvJoinReq(fromNodeIndex, fromAddr, userinfo)
 	end)
 end
 
 --标记下线即可 无需返回消息
 function TableLogic:logout(fromNodeIndex, selfAddr, uid)
 	return cs(function ()
-		return self.m_table:logout(fromNodeIndex, selfAddr, uid)
+		return self.m_table:recvLogout(fromNodeIndex, selfAddr, uid)
 	end)
 end
 
 
-function TableLogic:on_req(uid, msg_id, data)
+function TableLogic:on_req(uid, data)
 	return cs(function ()
-		return self.m_table:on_req(uid, msg_id, data)
+		return self.m_table:on_req(uid, data)
 	end)
 end
 
 -------------------------------------------------------------------------
-function TableLogic:_createTable(...)
-	local BaseTable = require("abstract.Table")
-	return new(BaseTable, ...)
+function TableLogic:_createTable(...)--tid,userInfo,data
+	--data.game_rules --玩法规则
+	--data.game_id    --子游戏
+	--data.game_type  --子玩法
+
+	--结束条件
+	local tblClass = require("abstract.Table")
+	return new(tblClass, ...)
 end
 
 return TableLogic

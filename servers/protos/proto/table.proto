@@ -1,0 +1,122 @@
+package common;
+option java_package = "protobuf.cher";
+
+import "hall.proto";
+
+// 房间内的玩家信息
+message TableUserBaseInfo {
+    required int64  user_id        = 1; // 用户ID
+    required string user_name      = 2; // 用户名
+    required string head_img_url   = 3; // 头像
+}
+
+message TableUserInfo {
+    required int64  user_id        = 1; // 用户ID
+    required int32  seat           = 2; // 座位号
+    required bool   ready          = 3; // 是否已经准备
+    required bool   online         = 4; // 是否在线
+    required int32  status         = 5; // 玩家状态，0：无操作，1：出牌，2：操作牌 
+    required int32  score          = 6; // 玩家分数  
+    optional bytes  expand_content = 7; // 子游戏额外扩展信息
+}
+
+//牌桌进度信息
+message TableProgressInfo {
+    optional int32 over_type          = 1; // 结束条件类型 1:局数 2:圈数 3:分数(胡息) 
+    optional int32 over_value         = 2; // 结束条件值  
+    optional int32 current_value      = 3; // 当前值  
+}
+
+
+
+//牌桌信息推送--当前状态重连
+message TableInfoPush {
+    optional GameBaseInfo      game_base_info = 1;
+    optional TableProgressInfo progress_info  = 2; // 当前牌桌进度
+    optional int32             game_status    = 3; // 游戏状态
+    repeated TableUserBaseInfo users_base     = 4; // 房间内的玩家
+    repeated TableUserInfo     users_info     = 5; // 房间内的玩家
+    optional bytes             expand_content = 6; // 子游戏额外扩展信息
+}
+
+// 游戏开始推送
+message RoundBeginPush {
+    optional int32             game_status     = 1; // 游戏状态 
+    optional TableProgressInfo progress_info   = 2; // 当前牌桌进度
+    repeated TableUserInfo     users_info      = 3; // 房间内的玩家状态刷新
+    optional bytes             expand_content  = 4; // 子游戏额外扩展信息
+}
+
+// 小局结算推送
+message RoundEndPush {
+    optional int32             game_status     = 1; // 游戏状态 
+    optional TableProgressInfo progress_info   = 2; // 当前牌桌进度
+    repeated TableUserInfo     users_info      = 3; // 房间内的玩家状态刷新
+    optional int64             over_time       = 4;
+    optional int32             reason          = 5; // 小局结束原因
+    optional bool              is_game_over    = 6;
+    optional bytes             expand_content  = 7; // 子游戏额外扩展信息
+}
+
+// 玩家进入房间推送--推送给其他玩家  玩家进来了
+message UserEnterPush {
+    required TableUserBaseInfo user_base_info = 1;
+    required TableUserInfo     user_info      = 2;
+}
+
+
+// 玩家上下线信息推送
+message UserInfoPush {
+    repeated TableUserInfo     user_info      = 1;
+}
+
+// 离开请求
+message UserExitRequest {
+
+}
+
+// 离开房间推送
+message UserExitPush {
+    required int64  user_id        = 1; // 用户ID
+}
+
+// 离开响应 可能当前状态不能离开
+message UserExitResponse {
+    optional int32  status     = 1; // 状态
+    optional string status_tip = 2; // 状态提示信息 
+}
+
+// 准备请求
+message ReadyRequest {
+    optional bool  ready = 1; // 准备 or 取消准备
+}
+
+// 解散请求
+message ReleaseRequest {
+    optional int32 type       = 1; //  1发起解散  2投票
+    optional int32 value      = 2; // 投票解散结果 2拒绝  3同意
+}
+
+// 解散响应 //可能失败  可能有时间间隔限制，次数限制
+message ReleaseResponse {
+    optional int32  status      = 1; // 状态
+    optional string status_tip  = 2; // 状态提示信息 
+    optional int32  req_type    = 3; //  1发起解散  2投票
+}
+
+//玩家解散投票信息
+message UserVoteInfo {
+	optional int32 vote       = 1; // 投票信息 1未操作 2拒绝 3同意
+    optional int64 user_id    = 2; // 用户ID
+}
+
+// 解散投票信息推送
+message ReleasePush {
+	optional int64 user_id            = 1; // 解散发起人//optional int32 release_status = 1; // 当前解散状态
+	optional int32 cur_release_count  = 2; //当前解散发起请求次数
+	optional int32 max_realease_limit = 3; //最大次数限制
+	optional int32 cur_seconds        = 4; //当前剩余时间
+	optional int32 max_seconds        = 5; //倒计时时间，单位秒
+	optional int32 status             = 6; //房间解散状态 1失败  2投票中  3成功 	
+	repeated UserVoteInfo votes       = 7; // 玩家们的投票信息	
+}

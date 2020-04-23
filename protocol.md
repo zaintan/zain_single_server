@@ -92,17 +92,26 @@ JoinRoomRequest:
 1). JoinRoomResponse:  required
 
 	msg_body = {
-		status = 1;
-		status_tip = "加入成功";
-		game_id = 1;
-		game_type = 1;
+		status         = 1;
+		status_tip     = "加入成功";
+		game_base_info = {//message GameBaseInfo
+    		game_id     = 1; // 子游戏ID
+    		game_type   = 1; // 子玩法ID 
+    		room_id     = 123456; // 房间号 
+		};
 	};
 
 如果已经在房间里面(重连) 还会触发推送通知其他玩家 玩家xxxxx上线
 
 2).RoomInfoPush：(推送房间信息) required
 
-	msg_body = {
+	msg_body = {//RoomLogicPush
+		push_type = 1;
+		push_content = {
+
+		};
+
+
 		info = { //message GameRoomInfo
 			game_id = 1;
 			game_type = 1;

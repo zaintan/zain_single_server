@@ -2,7 +2,7 @@
 local skynet    = require "skynet"
 local socket    = require "skynet.socket"
 ---! 帮助库
-local packetHelper  = (require "PacketHelper").create("protos/common.pb")
+local packetHelper  = (require "PacketHelper").create("protos/hall.pb")
 local LOGTAG = "Agent"
 
 local ClusterHelper = require "ClusterHelper"
@@ -94,7 +94,7 @@ function class:sendMsg(msg_id, data)
     end 
 
     local protoName = msg.IdToName[msg_id] 
-    local body      = packetHelper:encodeMsg("Base."..protoName, data)
+    local body      = packetHelper:encodeMsg("common."..protoName, data)
     local packet    = packetHelper:makeProtoData(msg_id , body)
     self:_sendPacket(packet)
     return true
@@ -103,6 +103,8 @@ end
 function class:_handlerHeartReq()--(data)
     self:sendMsg(msg.NameToId.HeartResponse,{})
 end
+
+
 
 function class:_handlerLoginReq(data)
 
@@ -113,8 +115,8 @@ function class:_handlerLoginReq(data)
                                             skynet.getenv("ServerIndex"), 
                                                             skynet.self())
     if not ok then 
-        Log.e(LOGTAG,"链接登录服失败!")
-        self:sendMsg(msg.NameToId.LoginResponse, {status = -1002;})
+        Log.e(LOGTAG,"链接登录服失败!")       
+        self:sendMsg(msg.NameToId.LoginResponse, g_createMsg(MsgCode.AgentFailedLinkLogin))
         self.FUserID  = nil
         self.userInfo = nil
         return
@@ -122,7 +124,7 @@ function class:_handlerLoginReq(data)
 
     if not ret or type(ret) ~= "table" then 
         Log.e(LOGTAG,"登录服返回参数失败!")
-        self:sendMsg(msg.NameToId.LoginResponse, {status = -1003;})
+        self:sendMsg(msg.NameToId.LoginResponse, g_createMsg(MsgCode.LoginFailedRetArgs))
         self.FUserID  = nil
         self.userInfo = nil
         return
@@ -135,7 +137,7 @@ function class:_handlerLoginReq(data)
         local callSucc,tid = ClusterHelper.callIndex(skynet.getenv("server_alloc"), ".AllocService", "queryTableId", self.FUserID)
         if not callSucc then 
             Log.e(LOGTAG,"链接分配服失败!无法查询该玩家是否在房间!")
-            self:sendMsg(msg.NameToId.LoginResponse, {status = -1005;})
+            self:sendMsg(msg.NameToId.LoginResponse, g_createMsg(MsgCode.AgentFailedLinkAlloc))
             return
         end
 
@@ -155,7 +157,7 @@ function class:_handlerCreateReq(data)
     local ok,ret = ClusterHelper.callIndex(skynet.getenv("server_alloc") , ".AllocService", "create",data,self.userInfo)
     if not ok then 
         Log.e(LOGTAG,"链接分配服失败!reason:%s",tostring(ret))
-        self:sendMsg(msg.NameToId.CreateRoomResponse, {status = -1202;})
+        self:sendMsg(msg.NameToId.CreateRoomResponse, g_createMsg(MsgCode.AgentFailedLinkAlloc))
         return
     end
     self:sendMsg(msg.NameToId.CreateRoomResponse, ret)
@@ -173,7 +175,7 @@ function class:_handlerJoinReq(data)
                                                        self.userInfo)
     if not ok then 
         Log.e(LOGTAG,"链接分配服失败!reason:%s",tostring(ret))
-        self:sendMsg(msg.NameToId.JoinRoomResponse, {status = -1204;})
+        self:sendMsg(msg.NameToId.JoinRoomResponse, g_createMsg(MsgCode.AgentFailedLinkAlloc))
         return
     end
 
@@ -186,18 +188,17 @@ function class:_handlerJoinReq(data)
     end 
 end
 
-function class:_handlerRoomReq(msg_id, msg_body)
+function class:_handlerRoomContentReq(data)
     if not self.gameSvr or not self.tableAddr then 
-        Log.e(LOGTAG,"无逻辑服地址!无法转发到逻辑服!")
-        self:sendMsg(msg_id + msg.ResponseBase, {status = -1401;})
+        Log.e(LOGTAG,"无逻辑服地址!无法转发到逻辑服!")--
+        self:sendMsg(msg.NameToId.RoomContentResponse, g_createMsg(MsgCode.AgentFailedLinkGame))
         return 
     end 
 
-    local ok = ClusterHelper.callIndex(self.gameSvr, self.tableAddr, "on_req", self.FUserID, msg_id, msg_body)
+    local ok = ClusterHelper.callIndex(self.gameSvr, self.tableAddr, "on_req", self.FUserID, data)
     if not ok then 
-        Log.e(LOGTAG,"uid:%s转发msgid=%d到逻辑服失败!toindex=%d, toAddr=%d",tostring(self.FUserID), msg_id,self.gameSvr, self.tableAddr)
-        self:sendMsg(msg_id + msg.ResponseBase, {status = -1402;})
-
+        Log.e(LOGTAG,"uid:%s转发msgid=%d到逻辑服失败!toindex=%d, toAddr=%d",tostring(self.FUserID), data.req_type,self.gameSvr, self.tableAddr)
+        self:sendMsg(msg.NameToId.RoomContentResponse, g_createMsg(MsgCode.AgentFailedLinkGame))
         self.gameSvr   = nil
         self.tableAddr = nil
         return 
@@ -206,17 +207,18 @@ function class:_handlerRoomReq(msg_id, msg_body)
 end
 
 local ComandFuncMap = {
-    [msg.NameToId.HeartRequest]      = class._handlerHeartReq;
-    [msg.NameToId.LoginRequest]      = class._handlerLoginReq;
-    [msg.NameToId.CreateRoomRequest] = class._handlerCreateReq;
-    [msg.NameToId.JoinRoomRequest]   = class._handlerJoinReq;
+    [msg.NameToId.HeartRequest]        = class._handlerHeartReq;
+    [msg.NameToId.LoginRequest]        = class._handlerLoginReq;
+    [msg.NameToId.CreateRoomRequest]   = class._handlerCreateReq;
+    [msg.NameToId.JoinRoomRequest]     = class._handlerJoinReq;
+    [msg.NameToId.RoomContentRequest]  = class._handlerRoomContentReq;
 }
 
 function class:command_handler(cmsg, recvTime)
     --Log.d(LOGTAG,"command_handler cmsg len:%d accessTime:%s",#cmsg,tostring(skynet.time()))
     self:_active()
     --解析包头 转发处理消息 做对应转发
-    local args    = packetHelper:decodeMsg("Base.ProtoInfo",cmsg)
+    local args    = packetHelper:decodeMsg("common.ProtoInfo",cmsg)
     local msgName = msg.IdToName[args.msg_id]
     if not msgName then 
         Log.e(LOGTAG,"recv unknown msg_id:%d",args.msg_id)
@@ -225,18 +227,16 @@ function class:command_handler(cmsg, recvTime)
 
     if args.msg_id ~= msg.NameToId.HeartRequest then
         --Log.dump(LOGTAG,data)
-
         if args.msg_id ~= msg.NameToId.LoginRequest and not self:_hadLogin() then 
             Log.e(LOGTAG,"非法用户请求msgid=%d,请先登录!",args.msg_id)
-            self:sendMsg(args.msg_id + msg.ResponseBase, {status = -999;})
+            self:sendMsg(g_msgid_req2rsp(args.msg_id), {status = -999;})
             return 
         end  
     end 
 
     local f = ComandFuncMap[args.msg_id]
     if f then 
-        --
-        local data,err = packetHelper:decodeMsg("Base."..msgName, args.msg_body)
+        local data,err = packetHelper:decodeMsg("common."..msgName, args.msg_body)
         if not data or err ~= nil then 
             Log.e(LOGTAG,"proto decode error: msgid=%d name=%s !", args.msg_id, msgName )
             return
@@ -244,8 +244,7 @@ function class:command_handler(cmsg, recvTime)
         Log.dump(LOGTAG,data)
         f(self, data)
     else--房间请求
-        self:_handlerRoomReq(args.msg_id,args.msg_body)
-        --self:_handlerRoomReq(args.msg_id, data)
+        Log.e(LOGTAG,"maybe error! recv unknown msg_id:%d !!!", args.msg_id )
     end 
 end
 

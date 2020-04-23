@@ -1,0 +1,100 @@
+package common;
+option java_package = "protobuf.cher";
+// 服务端客户端通信消息体
+message ProtoInfo {
+    optional int32 msg_id   = 1; // 消息ID
+    optional bytes msg_body = 2; // 消息内容
+}
+
+// 心跳请求
+message HeartRequest {
+}
+// 心跳响应
+message HeartResponse {
+}
+
+// 玩家信息
+message AccountInfo {
+    optional int64  user_id       = 1; // 用户ID
+    optional string user_name     = 2; // 用户名
+    optional string head_img_url  = 3; // 头像
+    optional int32  sex           = 4; // 性别
+    optional int64  diamond       = 5; // 金币数目
+    optional int64  gold          = 6; // 房卡数目
+    optional int32  vip_level     = 7; // 代理等级
+}
+
+// 登录请求
+message LoginRequest {
+    required int32  login_type      = 1; // 登录类型
+    optional string token           = 2; // 玩家用户名或微信token值
+    optional int32  platform        = 3; // 终端类型，1=android，2=ios，3=pc
+    optional string client_version  = 4; // 客户端版本
+    optional int32  game_index      = 5; // APP平台类型
+}
+// 登录响应
+message LoginResponse {
+    required int32       status         = 1; // 状态
+    optional string      status_tip     = 2; // 状态提示信息
+    optional AccountInfo user_info      = 3; // 玩家信息
+    optional int32       room_id        = 4; // 房间号。如果用户登录过后还在房间里，客户端主动发起JoinRoomRequest
+}
+
+// 玩法规则
+message GameRuleInfo {
+    optional int32 id       = 1; // 玩法id
+    optional int32 value    = 2; // 对应值
+    optional string desc    = 3;
+}
+
+//房間基本信息
+message GameBaseInfo {
+    optional int32 game_id     = 1; // 子游戏ID
+    optional int32 game_type   = 2; // 子玩法ID 
+    optional int32 room_id     = 3; // 房间号   
+    repeated GameRuleInfo game_rules = 4; // 玩法规则 
+}
+
+// 创建房间请求
+message CreateRoomRequest {
+    required int32 create_type       = 1; // 创建类型
+    required int32 game_id           = 2; // 子游戏ID
+    required int32 game_type         = 3; // 子玩法ID
+    repeated GameRuleInfo game_rules = 4; // 玩法规则
+    
+}
+// 创建房间响应
+message CreateRoomResponse {
+    required int32  status     = 1; // 状态
+    optional string status_tip = 2; // 状态提示信息
+    optional int32  room_id    = 3; // 
+    
+}
+
+// 进入房间请求
+message JoinRoomRequest {
+    required int32 room_id     = 1; // 房间号
+    optional bool  random_join = 2; // 是否随机加入，暂时用来测试
+    
+}
+
+// 进入房间响应
+message JoinRoomResponse {
+    optional int32        status         = 1; // 状态
+    optional string       status_tip     = 2; // 状态提示信息
+    optional GameBaseInfo game_base_info = 3;
+}
+
+//房间内请求 返回 推送
+message RoomContentRequest {
+    required int32 req_type        = 1; // 子类型
+    optional bytes req_content     = 2; // 消息内容
+    
+}
+
+message RoomContentResponse {
+    optional int32        status         = 1; // 状态
+    optional string       status_tip     = 2; // 状态提示信息
+    optional int32        type           = 3; // 子类型
+    optional bytes        content        = 4; // 消息内容  
+}

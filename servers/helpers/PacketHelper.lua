@@ -54,13 +54,12 @@ class.registerProtoName  = registerProtoName
 
 
 ---! @brief make a general proto data for client - server.
-local function makeProtoData (self,id,body)
+local function makeProtoData (self,id,body,name)
     local msg = {
         msg_id    = id,
         msg_body  = body
     }
-
-    local packet = protobuf.encode("Base.ProtoInfo", msg)
+    local packet = protobuf.encode(name or "Base.ProtoInfo", msg)
     return packet
 end
 class.makeProtoData = makeProtoData
