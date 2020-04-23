@@ -7,7 +7,7 @@ msg         = {
 	NameToId = require "gaMsgDef";
 	IdToName = {};
 }
-for k,v in pairs(m.NameToId) do
+for k,v in pairs(msg.NameToId) do
 	msg.IdToName[v] = k;
 end
 ----------------------------------------------
