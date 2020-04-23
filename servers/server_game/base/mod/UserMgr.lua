@@ -284,7 +284,7 @@ function UserMgr:onJoinReq( node, addr ,userinfo)
 	--回复该玩家成功加入
 	self:_rspJoinSucc(u)
 	--发送给该玩家房间信息
-	self:_sendMsg(msg.NameToId.RoomInfoPush, self.m_pTable:getTableInfo(), u)
+	self:_sendMsg(msg.NameToId.TableInfoPush, self.m_pTable:getTableInfo(), u)
 	return true
 end
 
@@ -335,7 +335,7 @@ function UserMgr:onReconnectReq(fromNodeIndex, fromAddr, uid)
 	--回复玩家 加入房间成功
 	self:_rspJoinSucc(u)
 	--发送给该玩家房间信息
-	self:_sendMsg(msg.NameToId.RoomInfoPush, self.m_pTable:getTableInfo(), u)
+	self:_sendMsg(msg.NameToId.TableInfoPush, self.m_pTable:getTableInfo(), u)
 	return true
 end
 

@@ -216,7 +216,7 @@ end
 function BaseTable:_decodeRoomContentReq(data)
 	local msgName = msg.IdToName[data.req_type]
 	if msgName then 
-		local data,err = self:_getPacketHelper():decodeMsg("common."..msgName, data.req_content)
+		local data,err = self:_getPacketHelper():decodeMsg(msgName, data.req_content)
         if not data or err ~= nil then 
             Log.e(LOGTAG,"proto decode RoomReq error: req_type=%d name=%s !", data.req_type, msgName)
             return false,nil
@@ -236,9 +236,13 @@ end
 function BaseTable:_getProtos()
 	return {"protos/hall.pb","protos/table.pb"}
 end
---编码
+--编码 
 function BaseTable:encodeRoomContentRsp(cmd, data)
-	-- body
+	return {
+		status  = 0;
+		type    = cmd;
+		content = self:_getPacketHelper():encodeMsg(msg.NameToId[cmd], data);
+	}
 end
 
 function BaseTable:_encodeTableInfoExpand()

@@ -94,7 +94,7 @@ function class:sendMsg(msg_id, data)
     end 
 
     local protoName = msg.IdToName[msg_id] 
-    local body      = packetHelper:encodeMsg("common."..protoName, data)
+    local body      = packetHelper:encodeMsg(protoName, data)
     local packet    = packetHelper:makeProtoData(msg_id , body)
     self:_sendPacket(packet)
     return true
@@ -218,7 +218,7 @@ function class:command_handler(cmsg, recvTime)
     --Log.d(LOGTAG,"command_handler cmsg len:%d accessTime:%s",#cmsg,tostring(skynet.time()))
     self:_active()
     --解析包头 转发处理消息 做对应转发
-    local args    = packetHelper:decodeMsg("common.ProtoInfo",cmsg)
+    local args    = packetHelper:decodeMsg(msg.Root,cmsg)
     local msgName = msg.IdToName[args.msg_id]
     if not msgName then 
         Log.e(LOGTAG,"recv unknown msg_id:%d",args.msg_id)
@@ -236,7 +236,7 @@ function class:command_handler(cmsg, recvTime)
 
     local f = ComandFuncMap[args.msg_id]
     if f then 
-        local data,err = packetHelper:decodeMsg("common."..msgName, args.msg_body)
+        local data,err = packetHelper:decodeMsg(msgName, args.msg_body)
         if not data or err ~= nil then 
             Log.e(LOGTAG,"proto decode error: msgid=%d name=%s !", args.msg_id, msgName )
             return
