@@ -19,6 +19,7 @@ local M = {
     UserExitPush     = 1003;
 
     ReadyRequest     = 1004;
+    UserInfoPush     = 1006;
 
     ReleaseRequest  = 1007;
     ReleaseResponse = 1008;
