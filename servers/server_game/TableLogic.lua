@@ -51,7 +51,7 @@ function TableLogic:on_req(uid, data)
 end
 
 -------------------------------------------------------------------------
-function TableLogic:_createTable(...)--tid,userInfo,data
+function TableLogic:_createTable(tid,userInfo,data)--tid,userInfo,data
 	--data.game_rules --玩法规则
 	--data.game_id    --子游戏
 	--data.game_type  --子玩法
@@ -60,7 +60,7 @@ function TableLogic:_createTable(...)--tid,userInfo,data
 	if data.game_id == 1001 then 
 		tblClass = require("subgame.mj.zhuanzhuan.ZZTable")
 	end 
-	return new(tblClass, ...)
+	return new(tblClass, tid,userInfo,data)
 end
 
 return TableLogic
