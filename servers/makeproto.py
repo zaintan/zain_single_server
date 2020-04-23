@@ -21,5 +21,5 @@ listdir(path, l)
 
 for name in l:
     input_name = name.replace(".proto",".pb")
-    cmd = "protoc -o ./protos/" + input_name + " ./protos/proto/" + name
+    cmd = "protoc -o ./protos/" + input_name + " ./protos/proto/" + name + " --proto_path=./protos/proto/"
     excuteCMD(cmd)
