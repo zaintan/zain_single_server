@@ -2,7 +2,7 @@
 local skynet    = require "skynet"
 local socket    = require "skynet.socket"
 ---! 帮助库
-local packetHelper  = (require "PacketHelper").create("protos/hall.pb")
+local packetHelper  = (require "PacketHelper").create({"protos/hall.pb","protos/table.pb"})
 local LOGTAG = "Agent"
 
 local ClusterHelper = require "ClusterHelper"

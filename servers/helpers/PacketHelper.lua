@@ -59,7 +59,7 @@ local function makeProtoData (self,id,body,name)
         msg_id    = id,
         msg_body  = body
     }
-    local packet = protobuf.encode(name or "Base.ProtoInfo", msg)
+    local packet = protobuf.encode(name or "common.ProtoInfo", msg)
     return packet
 end
 class.makeProtoData = makeProtoData
