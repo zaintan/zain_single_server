@@ -16,7 +16,7 @@ local M = {
 		NONE         = 0;
 		OUT_CARD     = 1;
 		OPERATE_CARD = 2;
-	}
+	};
 
 	Sex = {
 		MAN    = 1;

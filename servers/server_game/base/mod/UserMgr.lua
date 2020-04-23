@@ -112,8 +112,8 @@ end
 --回复玩家加入失败
 function UserMgr:_rspJoinFail(node, addr, msgcode)
 	local data = {
-		status     = msgcode[1]
-		status_tip = msgcode[2] or ""
+		status     = msgcode[1];
+		status_tip = msgcode[2] or "";
 	}
 	ClusterHelper.callIndex(node,addr,"sendMsg", msg.NameToId.JoinRoomResponse, data)
 end
@@ -121,8 +121,8 @@ end
 --回复玩家退出
 function UserMgr:_rspExit(user, msgcode)
 	local data = {
-		status     = msgcode[1]
-		status_tip = msgcode[2] or ""
+		status     = msgcode[1];
+		status_tip = msgcode[2] or "";
 	}
 	ClusterHelper.callIndex(node,addr,"sendMsg", msg.NameToId.UserExitResponse, data)
 end
