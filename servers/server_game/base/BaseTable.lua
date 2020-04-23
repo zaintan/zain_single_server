@@ -238,7 +238,7 @@ function BaseTable:_getProtos()
 end
 --编码 
 function BaseTable:encodeRoomContentRsp(cmd, data)
-	local msgName = msg.NameToId[cmd]
+	local msgName = msg.IdToName[cmd]
 	Log.d(LOGTAG, "encodeRoomContentRsp cmd=%d, msgName=%s", cmd, msgName)
 	Log.dump(LOGTAG, data)
 	local ret = {
