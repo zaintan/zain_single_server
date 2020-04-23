@@ -283,4 +283,4 @@ function BaseTable:callAllocServer(...)
 	ClusterHelper.callIndex(skynet.getenv("server_alloc"),".AllocService", ... )	
 end 
 
-return Table
+return BaseTable
