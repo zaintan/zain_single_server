@@ -238,11 +238,15 @@ function BaseTable:_getProtos()
 end
 --编码 
 function BaseTable:encodeRoomContentRsp(cmd, data)
-	return {
+	local msgName = msg.NameToId[cmd]
+	Log.d(LOGTAG, "encodeRoomContentRsp cmd=%d, msgName=%s", cmd, msgName)
+	Log.dump(LOGTAG, data)
+	local ret = {
 		status  = 0;
 		type    = cmd;
-		content = self:_getPacketHelper():encodeMsg(msg.NameToId[cmd], data);
+		content = self:_getPacketHelper():encodeMsg(msgName, data);
 	}
+	return ret
 end
 
 function BaseTable:_encodeTableInfoExpand()
