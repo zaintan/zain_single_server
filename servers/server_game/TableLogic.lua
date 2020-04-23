@@ -14,7 +14,7 @@ local TableLogic    = {}
 --初始化容器
 function TableLogic:init(tid, userInfo, data)
 	self.m_table = self:_createTable(tid,userInfo,data)
-	log.d("TL","TableLogic:init---self=%s,TableLogic=%s,self.m_table=%s",tostring(self),tostring(TableLogic),tostring(self.m_table))
+	Log.d("TL","TableLogic:init---self=%s,TableLogic=%s,self.m_table=%s",tostring(self),tostring(TableLogic),tostring(self.m_table))
 	if self.m_table then 
 		return true
 	end 
@@ -45,7 +45,7 @@ end
 
 function TableLogic:on_req(uid, data)
 	return cs(function ()
-		log.d("TL","TableLogic:on_req---uid=%d,self=%s,TableLogic=%s,self.m_table=%s",uid,tostring(self),tostring(TableLogic),tostring(self.m_table))		
+		Log.d("TL","TableLogic:on_req---uid=%d,self=%s,TableLogic=%s,self.m_table=%s",uid,tostring(self),tostring(TableLogic),tostring(self.m_table))		
 		return self.m_table:on_req(uid, data)
 	end)
 end
