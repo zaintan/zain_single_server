@@ -14,6 +14,7 @@ local TableLogic    = {}
 --初始化容器
 function TableLogic:init(tid, userInfo, data)
 	self.m_table = self:_createTable(tid,userInfo,data)
+	log.d("TL","TableLogic:init---self=%s,TableLogic=%s,self.m_table=%s",tostring(self),tostring(TableLogic),tostring(self.m_table))
 	if self.m_table then 
 		return true
 	end 
@@ -44,6 +45,7 @@ end
 
 function TableLogic:on_req(uid, data)
 	return cs(function ()
+		log.d("TL","TableLogic:on_req---uid=%d,self=%s,TableLogic=%s,self.m_table=%s",uid,tostring(self),tostring(TableLogic),tostring(self.m_table))		
 		return self.m_table:on_req(uid, data)
 	end)
 end
@@ -53,9 +55,11 @@ function TableLogic:_createTable(...)--tid,userInfo,data
 	--data.game_rules --玩法规则
 	--data.game_id    --子游戏
 	--data.game_type  --子玩法
-
 	--结束条件
-	local tblClass = require("abstract.Table")
+	local tblClass = nil
+	if data.game_id == 1001 then 
+		tblClass = require("subgame.mj.zhuanzhuan.ZZTable")
+	end 
 	return new(tblClass, ...)
 end
 

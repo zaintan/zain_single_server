@@ -76,19 +76,18 @@ function BaseTable:on_req(uid, data)
 		return false
 	end 
 	--解析消息
-	local req_type      = data.req_type
 	local ok,decodeData = self:_decodeRoomContentReq(data)
     if not ok then 
-        Log.e(LOGTAG,"proto decode error: req_type=%d ", req_type )
+        Log.e(LOGTAG,"proto decode error: req_type=%d ", data.req_type )
         return false
     end 
     Log.dump(LOGTAG, decodeData or {})
     --处理消息
-    local func = self:_getCommandHandler(req_type)
+    local func = self:_getCommandHandler(data.req_type)
     if func then 
     	return func(self, uid, decodeData)
     else
-    	log.w(LOGTAG, "unkown req_type = %d, can't find this command handler!", req_type)
+    	log.w(LOGTAG, "unkown req_type = %d, can't find this command handler!", data.req_type)
     end 
 	return false
 end
@@ -215,8 +214,27 @@ end
 
 --解析RoomReqContent
 function BaseTable:_decodeRoomContentReq(data)
-	Log.e(LOGTAG, "sub class must override this function!")
+	local msgName = msg.IdToName[data.req_type]
+	if msgName then 
+		local data,err = self:_getPacketHelper():decodeMsg("common."..msgName, data.req_content)
+        if not data or err ~= nil then 
+            Log.e(LOGTAG,"proto decode RoomReq error: req_type=%d name=%s !", data.req_type, msgName)
+            return false,nil
+        end 
+        return true,data		
+	end 
 	return false, nil
+end
+
+function BaseTable:_getPacketHelper()
+	if not self._packet then 
+		self._packet = (require "PacketHelper").create(self:_getProtos())
+	end 
+	return self._packet
+end
+
+function BaseTable:_getProtos()
+	return {"protos/hall.pb","protos/table.pb"}
 end
 --编码
 function BaseTable:encodeRoomContentRsp(cmd, data)

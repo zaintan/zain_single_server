@@ -1,12 +1,12 @@
 
 local Super         = require "base.BaseTable"
 local DezhouTable   = class(Super)
-local LOGTAG        = "BaseTable"
+local LOGTAG        = "DezhouTable"
 
 
-function DezhouTable:_createUserMgr()
-	-- body
-end
+--function DezhouTable:_createUserMgr()
+--	-- body
+--end
 
 --解析RoomReqContent
 function DezhouTable:_decodeRoomContentReq(data)
