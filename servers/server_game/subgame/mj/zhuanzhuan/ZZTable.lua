@@ -9,9 +9,9 @@ local LOGTAG            = "ZZTable"
 --end
 
 --解析RoomReqContent
-function ZZTable:_decodeRoomContentReq(data)
-	return false, nil
-end
+--function ZZTable:_decodeRoomContentReq(data)
+--	return false, nil
+--end
 --编码
 function ZZTable:encodeRoomContentRsp(cmd, data)
 	-- body

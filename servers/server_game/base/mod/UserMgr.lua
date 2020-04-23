@@ -236,6 +236,8 @@ end
 
 --userinfo.user_id
 function UserMgr:onJoinReq( node, addr ,userinfo)
+	Log.i("","UserMgr:onJoinReq node=%s",tostring(node))
+
 	if self.m_pTable:isGameStart() then 
 		Log.i("","Table is already start! can't join!")
 		self:_rspJoinFail(node, addr, MsgCode.JoinFailedStart)
@@ -274,6 +276,8 @@ function UserMgr:onJoinReq( node, addr ,userinfo)
 	local u = self:_createUser()
 	u:parse(userinfo)
 	u:setSeat(seat)
+	u:setAddr(node, addr)
+	u:setOnline(true)	
 	self.m_users[userinfo.user_id] = u
 	--广播通知其他人 玩家加入房间
 	self:_broadcastToOthersUserEnter(u)
