@@ -9,7 +9,7 @@
 	    optional bytes msg_body = 2; // 消息内容
 	};
 
-每一个msg_id对应一条消息，这个映射关系位于文件servers/config/cfg/msg.cfg
+每一个msg_id对应一条消息，这个映射关系位于文件servers/preload/gaMsgDef.lua
 为了方便,下面提到的交互协议省略了外层,只提到msg_body这一层
 
 二.协议记录
@@ -73,7 +73,7 @@ CreateRoomRequest:
 CreateRoomResponse:
 
 	msg_body = {
-		status = 1;
+		status = 1;//>=0 成功  <0 失败
 		status_tip = "创建成功";
 		room_id    = 123456;
 	};
@@ -85,36 +85,19 @@ CreateRoomResponse:
 JoinRoomRequest:
 
 	msg_body = {
-		room_id = 123456;
+		room_id = 123456;// 房间号
 	};
 
 服务器返回:
 1). JoinRoomResponse:  required
 
 	msg_body = {
-		status         = 1;
+		status         = 1; //>=0 成功  <0 失败
 		status_tip     = "加入成功";
 		game_base_info = {//message GameBaseInfo
     		game_id     = 1; // 子游戏ID
     		game_type   = 1; // 子玩法ID 
     		room_id     = 123456; // 房间号 
-		};
-	};
-
-如果已经在房间里面(重连) 还会触发推送通知其他玩家 玩家xxxxx上线
-
-2).RoomInfoPush：(推送房间信息) required
-
-	msg_body = {//RoomLogicPush
-		push_type = 1;
-		push_content = {
-
-		};
-
-
-		info = { //message GameRoomInfo
-			game_id = 1;
-			game_type = 1;
 			game_rules = { //repeated message GameRuleInfo
 				{
 					id = 1;
@@ -125,394 +108,218 @@ JoinRoomRequest:
 					value = 1;
 				};
 				...			
-			};
-			room_id = 123456;
-			round   = 8;
-			game_status = 0;//Free:0 Wait:1 Play:2
-		};
-		round_info = { //message RoundRoomInfo
-			cur_val = 1;//当前局数或当前圈数或当前分数
-			cur_banker = 0;//庄家座位号
-			pointed_seat_index = 0;//当前指向玩家座位号
-			dice_values = {1,2};//骰子
-			player_statuses = {0,0,0,0};// 玩家状态，0：无操作，1：出牌，2：操作牌
-			remain_num = 108;// 剩余牌数
-			total_num  = 108;//总牌数
-			head_send_count = 0;// 牌墩顺序发牌张数
-			tail_send_count = 0;// 牌墩尾部发牌张数
-		};
-		players = { //repeated message RoomUserInfo
-			{
-				user_id = 10001;
-				user_name = "tzy1";
-				head_img_url = "";
-				seat_index = 0;
-				ready = false;
-				creator = false;
-			};
-			{
-				user_id = 10002;
-				user_name = "tzy2";
-				head_img_url = "";
-				seat_index = 1;
-				ready = false;
-				creator = false;
-			};
+			};    		
 		};
 	};
 
-2).RoomCardsPush：(推送房间信息) optional 房间内所有玩家的牌数据推送
-牌局未开始不会推送该消息
+如果已经在房间里面(重连) 还会触发推送通知其他玩家 玩家xxxxx上线
 
-	msg_body = {
-		cards_infos = {//repeated message PlayerCardsInfo
-			{
-				has_hands = true;
-				has_weaves = true;
-				has_discards = true;
-				seat_index = 0;
-				hands = {1,1,1,2,2,2,3,3,4,4,4,5,5};
-				discards = {};
-				weaves = { //repeated message WeaveItemInfo
+2).TableInfoPush：(推送房间信息) required
+
+	msg_body = {//message RoomContentResponse
+		//每一个type对应一条消息 编解码content，这个映射关系有两部分组成 
+		//小于10000的通用消息 位于文件servers/preload/gaMsgDef.lua,
+		//大于10000的由子游戏自行约定
+		type    = 10; 
+		content = { // message TableInfoPush
+			game_base_info = {//message GameBaseInfo
+	    		game_id     = 1; // 子游戏ID
+	    		game_type   = 1; // 子玩法ID 
+	    		room_id     = 123456; // 房间号 
+				game_rules = { //repeated message GameRuleInfo
 					{
-						weave_kind = 1;
-						center_card = 1;
-						public_card = 1;
-						provide_player = 0;
+						id = 1;
+						value = 1;
 					};
-					...
+					{
+						id = 1;
+						value = 1;
+					};
+					...			
+				};    		
+			};
+			progress_info = {//message TableProgressInfo
+				over_type     = 1;//结束条件类型 1:局数 2:圈数 3:分数(胡息)  4：固定时间
+				over_value    = 2;//结束值
+				current_value = 3;//当前值
+			};
+			game_status  = 0;//当前房间状态  Free, Play, Wait
+			users_base   = {repeated message TableUserBaseInfo
+				{
+					user_id      = 0;
+					user_name    = ""; 
+					head_img_url = "";
 				};
-			};
-			{
-				has_hands = true;
-				has_weaves = true;
-				has_discards = true;
-				seat_index = 1;
-				hands = {1,1,1,2,2,2,3,3,4,4,4,5,5};
-				discards = {};
-				weaves = { //repeated message WeaveItemInfo
-					{
-						weave_kind = 1;
-						center_card = 1;
-						public_card = 1;
-						provide_player = 0;
-					};
-					...
+				{
+					user_id      = 0;
+					user_name    = ""; 
+					head_img_url = "";
 				};
+				...				
 			};
-			...
+			users_info  = {//repeated message TableUserInfo
+				{
+					user_id = 0;
+					seat    = 1;
+					ready   = true;
+					online  = true;
+					status  = 0;
+					score   = 0;
+					expand_content = ... //bytes 子游戏额外扩展信息
+				}
+				...
+			}
+			expand_content = ... //bytes 子游戏额外扩展信息
 		};
 	};
 
-3).PlayerStatusPush (推送操作信息) optional 牌局中Play状态 且该玩家当前有操作 未操作过才会推送
-
-	msg_body = {
-		player_status = 2;// 玩家状态，0：无操作，1：出牌，2：操作牌
-		pointed_seat_index = 0;//
-		op_info = { // message OperateInfo
-			operate_id = 1;//操作序号  避免这轮回复上轮消息
-			weaves = { // repeated message WeaveItemInfo
-					{
-						weave_kind = 1;
-						center_card = 1;
-						public_card = 1;
-						provide_player = 0;
-					};
-					...
-			};
-		};
-	};
-
-4).ReleasePush (推送解散信息) optional 当前处于投票解散等待状态
-
-	msg_body = {
-		release_info = { // message ReleaseInfo
-			result = 2;//房间解散状态 1失败  2投票中  3成功 
-			tip    = "";//
-			votes = { // repeated int 投票信息 1未操作 2拒绝 3同意 0发起者
-				0,1,3,3 //[seat+1] -> result
-			};
-			time  = 150;// 倒计时时间，单位秒
-			seat_index = 0;// 解散发起人
-		};
-	};
 ------------------------------------------------------------------------------------------
 4.房间内  准备
 
 客户端请求:
 ReadyRequest:
 
-	msg_body = {
-		ready = true;// true准备  false取消准备
+	msg_body = {// message RoomContentRequest
+		req_type    = 1004; //
+		req_content = { // message ReadyRequest
+			ready   = true;// true准备  false取消准备
+		}
 	};
 
-服务器返回:
-ReadyResponse:
-
-	msg_body = {
-		status = 1;
-		status_tip = "准备成功";
-		ready = true;//当前准备状态
+成功则 服务器返回给所有人
+UserInfoPush:
+	msg_body = { //message RoomContentResponse
+		//每一个type对应一条消息 编解码content，这个映射关系有两部分组成 
+		//小于10000的通用消息 位于文件servers/preload/gaMsgDef.lua,
+		//大于10000的由子游戏自行约定
+		type    = 1006; 
+		content = { // message UserInfoPush
+			user_info = { //repeated message TableUserInfo
+				{
+					user_id = 0;
+					seat    = 1;
+					ready   = true;
+					online  = true;
+					status  = 0;
+					score   = 0;
+					expand_content = ... //bytes 子游戏额外扩展信息
+				}
+				...
+			}
+		}
 	};
 
-推送给其他人
-ReadyPush:
 
-	msg_body = {
-		ready_infos = { //repeated message PlayerReadyInfo
-			{
-				seat_index = 0;
-				ready = true;
-			};
-			{
-				seat_index = 1;
-				ready = false;
-			};
-			...
-		};
-	};
+
 
 如果所有人均准备，牌局开始，推送所有人游戏开始消息
-GameStartPush:
+RoundBeginPush:
 
-	msg_body = {
-		game_status = 2;//Free:0 Wait:1 Play:2
-		round_room_info = { //message RoundRoomInfo
-			cur_val = 1;//当前局数或当前圈数或当前分数
-			cur_banker = 0;//庄家座位号
-			pointed_seat_index = 0;//当前指向玩家座位号
-			dice_values = {1,2};//骰子
-			player_statuses = {0,0,0,0};// 玩家状态，0：无操作，1：出牌，2：操作牌
-			remain_num = 108;// 剩余牌数
-			total_num  = 108;//总牌数
-			head_send_count = 0;// 牌墩顺序发牌张数
-			tail_send_count = 0;// 牌墩尾部发牌张数
-		};
+	msg_body = { //message RoomContentResponse
+		//每一个type对应一条消息 编解码content，这个映射关系有两部分组成 
+		//小于10000的通用消息 位于文件servers/preload/gaMsgDef.lua,
+		//大于10000的由子游戏自行约定
+		type    = 1012; 
+		content = { // message RoundBeginPush
+			game_status = 0;
+			progress_info = {//message TableProgressInfo
+				over_type     = 1;//结束条件类型 1:局数 2:圈数 3:分数(胡息)  4：固定时间
+				over_value    = 2;//结束值
+				current_value = 3;//当前值
+			};	
+			users_info  = {//repeated message TableUserInfo
+				{
+					user_id = 0;
+					seat    = 1;
+					ready   = true;
+					online  = true;
+					status  = 0;
+					score   = 0;
+					expand_content = ... //bytes 子游戏额外扩展信息
+				}
+				...
+			}
+			expand_content = ... //bytes 子游戏额外扩展信息					
+		}
 	};
 
-牌局开始后推送所有玩家手牌信息
-DealCardsPush:
-
-	msg_body = {
-		head_send_count = 26；
-		tail_send_count = 0；
-		cards_infos = {//repeated message PlayerCardsInfo
-			{
-				has_hands = true;
-				has_weaves = true;
-				has_discards = true;
-				seat_index = 0;
-				hands = {1,1,1,2,2,2,3,3,4,4,4,5,5};
-				discards = {};
-				weaves = {}; //repeated message WeaveItemInfo
-			};
-			{
-				has_hands = true;
-				has_weaves = true;
-				has_discards = true;
-				seat_index = 1;
-				hands = {1,1,1,2,2,2,3,3,4,4,4,5,5};
-				discards = {};
-				weaves = {}; //repeated message WeaveItemInfo
-			};
-			...
-		};
-	};
-
-推送抓牌消息 推送给所有人
-DispatchCardPush:
-
-	msg_body = {
-		dispatch_card = 1; // 抓的牌
-		seat_index    = 0; // 抓牌人
-		dispatch_type = 1;发牌类型：1：顺序发牌，2：尾部补牌
-	};
-
-客户端根据该条推送消息,自行在手牌中添加；每个人收到的推送消息不一样，只有自己才会收到真实dispatch_card，其他人收到的dispatch_card为-1
-
-推送玩家状态信息(每个人推送的不一样， 均只收到自己的状态信息)
-PlayerStatusPush:
-
-	msg_body = {
-		player_status = 1;// 玩家状态，0：无操作，1：出牌，2：操作牌
-		pointed_seat_index = 0;//
-		op_info = {} // message OperateInfo
-	};
 ------------------------------------------------------------------------------------------
 5.退出房间
 
 客户端请求:(空消息)
-PlayerExitRequest:
+UserExitRequest:
 
-	msg_body = {
+	msg_body = {// message RoomContentRequest
+		req_type    = 1001; //
+		req_content = { // message UserExitRequest
+		}
 	};
-
 服务器返回:
-PlayerExitResponse:
+UserExitResponse:
 
-	msg_body = {
-		status = 1;// 状态 <0失败  >=0成功  只有在Free状态才能退出房间
+	msg_body = { //message RoomContentResponse
+		//每一个type对应一条消息 编解码content，这个映射关系有两部分组成 
+		//小于10000的通用消息 位于文件servers/preload/gaMsgDef.lua,
+		//大于10000的由子游戏自行约定
+		type    = 1002; 
+		content = { // message UserExitResponse
+			status     = 1;//>=0 成功  <0 失败
+			status_tip = "退出成功";
+		}
 	};
 
 离开房间推送(通知其他玩家)
-PlayerExitPush:
+UserExitPush:
 
-	msg_body = {
-		seat_index = 0;//
+	msg_body = { //message RoomContentResponse
+		//每一个type对应一条消息 编解码content，这个映射关系有两部分组成 
+		//小于10000的通用消息 位于文件servers/preload/gaMsgDef.lua,
+		//大于10000的由子游戏自行约定
+		type    = 1003; 
+		content = { // message UserExitPush
+			user_id = 1;//退出玩家id
+		}
 	};
 ------------------------------------------------------------------------------------------
-6.出牌
 
-客户端请求:
-OutCardRequest:
-
-	msg_body = {
-		out_card = 1;
-	};
-
-服务器返回:
-OutCardResponse:
-
-	msg_body = {
-		status = 1;// 状态 <0失败  >=0成功
-	};
-
-如果成功 推送所有人消息
-OutCardPush:
-
-	msg_body = {
-		seat_index = 1;
-		out_card   = 1;
-	};
-
-客户端根据该条推送消息,自行在手牌中移除，并且在弃牌中添加
-
-------------------------------------------------------------------------------------------
-7.操作请求
-
-客户端请求:
-OperateCardRequest:
-
-	msg_body = {
-		weave_kind  = 1;// 操作类型  左吃 中吃 右吃 碰 杠 胡 
-		center_card = 1;//操作的牌
-		provide_player = 0;//牌的提供者座位号
-		operate_id = 1;//操作序号
-	};
-
-服务器返回:
-OperateCardResponse:
-
-	msg_body = {
-		status = 1;// 状态 <0失败  >=0成功
-		status_tip = "操作成功";
-	};
-
-如果操作成功,推送所有人
-1).广播执行操作
-OperateCardPush:
-
-	msg_body = {
-		seat_index  = 0；
-		weave_kind  = 1;// 操作类型  左吃 中吃 右吃 碰 杠 胡 
-		center_card = 1;//操作的牌
-		provide_player = 0;//牌的提供者座位号
-	};
-
-2).刷新提供者的弃牌   推送所有人
-RoomCardsPush:
-
-	msg_body = {
-		cards_infos = {//repeated message PlayerCardsInfo
-			{
-				has_hands = false;
-				has_weaves = false;
-				has_discards = true;
-				seat_index = 0;
-				discards = {};
-			};
-		};
-	};
-
-3).刷新操作者的手牌 组合牌， 推送所有人
-RoomCardsPush:
-
-	msg_body = {
-		cards_infos = {//repeated message PlayerCardsInfo
-			{
-				has_hands = true;
-				has_weaves = true;
-				has_discards = false;
-				seat_index = 1;
-				hands = {1,1,2,3,3,2,3};
-				weaves = { //repeated message WeaveItemInfo
-					{
-						weave_kind = 1;
-						center_card = 1;
-						public_card = 1;
-						provide_player = 0;
-					};
-				};
-			};
-		};
-	};
 
 如果是胡操作,游戏结束
 广播推送 小结算
-RoundFinishPush:
-
-	msg_body = {
-		game_status = 1;//Free:0 Wait:1 Play:2
-		round_finish_reason = 0; //int 小局结束原因
-		win_types    = {"接炮"};//repeated int32  胡类型
-		finish_desc  = {"接炮","","放炮",""};//repeated string 小结算文字描述信息
-		final_scores = {10,0,-10,0};//repeated int32 小局分数统计
-		over_time    = 0;//结束时间戳
-		cards_infos  = { //repeated  message PlayerCardsInfo
-			{
-				has_hands = true;
-				has_weaves = true;
-				has_discards = true;
-				seat_index = 0;
-				hands = {1,1,1,2,2,2,3,3,4,4,4,5,5};
-				discards = {};
-				weaves = { //repeated message WeaveItemInfo
-					{
-						weave_kind = 1;
-						center_card = 1;
-						public_card = 1;
-						provide_player = 0;
-					};
-					...
-				};
-				hu_info = {//message WeaveItemInfo
-					weave_kind = 1;//接炮
-					center_card = 1;//胡的牌
-					provide_player = 2;//放炮者
-				};
-			};
-			{
-				has_hands = true;
-				has_weaves = true;
-				has_discards = true;
-				seat_index = 1;
-				hands = {1,1,1,2,2,2,3,3,4,4,4,5,5};
-				discards = {};
-				weaves = { //repeated message WeaveItemInfo
-					{
-						weave_kind = 1;
-						center_card = 1;
-						public_card = 1;
-						provide_player = 0;
-					};
-					...
-				};
-			};
-			...
-		};
+RoundEndPush:
+	msg_body = { //message RoomContentResponse
+		//每一个type对应一条消息 编解码content，这个映射关系有两部分组成 
+		//小于10000的通用消息 位于文件servers/preload/gaMsgDef.lua,
+		//大于10000的由子游戏自行约定
+		type    = 1013; 
+		content = { // message RoundEndPush
+			//每一个type对应一条消息 编解码content，这个映射关系有两部分组成 
+			//小于10000的通用消息 位于文件servers/preload/gaMsgDef.lua,
+			//大于10000的由子游戏自行约定
+			game_status = 0;// 游戏状态 
+			progress_info = {//message TableProgressInfo
+				over_type     = 1;//结束条件类型 1:局数 2:圈数 3:分数(胡息)  4：固定时间
+				over_value    = 2;//结束值
+				current_value = 3;//当前值
+			};	
+			users_info  = {//repeated message TableUserInfo
+				{
+					user_id = 0;
+					seat    = 1;
+					ready   = true;
+					online  = true;
+					status  = 0;
+					score   = 0;
+					expand_content = ... //bytes 子游戏额外扩展信息
+				}
+				...
+			}
+			over_time    = 0;// 结束时间
+			reason       = 0;// 小局结束原因
+			is_game_over = false;//是否大结算
+			expand_content = ... //bytes 子游戏额外扩展信息								
+		}
 	};
 
-玩家根据该消息重置所有准备状态
 
 ------------------------------------------------------------------------------------------
 6.申请解散
@@ -520,63 +327,48 @@ RoundFinishPush:
 客户端请求:
 ReleaseRequest:
 
-	msg_body = {
-		type = 1;// 解散类型 1申请解散 2投票
+	msg_body = {// message RoomContentRequest
+		req_type    = 1007; //
+		req_content = { // message ReleaseRequest
+			type   = 1;// 1发起解散  2投票
+			value  = 3;// 投票结果 2拒绝  3同意
+		}
 	};
-
 服务器返回:
-ReleaseResponse:
+ReleaseResponse: //可能失败  可能有时间间隔限制，次数限制
 
-	msg_body = {
-		status = 1;// 状态
-		status_tip = "请求成功";// 状态提示信息
-
+	msg_body = { //message RoomContentResponse
+		//每一个type对应一条消息 编解码content，这个映射关系有两部分组成 
+		//小于10000的通用消息 位于文件servers/preload/gaMsgDef.lua,
+		//大于10000的由子游戏自行约定
+		type    = 1008; 
+		content = { // message ReleaseResponse
+			status = 0;
+			status_tip = "发起成功";
+		}
 	};
 
 推送信息: 通知所有人
 ReleasePush (推送解散信息) optional 当前处于投票解散等待状态
 
-	msg_body = {
-		release_info = { // message ReleaseInfo
-			result = 2;//房间解散状态 1失败  2投票中  3成功 
-			tip    = "";//
-			votes = { // repeated int 投票信息 1未操作 2拒绝 3同意 0发起者
-				0,1,1,1 //[seat+1] -> result
-			};
-			time  = 150;// 倒计时时间，单位秒
-			seat_index = 0;// 解散发起人
-		};
-	};
-
-7.投票解散
-客户端请求:
-ReleaseRequest:
-
-	msg_body = {
-		type = 2;// 解散类型 1申请解散 2投票
-		vote_value = 2; //投票信息 2拒绝 3同意
-	};
-
-服务器返回:
-ReleaseResponse:
-
-	msg_body = {
-		status = 1;// 状态
-		status_tip = "请求成功";// 状态提示信息
-
-	};
-
-推送信息: 通知所有人
-ReleasePush (推送解散信息) optional 当前处于投票解散等待状态
-
-	msg_body = {
-		release_info = { // message ReleaseInfo
-			result = 1;//房间解散状态 1失败  2投票中  3成功 
-			tip    = "xxx拒绝了";//
-			votes = { // repeated int 投票信息 1未操作 2拒绝 3同意 0发起者
-				0,2,1,1 //[seat+1] -> result
-			};
-			time  = 63;// 倒计时时间，单位秒
-			seat_index = 0;// 解散发起人
-		};
+	msg_body = { //message RoomContentResponse
+		//每一个type对应一条消息 编解码content，这个映射关系有两部分组成 
+		//小于10000的通用消息 位于文件servers/preload/gaMsgDef.lua,
+		//大于10000的由子游戏自行约定
+		type    = 1009; 
+		content = { // message ReleasePush
+			user_id            = 1;// 解散发起人
+			cur_release_count  = 1;//当前解散发起请求次数
+			max_realease_limit = 3;//最大次数限制
+			cur_seconds        = 34;
+			max_seconds        = 90;
+			status             = 2;////房间解散状态 1失败  2投票中  3成功
+			votes              = {//repeated message UserVoteInfo
+				{
+					vote    = 1;// 投票信息 1未操作 2拒绝 3同意
+					user_id = 1;
+				};
+				...
+			}
+		}
 	};

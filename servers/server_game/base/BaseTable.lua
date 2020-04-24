@@ -148,10 +148,7 @@ function BaseTable:changeToGamePlay()
 	Log.i("","tid=%d change to GamePlay State", self:getTableId())
 	--
 	self:_changeGameStatus(const.GameStatus.PLAY)
-	--初始化玩家操作
-	self.m_userMgr:onRoundBegin()
 	--牌局开始
-	self:_broadcastGameRoundBegin()
 	--
 	self:onSubGameRoundBegin()
 end
@@ -276,7 +273,7 @@ function BaseTable:_broadcastGameRoundEnd()
 	self.m_userMgr:broadcastMsg(msg.NameToId.RoundEndPush, data)
 end
 
-function BaseTable:_broadcastGameRoundBegin()
+function BaseTable:broadcastGameRoundBegin()
 	local data = {
 		game_status    = self.m_gameStatus;
 		progress_info  = self.m_progressMgr:getProgressInfo();
@@ -291,4 +288,8 @@ function BaseTable:callAllocServer(...)
 	ClusterHelper.callIndex(skynet.getenv("server_alloc"),".AllocService", ... )	
 end 
 
+function BaseTable:onSubGameRoundBegin()
+	-- body
+	self:broadcastGameRoundBegin()
+end
 return BaseTable

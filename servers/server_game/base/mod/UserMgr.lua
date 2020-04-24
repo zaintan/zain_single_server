@@ -388,9 +388,4 @@ function UserMgr:onReadyReq( uid , data )
 	return true
 end
 
-
-function UserMgr:onRoundBegin()
-	-- body
-end
-
 return UserMgr

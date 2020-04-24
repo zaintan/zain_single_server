@@ -1,0 +1,58 @@
+package dezhou;
+option java_package = "protobuf.cher";
+
+message UserCardInfo {
+	repeated int32 hand_cards  = 1;
+	optional int32 brand_type  = 2; // 当前最大牌型
+}
+
+message ChipsPoolInfo {//筹码池信息 多人allin 需分池
+	optional int32  chips      = 1; //筹码数
+	repeated int32  users      = 2; //参与分池的玩家座位号	
+}
+
+message TableUserExpandInfo {
+	optional int32  bring_chips      = 1; // 携带筹码数
+	optional int32  effect_chips     = 2; // 当前这一局 有效筹码
+	optional int32  bet_chips        = 3; // 当前这一轮 已下注筹码
+} 
+
+message TableExpandInfo {
+	repeated int32 common_cards = 1; // 当前公牌  -1表示牌背  空表示没有
+	optional int32 banker       = 2; // 庄家座位号
+	optional int32 xiao_mang    = 3; //
+	optional int32 da_mang      = 4; // 
+	repeated UserCardInfo user_cards  = 5;
+	repeated ChipsPoolInfo chips_pool = 6;
+}
+
+// 游戏开始推送
+message RoundBeginExpandInfo {
+
+}
+
+// 小局结算推送
+message RoundEndExpandInfo {
+
+}
+
+message StandSitRequest {
+    optional int32  type    = 1; // 1站起 2坐下
+}
+
+message OperateRequest {
+	optional int32  type    = 1; // 1看牌/过牌   2弃牌  3跟注  4加注
+	optional int32  value   = 2; // 跟注或加注的值
+}
+
+message DealHandCardPush {
+
+}
+
+message DealCommonCardPush {
+
+}
+
+message OperateInfoPush {
+
+}
