@@ -8,7 +8,8 @@ local packetHelper  = (require "PacketHelper").create({"protos/hall.pb","protos/
 ---! 依赖库
 local skynet        = require "skynet"
 
-local fd = nil
+local fd = socket.connect("127.0.0.1", 8100)
+
 local LOGTAG = "[client]"
 
 local function unpack_package(text)
@@ -89,7 +90,7 @@ end
 skynet.start(function()
     Log.d(LOGTAG, "start...")
     ---! 初始化随机数
-    fd = socket.connect("127.0.0.1", 8100)
+
     Log.d(LOGTAG, "connected 127.0.0.1:8100")
     skynet.sleep(200)
     skynet.fork(function ()
