@@ -89,9 +89,9 @@ end
 skynet.start(function()
     Log.d(LOGTAG, "start...")
     ---! 初始化随机数
-    fd = assert(socket.connect("127.0.0.1", 8100))
+    fd = socket.connect("127.0.0.1", 8100)
     Log.d(LOGTAG, "connected 127.0.0.1:8100")
-    skynet.sleep(100)
+    skynet.sleep(200)
     skynet.fork(function ()
         while true do 
             dispatch_package()
