@@ -72,10 +72,10 @@ end
 
 local function sendMsg(msg_id, data)
 
-    if msg_id ~= msg.NameToId.HeartResponse then
+    --if msg_id ~= msg.NameToId.HeartResponse then
         Log.d(LOGTAG,"sendClientMsg msg_id=%d",msg_id)
         Log.dump(LOGTAG,data)
-    end 
+    --end 
     local protoName = msg.IdToName[msg_id] 
     local body      = packetHelper:encodeMsg(protoName, data)
     local packet    = packetHelper:makeProtoData(msg_id , body)
@@ -87,7 +87,7 @@ end
 skynet.start(function()
     ---! 初始化随机数
     fd = assert(socket.connect("127.0.0.1", 8100))
-    skynet.sleep(1000)
+    skynet.sleep(100)
     skynet.fork(function ()
         while true do 
             dispatch_package()
@@ -101,5 +101,14 @@ skynet.start(function()
             skynet.sleep(10 * 100)
         end 
     end)
+
+    skynet.sleep(1000)
+    sendMsg(msg.NameToId.LoginRequest, {
+        login_type  = 1;
+        token       = skynet.getenv("ClientName");
+        platform    = 3;
+        client_version = "1.0.0";
+        game_index     = 1;
+    })
 
 end)
