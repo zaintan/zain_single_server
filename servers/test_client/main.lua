@@ -68,7 +68,11 @@ local function decode_data(data)
         return 
     end 
     local data,err = packetHelper:decodeMsg(msgName, args.msg_body)    
-    Log.dump(LOGTAG,data)
+    
+    if args.msg_id ~= msg.NameToId.HeartResponse then
+        Log.dump(LOGTAG,data)
+    end 
+
 
     if recv_server_handler[args.msg_id] then 
         recv_server_handler[args.msg_id](data)
@@ -90,9 +94,10 @@ local function dispatch_package()
 end
 
 local function sendMsg(msg_id, data)
-
+    if msg_id ~= msg.NameToId.HeartResponse then
         Log.d(LOGTAG,"send msg_id=%d",msg_id)
         Log.dump(LOGTAG,data)
+    end 
 
     local protoName = msg.IdToName[msg_id] 
     local body      = packetHelper:encodeMsg(protoName, data)
