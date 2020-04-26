@@ -2,13 +2,17 @@
 ---! @file
 ---! @brief test_client 的启动文件
 ------------------------------------------------------
-local socket = require "client.socket"
+
+
 
 local packetHelper  = (require "PacketHelper").create({"protos/hall.pb","protos/table.pb"})
 ---! 依赖库
 local skynet        = require "skynet"
+local socket        = require "skynet.socket"
+--local socket = require "client.socket"
 
-local fd = socket.connect("127.0.0.1", 8100)
+local fd = socket.open("127.0.0.1", 8100)
+--local fd = socket.connect("127.0.0.1", 8100)
 
 local LOGTAG = "[client]"
 
@@ -31,7 +35,7 @@ local function recv_package(last)
     if result then
         return result, last
     end
-    local r = socket.recv(fd)
+    local r = socket.read(fd)--socket.recv(fd)
     if not r then
         return nil, last
     end
@@ -39,6 +43,12 @@ local function recv_package(last)
         error "Server closed"
     end
     return unpack_package(last .. r)
+end
+
+local function sendPacket( packet )
+    local data = string.pack(">s2", packet)
+    socket.write(fd, data)
+    --socket.send(fd, data)
 end
 
 
@@ -68,10 +78,7 @@ local function dispatch_package()
     end
 end
 
-local function sendPacket( packet )
-    local data = string.pack(">s2", packet)
-    socket.send(fd, data)
-end
+
 
 local function sendMsg(msg_id, data)
 
