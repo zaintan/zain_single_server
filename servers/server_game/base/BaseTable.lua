@@ -145,7 +145,7 @@ end
 
 --all ready ->
 function BaseTable:changeToGamePlay()
-	Log.i("","tid=%d change to GamePlay State", self:getTableId())
+	Log.i("","tid=%d change to GamePlay State:GamePlay", self:getTableId())
 	--
 	self:_changeGameStatus(const.GameStatus.PLAY)
 	--牌局开始
@@ -155,7 +155,7 @@ end
 
 -->round over
 function BaseTable:changeToGameWait()
-	Log.i("","tid=%d change to GameWait State", self:getTableId())
+	Log.i("","tid=%d change to GameWait State:GameWait", self:getTableId())
 	self:_changeGameStatus(const.GameStatus.WAIT)
 	--牌局结束
 	self:_broadcastGameRoundEnd()

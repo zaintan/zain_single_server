@@ -168,7 +168,7 @@ console_cmd.create = function ()
         game_type    = 10001;
         game_rules   = {
             {id = 1;   value = 2;};
-            {id = 1002;value = 1;};
+            {id = 1002;value = 2;};
             {id = 3;   value = 1;}; 
             {id = 4;   value = 1;};                                   
         };
