@@ -14,6 +14,7 @@ function UserMgr:ctor(pTable, maxUserNum)
     self.m_curUserNum = 0
     --
 	self.m_maxUserNum = maxUserNum or 4
+    Log.d(LOGTAG, "maxUserNum = %d", self.m_maxUserNum)	
 end
 
 function UserMgr:dump()

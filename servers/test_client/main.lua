@@ -232,9 +232,6 @@ skynet.start(function()
             skynet.sleep(10 * 100)
         end 
     end)
-
-    --skynet.sleep(1000)
-    --send_login()
     ---! 注册skynet消息服务
     skynet.dispatch("lua", function(_,_, cmd, ...)
         Log.d(LOGTAG, "recv cmd:%s", cmd)
@@ -250,10 +247,19 @@ skynet.start(function()
     end)
 
     skynet.register(".client")
+
+    skynet.sleep(200)
+    console_cmd.login()
+    skynet.sleep(200)
+    if skynet.getenv("ClientName") == "1" then 
+        console_cmd.create()
+        skynet.sleep(500)
+        console_cmd.join(info.room_id)
+    end 
 end)
 
 -- 
 --nc 127.0.0.1 9999
 --call .client "login"
---call .client "join" 123456
+--call .client "join",123456
 --call .client "create"
