@@ -134,6 +134,7 @@ console_cmd.login = function ()
         client_version = "1.0.0";
         game_index     = 1;
     })
+    return true
 end
 
 console_cmd.create = function ()
@@ -148,12 +149,14 @@ console_cmd.create = function ()
             {id = 4;   value = 1;};                                   
         };
     })
+    return true
 end
 
 console_cmd.join = function ( id )
      sendMsg(msg.NameToId.JoinRoomRequest, {
         room_id  = id;
     })
+    return true
 end
 ---! 服务的启动函数
 skynet.start(function()
@@ -185,6 +188,7 @@ skynet.start(function()
     --send_login()
     ---! 注册skynet消息服务
     skynet.dispatch("lua", function(_,_, cmd, ...)
+        Log.d(LOGTAG, "recv cmd:%s", cmd)
         local f = console_cmd[cmd]
         if f then
             local ret = f(...)
