@@ -241,7 +241,7 @@ function class:command_handler(cmsg, recvTime)
             Log.e(LOGTAG,"proto decode error: msgid=%d name=%s !", args.msg_id, msgName )
             return
         end 
-        Log.dump(LOGTAG,data)
+        --Log.dump(LOGTAG,data)
         f(self, data)
     else--房间请求
         Log.e(LOGTAG,"maybe error! recv unknown msg_id:%d !!!", args.msg_id )

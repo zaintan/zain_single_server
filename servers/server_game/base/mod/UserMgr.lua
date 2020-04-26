@@ -374,7 +374,7 @@ function UserMgr:onReadyReq( uid , data )
 		return false
 	end
 	--
-	local ready =  data.req_content.ready
+	local ready =  data.ready
 	--修改玩家准备状态 
 	u:setReady(ready)
 	--广播通知suoyou玩家
