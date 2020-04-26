@@ -9,9 +9,15 @@ local packetHelper  = (require "PacketHelper").create({"protos/hall.pb","protos/
 ---! 依赖库
 local skynet        = require "skynet"
 local socket        = require "skynet.socket"
---local socket = require "client.socket"
 
-local fd = nil
+
+local fd  = nil
+local recv_server_handler = {}
+
+local info = {
+    uid     = -1;
+    room_id = 0;
+}
 
 local LOGTAG = "[client]"
 
@@ -47,7 +53,7 @@ end
 local function sendPacket( packet )
     local data = string.pack(">s2", packet)
     socket.write(fd, data)
-    --socket.send(fd, data)
+
 end
 
 
@@ -61,6 +67,10 @@ local function decode_data(data)
     end 
     local data,err = packetHelper:decodeMsg(msgName, args.msg_body)    
     Log.dump(LOGTAG,data)
+
+    if recv_server_handler[args.msg_id] then 
+        recv_server_handler[args.msg_id](data)
+    end 
 end
 
 local last = ""
@@ -77,14 +87,11 @@ local function dispatch_package()
     end
 end
 
-
-
 local function sendMsg(msg_id, data)
 
-    --if msg_id ~= msg.NameToId.HeartResponse then
-        Log.d(LOGTAG,"sendClientMsg msg_id=%d",msg_id)
+        Log.d(LOGTAG,"send msg_id=%d",msg_id)
         Log.dump(LOGTAG,data)
-    --end 
+
     local protoName = msg.IdToName[msg_id] 
     local body      = packetHelper:encodeMsg(protoName, data)
     local packet    = packetHelper:makeProtoData(msg_id , body)
@@ -92,14 +99,74 @@ local function sendMsg(msg_id, data)
     return true
 end
 
+
+local function sendRoomMsg(msg_id, data)
+    Log.d(LOGTAG,"send room: msg_id=%d",msg_id)
+    Log.dump(LOGTAG,data)
+    local ret = {
+        req_type    = msg_id;
+        req_content = packetHelper:encodeMsg(msg.IdToName[msg_id] , data);
+    }
+    return sendMsg(msg.NameToId.RoomContentRequest, ret)
+end
+
+
+local function send_login()
+    sendMsg(msg.NameToId.LoginRequest, {
+        login_type  = 1;
+        token       = skynet.getenv("ClientName");
+        platform    = 3;
+        client_version = "1.0.0";
+        game_index     = 1;
+    })
+end
+
+local function send_create()
+     sendMsg(msg.NameToId.CreateRoomRequest, {
+        create_type  = 1;
+        game_id      = 1001;
+        game_type    = 10001;
+        game_rules   = {
+            {id = 1;   value = 2;};
+            {id = 1002;value = 1;};
+            {id = 3;   value = 1;}; 
+            {id = 4;   value = 1;};                                   
+        };
+    })
+end
+
+local function send_join( num )
+     sendMsg(msg.NameToId.JoinRoomRequest, {
+        room_id  = num;
+    })
+end
+
+
+recv_server_handler[msg.NameToId.LoginResponse] = function ( data )
+    if data.status >= 0 then 
+        info.uid = data.user_info.user_id
+    end 
+end
+
+recv_server_handler[msg.NameToId.CreateRoomResponse] = function ( data )
+    if data.status >= 0 then 
+        info.room_id = data.room_id
+    end 
+end
+
+
 ---! 服务的启动函数
 skynet.start(function()
     Log.d(LOGTAG, "start...")
+    
+    skynet.newservice("debug_console", 9999)
+
     ---! 初始化随机数
     fd = socket.open("127.0.0.1", 8100)
-    --local fd = socket.connect("127.0.0.1", 8100)
+
     Log.d(LOGTAG, "connected 127.0.0.1:8100")
     skynet.sleep(200)
+
     skynet.fork(function ()
         while true do 
             dispatch_package()
@@ -109,18 +176,11 @@ skynet.start(function()
 
     skynet.fork(function ()
         while true do 
-            sendMsg(msg.NameToId.HeartResponse,{})
+            sendMsg(msg.NameToId.HeartRequest,{})
             skynet.sleep(10 * 100)
         end 
     end)
 
     skynet.sleep(1000)
-    sendMsg(msg.NameToId.LoginRequest, {
-        login_type  = 1;
-        token       = skynet.getenv("ClientName");
-        platform    = 3;
-        client_version = "1.0.0";
-        game_index     = 1;
-    })
-
+    send_login()
 end)
