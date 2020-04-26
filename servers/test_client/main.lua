@@ -11,8 +11,7 @@ local skynet        = require "skynet"
 local socket        = require "skynet.socket"
 --local socket = require "client.socket"
 
-local fd = socket.open("127.0.0.1", 8100)
---local fd = socket.connect("127.0.0.1", 8100)
+local fd = nil
 
 local LOGTAG = "[client]"
 
@@ -97,7 +96,8 @@ end
 skynet.start(function()
     Log.d(LOGTAG, "start...")
     ---! 初始化随机数
-
+    fd = socket.open("127.0.0.1", 8100)
+    --local fd = socket.connect("127.0.0.1", 8100)
     Log.d(LOGTAG, "connected 127.0.0.1:8100")
     skynet.sleep(200)
     skynet.fork(function ()
