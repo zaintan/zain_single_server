@@ -10,6 +10,11 @@ local packetHelper  = (require "PacketHelper").create({"protos/hall.pb","protos/
 local skynet        = require "skynet"
 local socket        = require "skynet.socket"
 
+testg = "global test"
+testgTbl = {
+    abc = "dfjkd";
+    dkf = "zzzz";
+}
 
 local fd  = nil
 local recv_server_handler = {}
