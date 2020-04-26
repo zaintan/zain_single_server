@@ -9,15 +9,12 @@ local packetHelper  = (require "PacketHelper").create({"protos/hall.pb","protos/
 ---! 依赖库
 local skynet        = require "skynet"
 local socket        = require "skynet.socket"
-
-testg = "global test"
-testgTbl = {
-    abc = "dfjkd";
-    dkf = "zzzz";
-}
+require "skynet.manager"
 
 local fd  = nil
 local recv_server_handler = {}
+local console_cmd = {}
+
 
 local info = {
     uid     = -1;
@@ -116,37 +113,6 @@ local function sendRoomMsg(msg_id, data)
 end
 
 
-local function send_login()
-    sendMsg(msg.NameToId.LoginRequest, {
-        login_type  = 1;
-        token       = skynet.getenv("ClientName");
-        platform    = 3;
-        client_version = "1.0.0";
-        game_index     = 1;
-    })
-end
-
-local function send_create()
-     sendMsg(msg.NameToId.CreateRoomRequest, {
-        create_type  = 1;
-        game_id      = 1001;
-        game_type    = 10001;
-        game_rules   = {
-            {id = 1;   value = 2;};
-            {id = 1002;value = 1;};
-            {id = 3;   value = 1;}; 
-            {id = 4;   value = 1;};                                   
-        };
-    })
-end
-
-local function send_join( num )
-     sendMsg(msg.NameToId.JoinRoomRequest, {
-        room_id  = num;
-    })
-end
-
-
 recv_server_handler[msg.NameToId.LoginResponse] = function ( data )
     if data.status >= 0 then 
         info.uid = data.user_info.user_id
@@ -160,6 +126,35 @@ recv_server_handler[msg.NameToId.CreateRoomResponse] = function ( data )
 end
 
 
+console_cmd.login = function ()
+    sendMsg(msg.NameToId.LoginRequest, {
+        login_type  = 1;
+        token       = skynet.getenv("ClientName");
+        platform    = 3;
+        client_version = "1.0.0";
+        game_index     = 1;
+    })
+end
+
+console_cmd.create = function ()
+     sendMsg(msg.NameToId.CreateRoomRequest, {
+        create_type  = 1;
+        game_id      = 1001;
+        game_type    = 10001;
+        game_rules   = {
+            {id = 1;   value = 2;};
+            {id = 1002;value = 1;};
+            {id = 3;   value = 1;}; 
+            {id = 4;   value = 1;};                                   
+        };
+    })
+end
+
+console_cmd.join = function ( id )
+     sendMsg(msg.NameToId.JoinRoomRequest, {
+        room_id  = id;
+    })
+end
 ---! 服务的启动函数
 skynet.start(function()
     Log.d(LOGTAG, "start...")
@@ -186,6 +181,20 @@ skynet.start(function()
         end 
     end)
 
-    skynet.sleep(1000)
-    send_login()
+    --skynet.sleep(1000)
+    --send_login()
+    ---! 注册skynet消息服务
+    skynet.dispatch("lua", function(_,_, cmd, ...)
+        local f = console_cmd[cmd]
+        if f then
+            local ret = f(...)
+            if ret then
+                skynet.ret(skynet.pack(ret))
+            end
+        else
+            Log.e(LOGTAG,"unknown command:%s", cmd)
+        end
+    end)
+
+    skynet.register(".client")
 end)
