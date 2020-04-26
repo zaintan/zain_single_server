@@ -125,6 +125,25 @@ recv_server_handler[msg.NameToId.CreateRoomResponse] = function ( data )
     end 
 end
 
+--[[
+local recv_room_handler = {}
+recv_room_handler[msg.NameToId.TableInfoPush] = function ( data )
+    local users = data.users_info
+    for i,v in ipairs(users) do
+        if info.uid == v.user_id then 
+            info.seat = v.seat
+        end 
+    end
+end
+]]
+recv_server_handler[msg.NameToId.RoomContentResponse] = function ( data )
+    local name = msg.IdToName[data.type]
+    if name then 
+        local d = packetHelper:decodeMsg(name,  data.content)
+        Log.dump(LOGTAG,d or {})
+    end 
+end
+
 
 console_cmd.login = function ()
     sendMsg(msg.NameToId.LoginRequest, {
@@ -158,11 +177,41 @@ console_cmd.join = function ( id )
     })
     return true
 end
+
+console_cmd.exit = function ()
+    sendRoomMsg(msg.NameToId.UserExitRequest, {
+    })
+    return true
+end
+
+console_cmd.ready = function ( bState )
+    sendRoomMsg(msg.NameToId.ReadyRequest, {
+        ready = bState and true or false;
+    })
+    return true
+end
+
+console_cmd.release = function ( )
+    sendRoomMsg(msg.NameToId.ReleaseRequest, {
+        type = 1;
+    })
+    return true
+end
+
+console_cmd.vote = function ( bAgree )
+    sendRoomMsg(msg.NameToId.ReleaseRequest, {
+        type = 2;
+        value = bAgree and 3 or 2;
+    })
+    return true
+end
+
 ---! 服务的启动函数
 skynet.start(function()
     Log.d(LOGTAG, "start...")
-    
-    skynet.newservice("debug_console", 9999)
+
+    local name = skynet.getenv("ClientName")
+    skynet.newservice("debug_console", 10000 + tonumber(name))
 
     ---! 初始化随机数
     fd = socket.open("127.0.0.1", 8100)
@@ -202,3 +251,9 @@ skynet.start(function()
 
     skynet.register(".client")
 end)
+
+-- 
+--nc 127.0.0.1 9999
+--call .client "login"
+--call .client "join" 123456
+--call .client "create"
