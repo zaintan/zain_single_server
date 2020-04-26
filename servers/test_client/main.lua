@@ -9,6 +9,7 @@ local packetHelper  = (require "PacketHelper").create({"protos/hall.pb","protos/
 local skynet        = require "skynet"
 
 local fd = nil
+local LOGTAG = "[client]"
 
 local function unpack_package(text)
     local size = #text
@@ -41,6 +42,7 @@ end
 
 
 local function decode_data(data)
+    Log.d(LOGTAG,"recvServerMsg")
     local args    = packetHelper:decodeMsg(msg.Root,data)
     local msgName = msg.IdToName[args.msg_id]
     if not msgName then 
@@ -85,8 +87,10 @@ end
 
 ---! 服务的启动函数
 skynet.start(function()
+    Log.d(LOGTAG, "start...")
     ---! 初始化随机数
     fd = assert(socket.connect("127.0.0.1", 8100))
+    Log.d(LOGTAG, "connected 127.0.0.1:8100")
     skynet.sleep(100)
     skynet.fork(function ()
         while true do 
