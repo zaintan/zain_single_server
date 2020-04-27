@@ -237,7 +237,7 @@ function AllocLogic:release(tid, bNotiGame)
 			self.m_tables:removeObject(tid)
 			----------------------------------------------
 			if bNotiGame then 
-				local callSucc,err = ClusterHelper.callIndex(gameIndex,gameAddr,"recvSysRelease")
+				local callSucc,err = ClusterHelper.callIndex(gameIndex,gameAddr,"release")
 				if not callSucc then
 					Log.d(LOGTAG,"无法通知逻辑服,链接逻辑服%d失败%s",tblInfo.index, tostring(err))
 					return false

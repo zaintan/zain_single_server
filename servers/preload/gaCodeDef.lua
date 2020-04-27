@@ -32,6 +32,11 @@ local M = {
 
 	["ExitFailed"]          = {-406,"牌局已开始!"};
 	["ExitSuccess"]         = {401,"退出成功!"};	
+
+	["ReleaseFailedType"]   = {-407, "无效的请求解散类型"};
+	["VoteFailed"]          = {-408, "解散投票失败"};
+	["ReleaseFailedCount"]  = {-409, "解散次数限制"};
+	["ReleaseFailedRepeat"] = {-410, "正在解散投票中"};
 }
 
 return M

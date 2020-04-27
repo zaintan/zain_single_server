@@ -36,7 +36,8 @@ message TableInfoPush {
     optional int32             game_status    = 3; // 游戏状态
     repeated TableUserBaseInfo users_base     = 4; // 房间内的玩家
     repeated TableUserInfo     users_info     = 5; // 房间内的玩家
-    optional bytes             expand_content = 6; // 子游戏额外扩展信息
+    optional ReleaseInfo       release_info   = 6; // 当前牌桌进度
+    optional bytes             expand_content = 7; // 子游戏额外扩展信息
 }
 
 // 游戏开始推送
@@ -110,13 +111,17 @@ message UserVoteInfo {
     optional int64 user_id    = 2; // 用户ID
 }
 
+message ReleaseInfo {
+    optional int64 user_id            = 1; // 解散发起人//optional int32 release_status = 1; // 当前解散状态
+    optional int32 cur_release_count  = 2; //当前解散发起请求次数
+    optional int32 max_realease_limit = 3; //最大次数限制
+    optional int32 cur_seconds        = 4; //当前剩余时间
+    optional int32 max_seconds        = 5; //倒计时时间，单位秒
+    optional int32 status             = 6; //房间解散状态 1失败  2投票中  3成功  
+    repeated UserVoteInfo votes       = 7; // 玩家们的投票信息      
+}
+
 // 解散投票信息推送
 message ReleasePush {
-	optional int64 user_id            = 1; // 解散发起人//optional int32 release_status = 1; // 当前解散状态
-	optional int32 cur_release_count  = 2; //当前解散发起请求次数
-	optional int32 max_realease_limit = 3; //最大次数限制
-	optional int32 cur_seconds        = 4; //当前剩余时间
-	optional int32 max_seconds        = 5; //倒计时时间，单位秒
-	optional int32 status             = 6; //房间解散状态 1失败  2投票中  3成功 	
-	repeated UserVoteInfo votes       = 7; // 玩家们的投票信息	
+    optional ReleaseInfo info       = 1; //   
 }

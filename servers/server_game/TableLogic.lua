@@ -42,6 +42,12 @@ function TableLogic:logout(fromNodeIndex, selfAddr, uid)
 	end)
 end
 
+function TableLogic:release()
+	return cs(function ()
+		return self.m_table:onSysRelease()
+	end)
+end
+
 
 function TableLogic:on_req(uid, data)
 	return cs(function ()

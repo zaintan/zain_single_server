@@ -3,7 +3,14 @@ local M = {
 		NORMAL       = 1;--正常结束
 		DRAW         = 2;--流局、荒庄
 		RELEASE_SYS  = 3;--系统解散
-		RELEASE_USER = 4;--用户申请解散
+		RELEASE_USER = 4;--用户申请解散 所有人同意
+		RELEASE_TIMEOUT = 5;--申请解散超时
+	};
+	GameFinishReason = {
+		NORMAL          = 1;--正常打完结束
+		RELEASE_SYS     = 2;--系统后台解散
+		RELEASE_USER    = 3;--用户申请解散 所有人同意
+		RELEASE_TIMEOUT = 4;--申请解散超时
 	};
 
 	GameStatus = {
@@ -40,9 +47,15 @@ local M = {
 		VOTE = 2;
 	};
 
+	ReleaseVoteVal = {
+		AGREE  = 3;
+		UNDO   = 1;
+		REJECT = 2;
+	};
+
 	ReleaseVote = {
-		FAILED = 1;
-		VOTING = 2;
+		FAILED  = 1;
+		VOTING  = 2;
 		SUCCESS = 3;
 	};
 }

@@ -97,13 +97,8 @@ end
 
 --回复玩家加入成功
 function UserMgr:_rspJoinSucc(u)
-	local statusInfo = MsgCode.JoinSuccess
-	--
-	local data  = {
-		status         = statusInfo[1];
-		status_tip     = statusInfo[2];
-		game_base_info = self.m_pTable:getGameBaseInfo();		
-	}
+	local data          = g_createMsg(MsgCode.JoinSuccess)
+	data.game_base_info = self.m_pTable:getGameBaseInfo();
 
 	local node,addr = u:getAddr()
 	--回复该玩家加入房间的信息
@@ -111,20 +106,12 @@ function UserMgr:_rspJoinSucc(u)
 end
 
 --回复玩家加入失败
-function UserMgr:_rspJoinFail(node, addr, msgcode)
-	local data = {
-		status     = msgcode[1];
-		status_tip = msgcode[2] or "";
-	}
+function UserMgr:_rspJoinFail(node, addr, data)
 	ClusterHelper.callIndex(node,addr,"sendMsg", msg.NameToId.JoinRoomResponse, data)
 end
 
 --回复玩家退出
-function UserMgr:_rspExit(user, msgcode)
-	local data = {
-		status     = msgcode[1];
-		status_tip = msgcode[2] or "";
-	}
+function UserMgr:_rspExit(user, data)
 	ClusterHelper.callIndex(node,addr,"sendMsg", msg.NameToId.UserExitResponse, data)
 end
 
@@ -235,39 +222,47 @@ function UserMgr:getAllUserInfo()
 	return ret
 end
 
+function UserMgr:getAllUids()
+	local ret = {}
+	for _,u in pairs(self.m_users) do
+		table.insert(ret, u:getId())
+	end	
+	return ret
+end
+
 --userinfo.user_id
 function UserMgr:onJoinReq( node, addr ,userinfo)
 	Log.i("","UserMgr:onJoinReq node=%s",tostring(node))
 
 	if self.m_pTable:isGameStart() then 
 		Log.i("","Table is already start! can't join!")
-		self:_rspJoinFail(node, addr, MsgCode.JoinFailedStart)
+		self:_rspJoinFail(node, addr, g_createMsg(MsgCode.JoinFailedStart))
 		return false
 	end 
 
 	if not userinfo or not userinfo.user_id then 
 		Log.e(LOGTAG,"invalid args: userinfo")
-		self:_rspJoinFail(node, addr, MsgCode.JoinFailedArgs)
+		self:_rspJoinFail(node, addr, g_createMsg(MsgCode.JoinFailedArgs))
 		return false
 	end 
 
 	local u = self:getUser(userinfo.user_id)
 	if u then 
 		Log.e(LOGTAG,"repeated add user")
-		self:_rspJoinFail(node, addr, MsgCode.JoinFailedRepeat)
+		self:_rspJoinFail(node, addr, g_createMsg(MsgCode.JoinFailedRepeat))
 		return false
 	end 
 
 	if self.m_curUserNum >= self.m_maxUserNum then 
 		Log.w(LOGTAG,"table is full![%d/%d]", self.m_curUserNum, self.m_maxUserNum)
-		self:_rspJoinFail(node, addr, MsgCode.JoinFailedFull)
+		self:_rspJoinFail(node, addr, g_createMsg(MsgCode.JoinFailedFull))
 		return false
 	end 
 
 	local seat = self:_getEmptySeat()
 	if not seat then 
 		Log.i(LOGTAG,"can't find seat!")
-		self:_rspJoinFail(node, addr, MsgCode.JoinFailedFull)
+		self:_rspJoinFail(node, addr, g_createMsg(MsgCode.JoinFailedFull))
 		return false
 	end  
 
@@ -302,13 +297,13 @@ function UserMgr:onExitReq( uid, data )
 	end 
 	--
 	if self.m_pTable:isGameStart() then 
-		self:_rspExit(u, MsgCode.ExitFailed)
+		self:_rspExit(u, g_createMsg(MsgCode.ExitFailed))
 		return false
 	end 
 	--
 	self.m_curUserNum = self.m_curUserNum - 1
 	--回复该玩家离开成功
-	self:_rspExit(u, MsgCode.ExitSuccess)
+	self:_rspExit(u, g_createMsg(MsgCode.ExitSuccess))
 	--广播通知其他人 玩家离开房间
 	self:_broadcastToOthersUserExit(u)
 	--清空该玩家
@@ -325,7 +320,7 @@ function UserMgr:onReconnectReq(fromNodeIndex, fromAddr, uid)
 	if not u then 
 		self:dump()
 		Log.e(LOGTAG,"can't find uid=%d",uid)
-		self:_rspJoinFail(fromNodeIndex, fromAddr, MsgCode.ReconnectFailed)
+		self:_rspJoinFail(fromNodeIndex, fromAddr, g_createMsg(MsgCode.ReconnectFailed))
 		return false
 	end 
 	--更新玩家节点信息

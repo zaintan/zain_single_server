@@ -13,20 +13,20 @@ function UserMgr:onJoinReq( node, addr ,userinfo)
 	
 	if self.m_curUserNum >= self.m_maxUserNum then 
 		Log.w(LOGTAG,"table is full![%d/%d]", self.m_curUserNum, self.m_maxUserNum)
-		self:_rspJoinFail(node, addr, MsgCode.JoinFailedFull)
+		self:_rspJoinFail(node, addr, g_createMsg(MsgCode.JoinFailedFull))
 		return false
 	end 
 
 	if not userinfo or not userinfo.user_id then 
 		Log.e(LOGTAG,"invalid args: userinfo")
-		self:_rspJoinFail(node, addr, MsgCode.JoinFailedArgs)
+		self:_rspJoinFail(node, addr, g_createMsg(MsgCode.JoinFailedArgs))
 		return false
 	end 
 
 	local u = self:getUser(userinfo.user_id)
 	if u then 
 		Log.e(LOGTAG,"repeated add user")
-		self:_rspJoinFail(node, addr, MsgCode.JoinFailedRepeat)
+		self:_rspJoinFail(node, addr, g_createMsg(MsgCode.JoinFailedRepeat))
 		return false
 	end 
 

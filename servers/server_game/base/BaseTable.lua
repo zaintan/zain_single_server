@@ -43,8 +43,8 @@ function BaseTable:recvReconnectReq(fromNodeIndex, fromAddr, uid)
 end
 
 --后台系统解散->Alloc->Game
-function BaseTable:recvSysRelease()
-	self:changeToGameOver(const.GameFinishReason.SYSTEM_BACK)
+function BaseTable:onSysRelease()
+	return self.m_releaseMgr:onSysRelease()
 end
 
 -------------------------------------------from [Client->Agent->Game] end-------------------------------------------
@@ -119,6 +119,7 @@ function BaseTable:getTableInfo()
 		users_base     = self.m_userMgr:getAllUserBaseInfo();
 		users_info     = self.m_userMgr:getAllUserInfo();
 		progress_info  = self.m_progressMgr:getProgressInfo();
+		release_info   = self.m_releaseMgr:getReleaseInfo();
 		expand_content = self:_encodeTableInfoExpand();
 	};
 end
@@ -145,7 +146,7 @@ end
 
 --all ready ->
 function BaseTable:changeToGamePlay()
-	Log.i("","tid=%d change to GamePlay State:GamePlay", self:getTableId())
+	Log.i(LOGTAG,"tid=%d change to GamePlay State:GamePlay", self:getTableId())
 	--
 	self:_changeGameStatus(const.GameStatus.PLAY)
 	--牌局开始
@@ -155,7 +156,7 @@ end
 
 -->round over
 function BaseTable:changeToGameWait()
-	Log.i("","tid=%d change to GameWait State:GameWait", self:getTableId())
+	Log.i(LOGTAG,"tid=%d change to GameWait State:GameWait", self:getTableId())
 	self:_changeGameStatus(const.GameStatus.WAIT)
 	--牌局结束
 	self:_broadcastGameRoundEnd()
@@ -163,9 +164,11 @@ end
 
 -->game over
 function BaseTable:changeToGameOver(reason)
-	--广播通知客户端结算信息
+	Log.i(LOGTAG,"tid=%d changeToGameOver reason:%d", self:getTableId(), reason)
+	--广播通知客户端结算信息 --大小结算
+	--0.1s后 通知弹大结算
 	--清理桌子
-	local notifyAlloc = reason ~= const.GameFinishReason.SYSTEM_BACK
+	local notifyAlloc = reason ~= const.GameFinishReason.RELEASE_SYS
 	self:onCleanup( notifyAlloc )
 end
 
@@ -187,10 +190,15 @@ end
 
 --
 function BaseTable:onInit()
+	self:_createTimer()
 	self:_createRuleMgr()	
 	self:_createUserMgr()
 	self:_createReleaseMgr()
 	self:_createProgressMgr()
+end
+
+function BaseTable:_createTimer()
+	self.m_timer = new(require('schedulerMgr'))
 end
 
 function BaseTable:_createRuleMgr()
