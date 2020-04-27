@@ -141,11 +141,10 @@ function schedulerMgr:update()
 end 
 
 function schedulerMgr:destroySchedulers(ids)
-	for i=1,#ids do
-		local name = ids[i]
-		local s    = self.m_schedulers[name]
-		delete(s)
-		self.m_schedulers[name] = nil
+	for _,name in ipairs(ids) do
+		if self.m_schedulers[name] then 
+			self.m_schedulers[name] = nil
+		end 
 	end
 end 
 

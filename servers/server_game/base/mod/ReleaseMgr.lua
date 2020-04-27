@@ -60,6 +60,7 @@ function ReleaseMgr:_rspReleaseReq(uid, req_type,  msgcode)
 end
 
 function ReleaseMgr:_onRelease( uid )
+	Log.d(LOGTAG, "recv uid = %d req release table!", uid);
 	--正在投票
 	if self:_isVoting() then 
 		Log.w(LOGTAG, "maybe error! is already voting!")
@@ -79,6 +80,9 @@ function ReleaseMgr:_onRelease( uid )
 end
 
 function ReleaseMgr:_onVote( uid, value )
+	Log.d(LOGTAG, "recv uid = %d req vote release value = %d", uid, value);
+	Log.dump(LOGTAG, self.m_voteData or {})
+	
 	local user_vote = self:_getUserVote(uid)
 	--无效投票
 	if (value ~= const.ReleaseVoteVal.AGREE and value ~= const.ReleaseVoteVal.REJECT)

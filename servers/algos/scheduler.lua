@@ -7,8 +7,6 @@ function scheduler:ctor(id, callback, intaval, times, delay,  target, ...)
 	self:updateSet(id, callback, intaval, times, delay,  target, ...)
 end 
 
-function scheduler:dtor()
-end
 
 function scheduler:updateSet(name, callback, intaval, times, delay,  target, ...)
 	self.delay     = delay 
