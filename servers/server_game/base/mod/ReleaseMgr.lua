@@ -35,6 +35,7 @@ function ReleaseMgr:onSysRelease()
 end
 
 function ReleaseMgr:onReleaseReq( uid, data )
+
 	--牌局还未开始
 	if self.m_pTable:isGameFree() then 
 		Log.i(LOGTAG,"invalid release req! table state is GAME_FREE!")
@@ -72,6 +73,8 @@ function ReleaseMgr:_onRelease( uid )
 	end 
 
 	self:_startVote(uid)	
+	--广播通知 刷新
+	self:_broadcastReleasePush()	
 	return true
 end
 
