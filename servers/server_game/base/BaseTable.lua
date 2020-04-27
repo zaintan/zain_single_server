@@ -199,6 +199,7 @@ end
 
 function BaseTable:_createTimer()
 	self.m_timer = new(require('schedulerMgr'))
+	self.m_timer:init()
 end
 
 function BaseTable:_createRuleMgr()
