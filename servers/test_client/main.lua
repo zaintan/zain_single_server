@@ -260,6 +260,8 @@ skynet.start(function()
         console_cmd.create()
         skynet.sleep(500)
         console_cmd.join(info.room_id)
+        skynet.sleep(500)
+        console_cmd.ready(true)
     end 
 end)
 

@@ -134,7 +134,7 @@ function ReleaseMgr:_startVote( req_uid )
 		v.vote = v.user_id == req_uid and const.ReleaseVoteVal.AGREE or const.ReleaseVoteVal.UNDO
 	end
 	--起定时器
-	self.m_timeHandler = self.m_timer:registerOnceNow(self.onWaitTimeOut, self.m_defaultWaitSeconds ,self)--//  times=-1需手动unregister
+	self.m_timeHandler = self.m_timer:registerOnceNow(self.onWaitTimeOut, self.m_defaultWaitSeconds * 1000 ,self)--//  times=-1需手动unregister
 end
 
 function ReleaseMgr:_stopVote( result )
@@ -196,6 +196,7 @@ end
 
 function ReleaseMgr:getReleaseInfo()
 	if self:_isVoting() then 
+		self:_updateTimeOfVoteData()
 		return self.m_voteData
 	end 	
 	return nil
