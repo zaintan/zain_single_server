@@ -78,7 +78,7 @@ function BaseUser:isOnline()
 end
 
 function BaseUser:getId()
-	return self.m_user_id
+	return self.m_base.user_id
 end
 
 function BaseUser:encodeBase()
@@ -87,7 +87,7 @@ end
 
 function BaseUser:encode()
 	local data = {
-		user_id        = self.m_user_id;
+		user_id        = self:getId();
 		seat           = self.m_seat;
 		ready          = self.m_ready;
 		online         = self.m_online;
