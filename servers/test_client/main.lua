@@ -94,7 +94,7 @@ local function dispatch_package()
 end
 
 local function sendMsg(msg_id, data)
-    if msg_id ~= msg.NameToId.HeartResponse then
+    if msg_id ~= msg.NameToId.HeartRequest then
         Log.d(LOGTAG,"send msg_id=%d",msg_id)
         Log.dump(LOGTAG,data)
     end 

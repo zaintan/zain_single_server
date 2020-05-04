@@ -2,6 +2,7 @@ local M = {
 	RoundFinishReason = {
 		NORMAL       = 1;--正常结束
 		DRAW         = 2;--流局、荒庄
+		RELEASE      = 3;--被解散的
 	};
 	GameFinishReason = {
 		NORMAL          = 1;--正常打完结束

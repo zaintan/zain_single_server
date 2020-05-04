@@ -41,23 +41,36 @@ message TableInfoPush {
 }
 
 // 游戏开始推送
-message RoundBeginPush {
+message GameBeginPush {
     optional int32             game_status     = 1; // 游戏状态 
     optional TableProgressInfo progress_info   = 2; // 当前牌桌进度
     repeated TableUserInfo     users_info      = 3; // 房间内的玩家状态刷新
     optional bytes             expand_content  = 4; // 子游戏额外扩展信息
 }
 
-// 小局结算推送
-message RoundEndPush {
+message RoundEndInfo {
+    optional int32             reason          = 1; // 小局结束原因
+    repeated int32             scores          = 2; // 小局分数变化
+    optional bytes             expand_content  = 3; // 子游戏额外扩展信息 --小局额外信息展示      
+}
+
+message GameEndInfo {
+    optional int32             reason          = 1; // 大局结束原因
+    repeated int32             scores          = 2; // 大局结算分数
+    optional bytes             expand_content  = 3; // 子游戏额外扩展信息 --小局额外信息展示       
+}
+
+// 结算推送
+message GameEndPush {
     optional int32             game_status     = 1; // 游戏状态 
     optional TableProgressInfo progress_info   = 2; // 当前牌桌进度
     repeated TableUserInfo     users_info      = 3; // 房间内的玩家状态刷新
     optional int64             over_time       = 4;
-    optional int32             reason          = 5; // 小局结束原因
-    optional bool              is_game_over    = 6;
-    optional bytes             expand_content  = 7; // 子游戏额外扩展信息
+    optional RoundEndInfo      round_info      = 5; // 子游戏小局额外信息展示
+    optional GameEndInfo       game_info       = 6; // 子游戏大局额外信息展示
+    optional bytes             expand_content  = 7; // 子游戏大小结算共有额外扩展信息 
 }
+
 
 // 玩家进入房间推送--推送给其他玩家  玩家进来了
 message UserEnterPush {

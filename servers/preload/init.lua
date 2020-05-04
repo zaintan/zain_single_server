@@ -1,10 +1,10 @@
 log_level = 4
 Log       = Log or (require "LogHelper")
 ----------------------------------------------
-MsgCode     = require "gaCodeDef"
-const       = require "gaConstDef"
+MsgCode     = require "MsgCode"
+const       = require "const"
 msg         = {
-	NameToId = require "gaMsgDef";
+	NameToId = require "msg";
 	IdToName = {};
 	Root     = "common.ProtoInfo";
 }

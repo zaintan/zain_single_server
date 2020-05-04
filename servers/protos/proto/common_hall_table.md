@@ -9,7 +9,7 @@
 	    optional bytes msg_body = 2; // 消息内容
 	};
 
-每一个msg_id对应一条消息，这个映射关系位于文件servers/preload/gaMsgDef.lua
+每一个msg_id对应一条消息，这个映射关系位于文件servers/preload/msg.lua
 为了方便,下面提到的交互协议省略了外层,只提到msg_body这一层
 
 二.协议记录
@@ -118,7 +118,7 @@ JoinRoomRequest:
 
 	msg_body = {//message RoomContentResponse
 		//每一个type对应一条消息 编解码content，这个映射关系有两部分组成 
-		//小于10000的通用消息 位于文件servers/preload/gaMsgDef.lua,
+		//小于10000的通用消息 位于文件servers/preload/msg.lua,
 		//大于10000的由子游戏自行约定
 		type    = 10; 
 		content = { // message TableInfoPush
@@ -190,7 +190,7 @@ ReadyRequest:
 UserInfoPush:
 	msg_body = { //message RoomContentResponse
 		//每一个type对应一条消息 编解码content，这个映射关系有两部分组成 
-		//小于10000的通用消息 位于文件servers/preload/gaMsgDef.lua,
+		//小于10000的通用消息 位于文件servers/preload/msg.lua,
 		//大于10000的由子游戏自行约定
 		type    = 1006; 
 		content = { // message UserInfoPush
@@ -213,14 +213,14 @@ UserInfoPush:
 
 
 如果所有人均准备，牌局开始，推送所有人游戏开始消息
-RoundBeginPush:
+GameBeginPush:
 
 	msg_body = { //message RoomContentResponse
 		//每一个type对应一条消息 编解码content，这个映射关系有两部分组成 
-		//小于10000的通用消息 位于文件servers/preload/gaMsgDef.lua,
+		//小于10000的通用消息 位于文件servers/preload/msg.lua,
 		//大于10000的由子游戏自行约定
 		type    = 1012; 
-		content = { // message RoundBeginPush
+		content = { // message GameBeginPush
 			game_status = 0;
 			progress_info = {//message TableProgressInfo
 				over_type     = 1;//结束条件类型 1:局数 2:圈数 3:分数(胡息)  4：固定时间
@@ -259,7 +259,7 @@ UserExitResponse:
 
 	msg_body = { //message RoomContentResponse
 		//每一个type对应一条消息 编解码content，这个映射关系有两部分组成 
-		//小于10000的通用消息 位于文件servers/preload/gaMsgDef.lua,
+		//小于10000的通用消息 位于文件servers/preload/msg.lua,
 		//大于10000的由子游戏自行约定
 		type    = 1002; 
 		content = { // message UserExitResponse
@@ -273,7 +273,7 @@ UserExitPush:
 
 	msg_body = { //message RoomContentResponse
 		//每一个type对应一条消息 编解码content，这个映射关系有两部分组成 
-		//小于10000的通用消息 位于文件servers/preload/gaMsgDef.lua,
+		//小于10000的通用消息 位于文件servers/preload/msg.lua,
 		//大于10000的由子游戏自行约定
 		type    = 1003; 
 		content = { // message UserExitPush
@@ -285,15 +285,15 @@ UserExitPush:
 
 如果是胡操作,游戏结束
 广播推送 小结算
-RoundEndPush:
+GameEndPush:
 	msg_body = { //message RoomContentResponse
 		//每一个type对应一条消息 编解码content，这个映射关系有两部分组成 
-		//小于10000的通用消息 位于文件servers/preload/gaMsgDef.lua,
+		//小于10000的通用消息 位于文件servers/preload/msg.lua,
 		//大于10000的由子游戏自行约定
 		type    = 1013; 
-		content = { // message RoundEndPush
+		content = { // message GameEndPush
 			//每一个type对应一条消息 编解码content，这个映射关系有两部分组成 
-			//小于10000的通用消息 位于文件servers/preload/gaMsgDef.lua,
+			//小于10000的通用消息 位于文件servers/preload/msg.lua,
 			//大于10000的由子游戏自行约定
 			game_status = 0;// 游戏状态 
 			progress_info = {//message TableProgressInfo
@@ -314,9 +314,16 @@ RoundEndPush:
 				...
 			}
 			over_time    = 0;// 结束时间
-			reason       = 0;// 小局结束原因
-			is_game_over = false;//是否大结算
-			expand_content = ... //bytes 子游戏额外扩展信息								
+			round_info   = {//message RoundEndInfo
+				reason         = 1;//小局结束原因
+				scores         = 2;//小局分数变化
+				expand_content = 3;//子游戏额外扩展信息
+			};	
+			game_info    = {//message GameEndInfo
+				reason         = 1;//大局结束原因
+				scores         = 2;//大局结算分数
+				expand_content = 3;//子游戏额外扩展信息
+			};							
 		}
 	};
 
@@ -339,7 +346,7 @@ ReleaseResponse: //可能失败  可能有时间间隔限制，次数限制
 
 	msg_body = { //message RoomContentResponse
 		//每一个type对应一条消息 编解码content，这个映射关系有两部分组成 
-		//小于10000的通用消息 位于文件servers/preload/gaMsgDef.lua,
+		//小于10000的通用消息 位于文件servers/preload/msg.lua,
 		//大于10000的由子游戏自行约定
 		type    = 1008; 
 		content = { // message ReleaseResponse
@@ -353,7 +360,7 @@ ReleasePush (推送解散信息) optional 当前处于投票解散等待状态
 
 	msg_body = { //message RoomContentResponse
 		//每一个type对应一条消息 编解码content，这个映射关系有两部分组成 
-		//小于10000的通用消息 位于文件servers/preload/gaMsgDef.lua,
+		//小于10000的通用消息 位于文件servers/preload/msg.lua,
 		//大于10000的由子游戏自行约定
 		type    = 1009; 
 		content = { // message ReleasePush

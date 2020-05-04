@@ -48,7 +48,7 @@ function BaseTable:onSysRelease()
 end
 
 -------------------------------------------from [Client->Agent->Game] end-------------------------------------------
-local _COMMAND_MAP_ = {
+BaseTable._COMMAND_MAP_ = {
 	[msg.NameToId.ReadyRequest]          = "onReadyReq";
 	[msg.NameToId.UserExitRequest]       = "onPlayerExitReq";
 	[msg.NameToId.ReleaseRequest]        = "onReleaseReq";
@@ -56,7 +56,7 @@ local _COMMAND_MAP_ = {
 
 --处理消息
 function BaseTable:_getCommandHandler( type )
-    local func_name = _COMMAND_MAP_[type]
+    local func_name = self._COMMAND_MAP_[type]
     if func_name then 
     	return self[func_name]
     end 	
@@ -165,27 +165,22 @@ end
 -->game over
 function BaseTable:changeToGameOver(reason)
 	Log.i(LOGTAG,"tid=%d changeToGameOver reason:%d", self:getTableId(), reason)
-	--广播通知客户端结算信息 --大小结算
-	--0.1s后 通知弹大结算
-	--清理桌子
-	local notifyAlloc = reason ~= const.GameFinishReason.RELEASE_SYS
-	self:onCleanup( notifyAlloc )
-end
-
---清理桌子
-function BaseTable:onCleanup(notifyAlloc)
-	--
-	if notifyAlloc then 
-		--GameServer主动结束的解散,  不用再通知GameServer
-		local bNotifiGame = false		
-		self:callAllocServer("release", self:getTableId(),  bNotifiGame)
-	end 
+	Log.i(LOGTAG,"table = %d will destroy after 100ms, in this range no longer access request!", self:getTableId() )
 	--标记即将销毁  不再处理消息
 	self.m_bWaitDestroy = true
-	--延时退出exit  防止队列阻塞不返回
-	skynet.timeout(1,function()
+	self.m_timer:registerOnceNow(function ()
+		-- body
+		--小结算
+		--大结算
+		--
+		local notifyAlloc = reason ~= const.GameFinishReason.RELEASE_SYS
+		if notifyAlloc then 
+			local bNotifiGame = false --GameServer主动结束的解散,  不用再通知GameServer
+			self:callAllocServer("release", self:getTableId(),  bNotifiGame)
+		end 
+		--
 		skynet.exit()
-	end)	
+	end, 100)--100ms后结束
 end
 
 --
@@ -220,9 +215,10 @@ end
 
 --解析RoomReqContent
 function BaseTable:_decodeRoomContentReq(data)
-	local msgName = msg.IdToName[data.req_type]
+	local msgName = self:_getMsgName(data.req_type)
+	--msg.IdToName[data.req_type]
 	if msgName then 
-		local data,err = self:_getPacketHelper():decodeMsg(msgName, data.req_content)
+		local data,err = self:getPacketHelper():decodeMsg(msgName, data.req_content)
         if not data or err ~= nil then 
             Log.e(LOGTAG,"proto decode RoomReq error: req_type=%d name=%s !", data.req_type, msgName)
             return false,nil
@@ -232,7 +228,7 @@ function BaseTable:_decodeRoomContentReq(data)
 	return false, nil
 end
 
-function BaseTable:_getPacketHelper()
+function BaseTable:getPacketHelper()
 	if not self._packet then 
 		self._packet = (require "PacketHelper").create(self:_getProtos())
 	end 
@@ -242,15 +238,20 @@ end
 function BaseTable:_getProtos()
 	return {"protos/hall.pb","protos/table.pb"}
 end
+
+function BaseTable:_getMsgName( cmd )
+	return msg.IdToName[cmd]
+end
 --编码 
 function BaseTable:encodeRoomContentRsp(cmd, data)
-	local msgName = msg.IdToName[cmd]
+	local msgName = self:_getMsgName(cmd)
+	-- msg.IdToName[cmd]
 	Log.d(LOGTAG, "encodeRoomContentRsp cmd=%d, msgName=%s", cmd, msgName)
 	Log.dump(LOGTAG, data)
 	local ret = {
 		status  = 0;
 		type    = cmd;
-		content = self:_getPacketHelper():encodeMsg(msgName, data);
+		content = self:getPacketHelper():encodeMsg(msgName, data);
 	}
 	return ret
 end
@@ -275,11 +276,11 @@ function BaseTable:_broadcastGameRoundEnd()
 		
 		over_time      = os.time();
 		reason         = 0;
-		is_game_over   = false;
+		--is_game_over   = false;
 		
 		expand_content = self:_encodeRoundEndExpand()
 	}
-	self.m_userMgr:broadcastMsg(msg.NameToId.RoundEndPush, data)
+	self.m_userMgr:broadcastMsg(msg.NameToId.GameEndPush, data)
 end
 
 function BaseTable:broadcastGameRoundBegin()
@@ -289,7 +290,7 @@ function BaseTable:broadcastGameRoundBegin()
 		users_info     = self.m_userMgr:getAllUserInfo();
 		expand_content = self:_encodeRoundBeginExpand()
 	}
-	self.m_userMgr:broadcastMsg(msg.NameToId.RoundBeginPush, data)
+	self.m_userMgr:broadcastMsg(msg.NameToId.GameBeginPush, data)
 end
 
 

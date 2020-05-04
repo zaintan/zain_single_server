@@ -28,8 +28,8 @@ local M = {
     UserEnterPush   = 1010;
     TableInfoPush   = 1011;
 
-    RoundBeginPush  = 1012;
-    RoundEndPush    = 1013;
+    GameBeginPush  = 1012;
+    GameEndPush    = 1013;
 }
 
 return M
